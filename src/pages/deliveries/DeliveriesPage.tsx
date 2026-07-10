@@ -7,13 +7,33 @@ import { Badge } from "../../app/components/common/Badge";
 import { Card } from "../../app/components/common/Card";
 import { SectionLabel } from "../../app/components/common/SectionLabel";
 
+import { useAuth } from "../../hooks/useAuth";
+
 export const DeliveriesPage = () => {
+  const { business } = useAuth();
   const [selected, setSelected] = useState<number>(1);
   const [showAssign, setShowAssign] = useState(false);
   const [showPOD, setShowPOD] = useState(false);
   const [assigned, setAssigned] = useState(false);
 
-  const active = deliveries.find(d => d.id === selected) || deliveries[0];
+  const isDemoBusiness = business?.name === "Shri Krishna Traders";
+  const userDeliveries = isDemoBusiness ? deliveries : [];
+
+  if (userDeliveries.length === 0) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center p-8 text-center" style={{ background: C.dark, minHeight: "100vh" }}>
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px border-dashed rgba(255,255,255,0.1)", borderRadius: 999 }} className="w-16 h-16 flex items-center justify-center mb-4">
+          <Truck size={28} color="rgba(255,255,255,0.3)" />
+        </div>
+        <div className="text-white text-base font-bold mb-1">No deliveries scheduled</div>
+        <p className="text-white/40 text-xs max-w-xs leading-normal">
+          Active logistics routes and driver assignments will appear here once trips are dispatched.
+        </p>
+      </div>
+    );
+  }
+
+  const active = userDeliveries.find(d => d.id === selected) || userDeliveries[0];
 
   if (showAssign) {
     return (

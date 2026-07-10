@@ -75,7 +75,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
             background: isDark ? "rgba(255,255,255,0.06)" : C.surface,
             border: `1px solid ${borderColor}`,
           }}
-          className="w-9 h-9 rounded-full flex items-center justify-center relative cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
+          className="w-9 h-9 rounded-full flex items-center justify-center relative cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 active:scale-95"
         >
           <Bell size={16} color={isDark ? "white" : C.ink} />
           <span style={{ background: C.error }} className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" />
@@ -88,7 +88,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
             background: isDark ? "rgba(255,255,255,0.06)" : C.surface,
             border: `1px solid ${borderColor}`,
           }}
-          className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
+          className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 active:scale-95"
         >
           <User size={16} color={isDark ? "white" : C.ink} />
         </button>

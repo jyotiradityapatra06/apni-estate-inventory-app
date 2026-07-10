@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import {
   Building2, FileText, IndianRupee, Star, Warehouse, Users, Shield,
   CheckCircle, Clock, Settings, RefreshCw, Download, Bell, Eye, Share2,
@@ -10,14 +11,24 @@ import { Badge } from "../../app/components/common/Badge";
 import { SectionLabel } from "../../app/components/common/SectionLabel";
 import { Divider } from "../../app/components/common/Divider";
 
+import { useAuth } from "../../hooks/useAuth";
+
 export const ProfilePage = () => {
   const [showDeactivate, setShowDeactivate] = useState(false);
+  const [activeSection, setActiveSection] = useState("BUSINESS");
+  const navigate = useNavigate();
+  const { user, business, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   const sections = [
     {
       title: "BUSINESS",
       items: [
-        { icon: Building2, label: "Business Profile", sub: "Shri Krishna Traders" },
+        { icon: Building2, label: "Business Profile", sub: business?.name || "Shri Krishna Traders" },
         { icon: FileText, label: "Invoice Configuration", sub: "Letterhead, serial, terms" },
         { icon: IndianRupee, label: "Tax Settings", sub: "GSTIN, HSN codes, GST rates" },
         { icon: Star, label: "Payment Methods", sub: "UPI, NEFT, Cheque, Cash" },
@@ -48,7 +59,14 @@ export const ProfilePage = () => {
     },
   ];
 
-  const [activeSection, setActiveSection] = useState("BUSINESS");
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .substring(0, 2)
+    : "RK";
 
   return (
     <div className="flex flex-col gap-0 pb-4">
@@ -56,19 +74,19 @@ export const ProfilePage = () => {
       <div style={{ background: C.blue }} className="px-4 pt-12 pb-6 md:hidden">
         <div className="flex items-center gap-4">
           <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: 999 }} className="w-14 h-14 flex items-center justify-center">
-            <span className="text-white text-xl font-bold">RK</span>
+            <span className="text-white text-xl font-bold">{initials}</span>
           </div>
           <div>
-            <div className="text-white text-base font-bold">Ramesh Kumar</div>
-            <div className="text-white/60 text-xs">Owner · Admin</div>
-            <div className="text-white/50 text-[11px] mt-0.5">+91 98765 00001</div>
+            <div className="text-white text-base font-bold">{user?.name || "Ramesh Kumar"}</div>
+            <div className="text-white/60 text-xs">{user?.role || "Owner"} · Admin</div>
+            <div className="text-white/50 text-[11px] mt-0.5">{business?.phone || "+91 98765 00001"}</div>
           </div>
         </div>
         <div style={{ background: "rgba(255,255,255,0.12)", borderRadius: 10 }} className="mt-4 px-4 py-3">
           <div className="text-white/50 text-[10px] uppercase tracking-wide mb-1">Business</div>
-          <div className="text-white text-[13px] font-semibold">Shri Krishna Traders</div>
-          <div className="text-white/60 text-[11px]">GSTIN: 27AABFR5987M1ZP</div>
-          <div className="text-white/50 text-[11px]">Plot 14, Bhosari MIDC, Pune 411026</div>
+          <div className="text-white text-[13px] font-semibold">{business?.name || "Shri Krishna Traders"}</div>
+          <div className="text-white/60 text-[11px]">GSTIN: {business?.gstNumber || "27AABFR5987M1ZP"}</div>
+          <div className="text-white/50 text-[11px]">{business?.address || "Plot 14, Bhosari MIDC, Pune 411026"}</div>
         </div>
       </div>
 
@@ -76,16 +94,16 @@ export const ProfilePage = () => {
       <div className="hidden md:flex items-center justify-between bg-white border border-[rgba(20,18,14,0.1)] rounded-xl p-6 mb-4">
         <div className="flex items-center gap-4">
           <div style={{ background: "rgba(42,76,214,0.1)" }} className="w-14 h-14 rounded-full flex items-center justify-center">
-            <span style={{ color: C.blue }} className="text-xl font-bold">RK</span>
+            <span style={{ color: C.blue }} className="text-xl font-bold">{initials}</span>
           </div>
           <div>
-            <h2 style={{ color: C.ink }} className="text-base font-bold">Ramesh Kumar</h2>
-            <div style={{ color: C.muted }} className="text-xs">Owner · Admin · +91 98765 00001</div>
+            <h2 style={{ color: C.ink }} className="text-base font-bold">{user?.name || "Ramesh Kumar"}</h2>
+            <div style={{ color: C.muted }} className="text-xs">{user?.role || "Owner"} · Admin · {business?.phone || "+91 98765 00001"}</div>
           </div>
         </div>
         <div className="text-right border-l border-[rgba(20,18,14,0.1)] pl-6">
-          <div style={{ color: C.ink }} className="text-sm font-semibold">Shri Krishna Traders</div>
-          <div style={{ color: C.muted }} className="text-xs">GSTIN: 27AABFR5987M1ZP</div>
+          <div style={{ color: C.ink }} className="text-sm font-semibold">{business?.name || "Shri Krishna Traders"}</div>
+          <div style={{ color: C.muted }} className="text-xs">GSTIN: {business?.gstNumber || "27AABFR5987M1ZP"}</div>
         </div>
       </div>
 
@@ -156,7 +174,10 @@ export const ProfilePage = () => {
                 <ChevronRight size={14} color={C.muted} />
               </button>
               <Divider />
-              <button className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer animate-none">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer animate-none"
+              >
                 <div style={{ background: "#FEF2F2" }} className="w-8 h-8 rounded-lg flex items-center justify-center">
                   <LogOut size={15} color={C.error} />
                 </div>
@@ -236,7 +257,10 @@ export const ProfilePage = () => {
                     <ChevronRight size={14} color={C.muted} />
                   </button>
                   <Divider />
-                  <button className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-black/5 animate-none">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-black/5 animate-none"
+                  >
                     <div style={{ background: "#FEF2F2" }} className="w-8 h-8 rounded-lg flex items-center justify-center">
                       <LogOut size={15} color={C.error} />
                     </div>

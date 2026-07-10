@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Plus, Search, Filter, ChevronRight, Share2, Phone, FileText, X,
   CheckCircle, ArrowLeft, Edit3, Eye, AlertTriangle, Download
@@ -245,6 +245,48 @@ export const SalesPage = () => {
   const [payAmount, setPayAmount] = useState("150000");
   const [payConfirmed, setPayConfirmed] = useState(false);
 
+  // Statement & Ledger State
+  const [showStatement, setShowStatement] = useState(false);
+  const [showLedger, setShowLedger] = useState(false);
+
+  // Ledger Filter States
+  const [ledgerSearch, setLedgerSearch] = useState("");
+  const [ledgerType, setLedgerType] = useState<"all" | "invoice" | "payment">("all");
+  const [ledgerStart, setLedgerStart] = useState("");
+  const [ledgerEnd, setLedgerEnd] = useState("");
+
+  // Keyboard accessibility Escape close handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowStatement(false);
+        setShowLedger(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownloadCSV = (party: any, transactions: any[]) => {
+    let csv = "Date,Reference,Type,Description,Debit,Credit,Running Balance,Status\n";
+    transactions.forEach(t => {
+      csv += `${t.date},${t.reference},${t.type},"${t.description}",${t.debit},${t.credit},${t.runningBalance},${t.status}\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${party.name.replace(/\s+/g, "_")}_statement.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const list = seg === "recv" ? receivables : payables;
   const totalOut = list.reduce((a, r) => a + r.total - r.paid, 0);
   const overdue = list.filter(r => r.overdue > 0).reduce((a, r) => a + (r.total - r.paid), 0);
@@ -386,15 +428,39 @@ export const SalesPage = () => {
                           >
                             <Plus size={13} /> Record Payment
                           </button>
-                          <button style={{ background: C.surface, border: `1px solid ${C.border}` }} className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer" onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setSelected(r.id); setShowStatement(true); }}
+                            style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                            className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer hover:bg-black/5 active:scale-95 transition-all"
+                          >
                             <Share2 size={12} color={C.muted} />
                             <span style={{ color: C.ink }}>Statement</span>
                           </button>
-                          <button style={{ background: C.surface, border: `1px solid ${C.border}` }} className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer" onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (r.phone) {
+                                window.open(`tel:${r.phone}`, "_self");
+                              }
+                            }}
+                            disabled={!r.phone}
+                            title={!r.phone ? "Phone number unavailable" : undefined}
+                            style={{
+                              background: C.surface,
+                              border: `1px solid ${C.border}`,
+                              opacity: !r.phone ? 0.5 : 1,
+                              cursor: !r.phone ? "not-allowed" : "pointer"
+                            }}
+                            className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer active:scale-95 transition-all"
+                          >
                             <Phone size={12} color={C.muted} />
                             <span style={{ color: C.ink }}>Call</span>
                           </button>
-                          <button style={{ background: C.surface, border: `1px solid ${C.border}` }} className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer" onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setSelected(r.id); setShowLedger(true); }}
+                            style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                            className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer hover:bg-black/5 active:scale-95 transition-all"
+                          >
                             <FileText size={12} color={C.muted} />
                             <span style={{ color: C.ink }}>Ledger</span>
                           </button>
@@ -447,15 +513,38 @@ export const SalesPage = () => {
                     <Plus size={13} /> Record Payment
                   </button>
                   <div className="grid grid-cols-3 gap-2">
-                    <button style={{ background: C.surface, border: `1px solid ${C.border}` }} className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer">
+                    <button
+                      onClick={() => setShowStatement(true)}
+                      style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                      className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer hover:bg-black/5 active:scale-95 transition-all"
+                    >
                       <Share2 size={12} color={C.muted} />
                       <span style={{ color: C.ink }}>Statement</span>
                     </button>
-                    <button style={{ background: C.surface, border: `1px solid ${C.border}` }} className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer">
+                    <button
+                      onClick={() => {
+                        if (sel.phone) {
+                          window.open(`tel:${sel.phone}`, "_self");
+                        }
+                      }}
+                      disabled={!sel.phone}
+                      title={!sel.phone ? "Phone number unavailable" : undefined}
+                      style={{
+                        background: C.surface,
+                        border: `1px solid ${C.border}`,
+                        opacity: !sel.phone ? 0.5 : 1,
+                        cursor: !sel.phone ? "not-allowed" : "pointer"
+                      }}
+                      className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer active:scale-95 transition-all"
+                    >
                       <Phone size={12} color={C.muted} />
                       <span style={{ color: C.ink }}>Call</span>
                     </button>
-                    <button style={{ background: C.surface, border: `1px solid ${C.border}` }} className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer">
+                    <button
+                      onClick={() => setShowLedger(true)}
+                      style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                      className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer hover:bg-black/5 active:scale-95 transition-all"
+                    >
                       <FileText size={12} color={C.muted} />
                       <span style={{ color: C.ink }}>Ledger</span>
                     </button>
@@ -535,6 +624,368 @@ export const SalesPage = () => {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ACCOUNT STATEMENT */}
+      {showStatement && sel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm print:relative print:p-0 print:bg-white" onClick={() => setShowStatement(false)}>
+          <div 
+            className="bg-white rounded-2xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto flex flex-col gap-4 shadow-xl print:shadow-none print:max-h-none print:w-full print:p-0"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between border-b pb-3 print:hidden">
+              <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Account Statement</span>
+              <button onClick={() => setShowStatement(false)} className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer">×</button>
+            </div>
+
+            {/* Demo watermark banner */}
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 px-3 py-2 rounded-lg text-[11px] font-medium flex items-center gap-1.5 print:hidden">
+              <AlertTriangle size={13} className="text-amber-600 flex-shrink-0" />
+              <span>Demo data — Sales backend integration pending</span>
+            </div>
+
+            {/* Statement Summary */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl text-xs text-gray-700">
+              <div>
+                <span className="text-gray-400 block mb-0.5">Party Name</span>
+                <span className="font-bold text-gray-900 text-sm">{sel.name}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-0.5">Phone Number</span>
+                <span className="font-semibold text-gray-900">{sel.phone || "N/A"}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-0.5">Credit Terms</span>
+                <span className="font-semibold text-gray-900">{sel.terms}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-0.5">Total Invoiced</span>
+                <span className="font-bold text-gray-900">{fmt(sel.total)}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-0.5">Total Paid</span>
+                <span className="font-bold text-gray-900">{fmt(sel.paid)}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-0.5">Remaining Balance</span>
+                <span className="font-bold text-blue-700">{fmt(sel.total - sel.paid)}</span>
+              </div>
+            </div>
+
+            {/* Transactions list */}
+            <div>
+              <SectionLabel>Transactions Log</SectionLabel>
+              
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-hidden border border-gray-100 rounded-lg bg-white mt-2">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b font-semibold text-gray-500">
+                      <th className="p-3">Date</th>
+                      <th className="p-3">Reference</th>
+                      <th className="p-3">Type</th>
+                      <th className="p-3">Description</th>
+                      <th className="p-3 text-right">Debit</th>
+                      <th className="p-3 text-right">Credit</th>
+                      <th className="p-3 text-right">Balance</th>
+                      <th className="p-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sel.transactions && sel.transactions.length > 0 ? (
+                      sel.transactions.map(t => (
+                        <tr key={t.id} className="border-b last:border-none hover:bg-gray-50 text-gray-700">
+                          <td className="p-3">{t.date}</td>
+                          <td className="p-3 font-semibold">{t.reference}</td>
+                          <td className="p-3 capitalize">{t.type}</td>
+                          <td className="p-3 max-w-[200px] truncate" title={t.description}>{t.description}</td>
+                          <td className="p-3 text-right font-semibold">{t.debit > 0 ? fmt(t.debit) : "-"}</td>
+                          <td className="p-3 text-right font-semibold">{t.credit > 0 ? fmt(t.credit) : "-"}</td>
+                          <td className="p-3 text-right font-bold text-gray-955">{fmt(t.runningBalance)}</td>
+                          <td className="p-3"><Badge label={t.status.toUpperCase()} color={t.status === "completed" ? "success" : "warning"} /></td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={8} className="p-6 text-center text-gray-400">No transactions recorded.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Stacked List */}
+              <div className="md:hidden flex flex-col gap-2 mt-2">
+                {sel.transactions && sel.transactions.length > 0 ? (
+                  sel.transactions.map(t => (
+                    <div key={t.id} className="border rounded-xl p-3 bg-white flex flex-col gap-1.5 text-xs text-gray-700 font-medium">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-gray-900">{t.reference}</span>
+                        <span className="text-[10px] text-gray-400">{t.date}</span>
+                      </div>
+                      <div className="text-[11px] text-gray-500">{t.description}</div>
+                      <div className="grid grid-cols-3 gap-2 text-[10px] border-t pt-1.5 mt-1">
+                        <div>
+                          <span className="text-gray-400 block uppercase font-bold text-[8px]">Debit</span>
+                          <span className="font-semibold">{t.debit > 0 ? fmt(t.debit) : "-"}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block uppercase font-bold text-[8px]">Credit</span>
+                          <span className="font-semibold">{t.credit > 0 ? fmt(t.credit) : "-"}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block uppercase font-bold text-[8px]">Balance</span>
+                          <span className="font-bold text-gray-950">{fmt(t.runningBalance)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-6 text-center border border-dashed rounded-xl text-gray-400">No transactions recorded.</div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div className="flex gap-2 border-t pt-3 mt-2 print:hidden text-xs">
+              <button
+                onClick={handlePrint}
+                style={{ background: C.blue }}
+                className="flex-1 py-2.5 rounded-lg text-white font-bold cursor-pointer hover:opacity-95 text-center"
+              >
+                Print Statement
+              </button>
+              <button
+                onClick={() => handleDownloadCSV(sel, sel.transactions || [])}
+                style={{ background: C.white, border: `1.5px solid ${C.blue}` }}
+                className="flex-1 py-2.5 rounded-lg text-blue-700 font-bold cursor-pointer hover:bg-blue-50 text-center"
+              >
+                Download Statement (CSV)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: PARTY LEDGER */}
+      {showLedger && sel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm print:relative print:p-0 print:bg-white" onClick={() => setShowLedger(false)}>
+          <div 
+            className="bg-white rounded-2xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto flex flex-col gap-4 shadow-xl print:shadow-none print:max-h-none print:w-full print:p-0"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between border-b pb-3 print:hidden">
+              <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Business Ledger</span>
+              <button onClick={() => setShowLedger(false)} className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer">×</button>
+            </div>
+
+            {/* Demo watermark banner */}
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 px-3 py-2 rounded-lg text-[11px] font-medium flex items-center gap-1.5 print:hidden">
+              <AlertTriangle size={13} className="text-amber-600 flex-shrink-0" />
+              <span>Demo data — Sales backend integration pending</span>
+            </div>
+
+            {/* Ledger Meta Summary */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-xl text-xs text-gray-700">
+              <div>
+                <span className="text-gray-400 block mb-0.5">Party Name</span>
+                <span className="font-bold text-gray-900 text-sm">{sel.name}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-0.5">Current Balance</span>
+                <span className="font-bold text-blue-700 text-sm">{fmt(sel.total - sel.paid)}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-0.5">Total Debited</span>
+                <span className="font-semibold text-gray-900">{fmt(sel.total)}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 block mb-0.5">Total Credited</span>
+                <span className="font-semibold text-gray-900">{fmt(sel.paid)}</span>
+              </div>
+            </div>
+
+            {/* Ledger Filters section */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-gray-50/50 p-3 rounded-lg text-xs print:hidden">
+              <div className="flex flex-col gap-1 col-span-2 md:col-span-1">
+                <label className="text-gray-400 font-semibold uppercase text-[9px]">Reference Search</label>
+                <input 
+                  type="text"
+                  placeholder="e.g. INV-2025"
+                  value={ledgerSearch}
+                  onChange={e => setLedgerSearch(e.target.value)}
+                  style={{ background: C.white, border: `1px solid ${C.border}`, color: C.ink }}
+                  className="w-full px-2 py-1.5 rounded outline-none focus:ring-1 focus:ring-blue-500/20"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-400 font-semibold uppercase text-[9px]">Type</label>
+                <select
+                  value={ledgerType}
+                  onChange={e => setLedgerType(e.target.value as any)}
+                  style={{ background: C.white, border: `1px solid ${C.border}`, color: C.ink }}
+                  className="w-full px-2 py-1.5 rounded outline-none"
+                >
+                  <option value="all">All Types</option>
+                  <option value="invoice">Invoices Only</option>
+                  <option value="payment">Payments Only</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-400 font-semibold uppercase text-[9px]">Start Date</label>
+                <input 
+                  type="date"
+                  value={ledgerStart}
+                  onChange={e => setLedgerStart(e.target.value)}
+                  style={{ background: C.white, border: `1px solid ${C.border}`, color: C.ink }}
+                  className="w-full px-2 py-1 rounded outline-none"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-400 font-semibold uppercase text-[9px]">End Date</label>
+                <input 
+                  type="date"
+                  value={ledgerEnd}
+                  onChange={e => setLedgerEnd(e.target.value)}
+                  style={{ background: C.white, border: `1px solid ${C.border}`, color: C.ink }}
+                  className="w-full px-2 py-1 rounded outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Clear Filters indicator */}
+            <div className="flex justify-between items-center print:hidden text-xs">
+              <span className="text-gray-500 font-semibold">Showing {
+                (sel.transactions || []).filter(t => {
+                  const matchSearch = t.reference.toLowerCase().includes(ledgerSearch.toLowerCase()) || 
+                                      t.description.toLowerCase().includes(ledgerSearch.toLowerCase());
+                  const matchType = ledgerType === "all" || t.type === ledgerType;
+                  const matchStart = !ledgerStart || t.date >= ledgerStart;
+                  const matchEnd = !ledgerEnd || t.date <= ledgerEnd;
+                  return matchSearch && matchType && matchStart && matchEnd;
+                }).length
+              } of {(sel.transactions || []).length} ledger rows</span>
+              {(ledgerSearch || ledgerType !== "all" || ledgerStart || ledgerEnd) && (
+                <button 
+                  onClick={() => { setLedgerSearch(""); setLedgerType("all"); setLedgerStart(""); setLedgerEnd(""); }}
+                  className="text-red-500 font-bold hover:underline cursor-pointer"
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+
+            {/* Ledger transactions list */}
+            <div>
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-hidden border border-gray-100 rounded-lg bg-white">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b font-semibold text-gray-500">
+                      <th className="p-3">Date</th>
+                      <th className="p-3">Reference</th>
+                      <th className="p-3">Description</th>
+                      <th className="p-3 text-right">Debit (Dr)</th>
+                      <th className="p-3 text-right">Credit (Cr)</th>
+                      <th className="p-3 text-right">Running Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(sel.transactions || []).filter(t => {
+                      const matchSearch = t.reference.toLowerCase().includes(ledgerSearch.toLowerCase()) || 
+                                          t.description.toLowerCase().includes(ledgerSearch.toLowerCase());
+                      const matchType = ledgerType === "all" || t.type === ledgerType;
+                      const matchStart = !ledgerStart || t.date >= ledgerStart;
+                      const matchEnd = !ledgerEnd || t.date <= ledgerEnd;
+                      return matchSearch && matchType && matchStart && matchEnd;
+                    }).length > 0 ? (
+                      (sel.transactions || []).filter(t => {
+                        const matchSearch = t.reference.toLowerCase().includes(ledgerSearch.toLowerCase()) || 
+                                            t.description.toLowerCase().includes(ledgerSearch.toLowerCase());
+                        const matchType = ledgerType === "all" || t.type === ledgerType;
+                        const matchStart = !ledgerStart || t.date >= ledgerStart;
+                        const matchEnd = !ledgerEnd || t.date <= ledgerEnd;
+                        return matchSearch && matchType && matchStart && matchEnd;
+                      }).map(t => (
+                        <tr key={t.id} className="border-b last:border-none hover:bg-gray-50 text-gray-700">
+                          <td className="p-3">{t.date}</td>
+                          <td className="p-3 font-semibold">{t.reference}</td>
+                          <td className="p-3 max-w-[240px] truncate" title={t.description}>{t.description}</td>
+                          <td className="p-3 text-right font-semibold text-red-600">{t.debit > 0 ? fmt(t.debit) : "-"}</td>
+                          <td className="p-3 text-right font-semibold text-green-700">{t.credit > 0 ? fmt(t.credit) : "-"}</td>
+                          <td className="p-3 text-right font-bold text-gray-955">{fmt(t.runningBalance)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="p-6 text-center text-gray-400">No ledger entries match current filters.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile View */}
+              <div className="md:hidden flex flex-col gap-2">
+                {(sel.transactions || []).filter(t => {
+                  const matchSearch = t.reference.toLowerCase().includes(ledgerSearch.toLowerCase()) || 
+                                      t.description.toLowerCase().includes(ledgerSearch.toLowerCase());
+                  const matchType = ledgerType === "all" || t.type === ledgerType;
+                  const matchStart = !ledgerStart || t.date >= ledgerStart;
+                  const matchEnd = !ledgerEnd || t.date <= ledgerEnd;
+                  return matchSearch && matchType && matchStart && matchEnd;
+                }).length > 0 ? (
+                  (sel.transactions || []).filter(t => {
+                    const matchSearch = t.reference.toLowerCase().includes(ledgerSearch.toLowerCase()) || 
+                                        t.description.toLowerCase().includes(ledgerSearch.toLowerCase());
+                    const matchType = ledgerType === "all" || t.type === ledgerType;
+                    const matchStart = !ledgerStart || t.date >= ledgerStart;
+                    const matchEnd = !ledgerEnd || t.date <= ledgerEnd;
+                    return matchSearch && matchType && matchStart && matchEnd;
+                  }).map(t => (
+                    <div key={t.id} className="border rounded-xl p-3 bg-white flex flex-col gap-1 text-xs text-gray-700">
+                      <div className="flex items-center justify-between font-semibold">
+                        <span>{t.reference}</span>
+                        <span className="text-[10px] text-gray-400 font-normal">{t.date}</span>
+                      </div>
+                      <div className="text-[11px] text-gray-500 mb-1">{t.description}</div>
+                      <div className="flex items-center justify-between border-t pt-1.5 text-[10px]">
+                        <span>Dr: <span className="font-semibold text-red-600">{t.debit > 0 ? fmt(t.debit) : "-"}</span></span>
+                        <span>Cr: <span className="font-semibold text-green-700">{t.credit > 0 ? fmt(t.credit) : "-"}</span></span>
+                        <span className="font-bold text-gray-950">Bal: {fmt(t.runningBalance)}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-6 text-center border border-dashed rounded-xl text-gray-400 text-xs">No ledger entries match current filters.</div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer actions */}
+            <div className="flex gap-2 border-t pt-3 mt-2 print:hidden text-xs">
+              <button
+                onClick={() => handleDownloadCSV(
+                  sel, 
+                  (sel.transactions || []).filter(t => {
+                    const matchSearch = t.reference.toLowerCase().includes(ledgerSearch.toLowerCase()) || 
+                                        t.description.toLowerCase().includes(ledgerSearch.toLowerCase());
+                    const matchType = ledgerType === "all" || t.type === ledgerType;
+                    const matchStart = !ledgerStart || t.date >= ledgerStart;
+                    const matchEnd = !ledgerEnd || t.date <= ledgerEnd;
+                    return matchSearch && matchType && matchStart && matchEnd;
+                  })
+                )}
+                style={{ background: C.blue }}
+                className="w-full py-3 rounded-xl text-white font-bold cursor-pointer hover:opacity-95 text-center"
+              >
+                Export CSV Ledger
+              </button>
+            </div>
           </div>
         </div>
       )}

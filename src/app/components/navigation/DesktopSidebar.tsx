@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router";
 import { tabs, badges } from "../../../constants/navigation";
 import { C } from "../../../constants/colors";
 import { Building2, LogOut } from "lucide-react";
+import { useAuth } from "../../../hooks/useAuth";
 
 export interface DesktopSidebarProps {
   isDark: boolean;
@@ -10,37 +11,52 @@ export interface DesktopSidebarProps {
 export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, business, logout } = useAuth();
 
   const handleNavigate = (path: string) => {
     navigate(path);
   };
 
-  const activeColor = isDark ? "#60A5FA" : C.blue;
-  const inactiveColor = isDark ? "rgba(255,255,255,0.4)" : C.muted;
-  const textColor = isDark ? "white" : C.ink;
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
+  const activeColor = C.blue;
+  const inactiveColor = "#94A3B8";
+  const textColor = "#F8FAFC";
+
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .substring(0, 2)
+    : "RK";
 
   return (
     <aside
       style={{
-        background: isDark ? C.darkCard : C.white,
-        borderRight: `1px solid ${isDark ? C.darkBorder : C.border}`,
+        background: "#0F172A",
+        borderRight: "1px solid #1E293B",
       }}
       className="hidden md:flex flex-col h-full transition-all duration-300 w-20 lg:w-60 flex-shrink-0"
     >
       {/* Branding Section */}
       <div
-        style={{ borderBottom: `1px solid ${isDark ? C.darkBorder : C.border}` }}
+        style={{ borderBottom: "1px solid #1E293B" }}
         className="h-16 flex items-center justify-center lg:justify-start px-4 gap-3 flex-shrink-0"
       >
-        <div style={{ background: C.blue }} className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
-          <Building2 size={16} color="white" />
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden bg-white">
+          <img src="/brand/apni-estate-logo.jpeg" alt="APNI ESTATE Logo" className="w-full h-full object-cover" />
         </div>
         <div className="hidden lg:flex flex-col">
           <span style={{ color: textColor }} className="text-xs font-bold leading-tight truncate max-w-[150px]">
-            Shri Krishna Traders
+            APNI ESTATE
           </span>
-          <span className="text-[9px] text-white/50 uppercase tracking-wider font-semibold">
-            ERP OS
+          <span className="text-[8px] text-white/50 uppercase tracking-wider font-semibold">
+            Construction Supplier ERP
           </span>
         </div>
       </div>
@@ -57,10 +73,10 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
               key={tab.id}
               onClick={() => handleNavigate(tab.path)}
               style={{
-                background: isActive ? (isDark ? "rgba(255,255,255,0.06)" : "rgba(42,76,214,0.08)") : "transparent",
-                color: isActive ? activeColor : textColor,
+                background: isActive ? "rgba(38, 72, 231, 0.15)" : "transparent",
+                color: isActive ? activeColor : inactiveColor,
               }}
-              className="w-full flex flex-col lg:flex-row items-center gap-1.5 lg:gap-3 px-2 lg:px-4 py-3 lg:py-2.5 rounded-lg cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5 group"
+              className="w-full flex flex-col lg:flex-row items-center gap-1.5 lg:gap-3 px-2 lg:px-4 py-3 lg:py-2.5 rounded-lg cursor-pointer transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 group active:scale-[0.98]"
             >
               <div className="relative flex items-center justify-center flex-shrink-0">
                 <Icon
@@ -70,8 +86,8 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
                 />
                 {badge && !isActive && (
                   <span
-                    style={{ background: C.error, fontSize: 8, minWidth: 14, height: 14, lineHeight: "14px" }}
-                    className="absolute -top-1 -right-1 rounded-full text-white font-bold text-center px-0.5"
+                    style={{ background: C.yellow, color: C.ink, fontSize: 8, minWidth: 14, height: 14, lineHeight: "14px" }}
+                    className="absolute -top-1 -right-1 rounded-full font-bold text-center px-0.5"
                   >
                     {badge}
                   </span>
@@ -88,8 +104,8 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
               {/* Desktop Only Badge */}
               {badge && !isActive && (
                 <span
-                  style={{ background: C.error }}
-                  className="hidden lg:inline-block ml-auto px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white leading-none"
+                  style={{ background: C.yellow, color: C.ink }}
+                  className="hidden lg:inline-block ml-auto px-1.5 py-0.5 rounded-full text-[9px] font-bold leading-none"
                 >
                   {badge}
                 </span>
@@ -101,20 +117,20 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
 
       {/* Profile Footer Section */}
       <div
-        style={{ borderTop: `1px solid ${isDark ? C.darkBorder : C.border}` }}
+        style={{ borderTop: "1px solid #1E293B" }}
         className="p-3 lg:p-4 flex items-center justify-center lg:justify-start gap-3 flex-shrink-0"
       >
-        <div style={{ background: "rgba(42,76,214,0.2)", borderRadius: 999 }} className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center flex-shrink-0">
-          <span style={{ color: activeColor }} className="text-xs lg:text-sm font-bold">RK</span>
+        <div style={{ background: "rgba(38,72,231,0.2)", borderRadius: 999 }} className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center flex-shrink-0">
+          <span style={{ color: activeColor }} className="text-xs lg:text-sm font-bold">{initials}</span>
         </div>
         <div className="hidden lg:flex flex-col flex-1 min-w-0">
-          <span style={{ color: textColor }} className="text-xs font-bold leading-tight truncate">Ramesh Kumar</span>
-          <span className="text-[10px] text-white/50">Owner · Admin</span>
+          <span style={{ color: textColor }} className="text-xs font-bold leading-tight truncate">{user?.name || "Ramesh Kumar"}</span>
+          <span className="text-[10px] text-white/50">{user?.role || "Owner"} · Admin</span>
         </div>
         <button
-          onClick={() => handleNavigate("/profile")}
+          onClick={handleLogout}
           style={{ color: inactiveColor }}
-          className="hidden lg:flex p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+          className="hidden lg:flex p-1.5 rounded-lg hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-200 active:scale-90 cursor-pointer"
         >
           <LogOut size={14} />
         </button>

@@ -1,0 +1,226 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router";
+import { useAuth } from "../../hooks/useAuth";
+import { C } from "../../constants/colors";
+import { Building2, Mail, Lock, User, PlusCircle, LogIn, AlertCircle } from "lucide-react";
+
+export const LoginPage = () => {
+  const navigate = useNavigate();
+  const { login, register } = useAuth();
+
+  const [isRegister, setIsRegister] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [businessName, setBusinessName] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (isRegister) {
+        if (!name || !email || !password || !businessName) {
+          throw new Error("All registration fields are required.");
+        }
+        await register({ name, email, password, businessName });
+      } else {
+        if (!email || !password) {
+          throw new Error("Email and password are required.");
+        }
+        await login({ email, password });
+      }
+      navigate("/dashboard");
+    } catch (err: any) {
+      console.error("Authentication error:", err);
+      setError(err?.message || "An unexpected validation or network error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        background: `linear-gradient(135deg, ${C.surface} 0%, #E2E8F0 100%)`,
+        fontFamily: "'Plus Jakarta Sans', sans-serif",
+      }}
+      className="flex items-center justify-center min-h-screen w-full px-4 py-8 select-none"
+    >
+      <div
+        style={{
+          background: C.white,
+          border: `1px solid ${C.border}`,
+          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)",
+        }}
+        className="w-full max-w-md rounded-2xl overflow-hidden p-6 md:p-8 flex flex-col gap-6"
+      >
+        {/* Header branding */}
+        <div className="flex flex-col items-center text-center gap-2">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md overflow-hidden bg-white">
+            <img src="/brand/apni-estate-logo.jpeg" alt="APNI ESTATE Logo" className="w-full h-full object-cover" />
+          </div>
+          <h1 style={{ color: C.ink }} className="text-xl font-bold tracking-tight">
+            Welcome to APNI ESTATE
+          </h1>
+          <p style={{ color: C.muted }} className="text-xs">
+            Manage your construction supply business efficiently.
+          </p>
+        </div>
+
+        {/* Tab triggers */}
+        <div style={{ background: "rgba(0,0,0,0.03)" }} className="flex rounded-lg p-1">
+          <button
+            onClick={() => { setIsRegister(false); setError(null); }}
+            style={{
+              background: !isRegister ? C.white : "transparent",
+              color: !isRegister ? C.blue : C.muted,
+              boxShadow: !isRegister ? "0 1px 3px rgba(0,0,0,0.05)" : "none",
+            }}
+            className="flex-1 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-1.5"
+          >
+            <LogIn size={13} /> Sign In
+          </button>
+          <button
+            onClick={() => { setIsRegister(true); setError(null); }}
+            style={{
+              background: isRegister ? C.white : "transparent",
+              color: isRegister ? C.blue : C.muted,
+              boxShadow: isRegister ? "0 1px 3px rgba(0,0,0,0.05)" : "none",
+            }}
+            className="flex-1 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-1.5"
+          >
+            <PlusCircle size={13} /> Create Account
+          </button>
+        </div>
+
+        {/* Error Alert Box */}
+        {error && (
+          <div
+            style={{ background: "#FEF2F2", border: `1px solid ${C.error}30` }}
+            className="rounded-xl px-4 py-3 flex items-start gap-3"
+          >
+            <AlertCircle size={16} color={C.error} className="flex-shrink-0 mt-0.5" />
+            <span style={{ color: "#991B1B" }} className="text-xs font-medium leading-snug">
+              {error}
+            </span>
+          </div>
+        )}
+
+        {/* Form fields */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {isRegister && (
+            <>
+              {/* Full Name */}
+              <div className="flex flex-col gap-1.5">
+                <label style={{ color: C.muted }} className="text-[10px] font-bold uppercase tracking-wider">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full pl-9 pr-3 py-2 rounded-lg text-xs outline-none focus:border-blue-500 font-medium"
+                  />
+                  <User size={13} style={{ color: C.muted }} className="absolute left-3 top-3" />
+                </div>
+              </div>
+
+              {/* Company Name */}
+              <div className="flex flex-col gap-1.5">
+                <label style={{ color: C.muted }} className="text-[10px] font-bold uppercase tracking-wider">
+                  Business / Company Name
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Shri Krishna Traders"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full pl-9 pr-3 py-2 rounded-lg text-xs outline-none focus:border-blue-500 font-medium"
+                  />
+                  <Building2 size={13} style={{ color: C.muted }} className="absolute left-3 top-3" />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Email Address */}
+          <div className="flex flex-col gap-1.5">
+            <label style={{ color: C.muted }} className="text-[10px] font-bold uppercase tracking-wider">
+              Email Address
+            </label>
+            <div className="relative">
+              <input
+                type="email"
+                required
+                placeholder="you@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                className="w-full pl-9 pr-3 py-2 rounded-lg text-xs outline-none focus:border-blue-500 font-medium"
+              />
+              <Mail size={13} style={{ color: C.muted }} className="absolute left-3 top-3" />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="flex flex-col gap-1.5">
+            <label style={{ color: C.muted }} className="text-[10px] font-bold uppercase tracking-wider">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type="password"
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                className="w-full pl-9 pr-3 py-2 rounded-lg text-xs outline-none focus:border-blue-500 font-medium"
+              />
+              <Lock size={13} style={{ color: C.muted }} className="absolute left-3 top-3" />
+            </div>
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ background: C.blue }}
+            className="w-full mt-2 py-3 rounded-xl text-white font-bold text-xs cursor-pointer flex items-center justify-center gap-2 hover:opacity-95 disabled:opacity-50"
+          >
+            {loading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : isRegister ? (
+              "Create Account & Sign In"
+            ) : (
+              "Secure Log In"
+            )}
+          </button>
+        </form>
+
+        {/* Demo login helper */}
+        {!isRegister && (
+          <div style={{ background: C.surface, borderRadius: 10 }} className="p-3 text-[10px] text-gray-500">
+            <span className="font-semibold block mb-0.5">Quick Demo Login:</span>
+            Email: <span className="text-gray-700 font-medium select-all">admin@shrikrishnatraders.com</span>
+            <br />
+            Password: <span className="text-gray-700 font-medium select-all">Admin@123</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+export default LoginPage;

@@ -17,6 +17,8 @@ import { SectionLabel } from "../../app/components/common/SectionLabel";
 import { StatChip } from "../../app/components/common/StatChip";
 import { Divider } from "../../app/components/common/Divider";
 
+import { useAuth } from "../../hooks/useAuth";
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -34,6 +36,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
+  const { business } = useAuth();
   const [expanded, setExpanded] = useState<number | null>(null);
 
   return (
@@ -43,7 +46,7 @@ export const DashboardPage = () => {
         <div className="flex items-center justify-between mb-3">
           <div>
             <div className="text-white/60 text-[11px] font-medium uppercase tracking-wider">Operating System</div>
-            <div className="text-white text-lg font-bold leading-tight">Shri Krishna Traders</div>
+            <div className="text-white text-lg font-bold leading-tight">{business?.name || "Shri Krishna Traders"}</div>
           </div>
           <div className="flex items-center gap-2">
             <button style={{ background: "rgba(255,255,255,0.15)" }} className="w-9 h-9 rounded-full flex items-center justify-center relative">
