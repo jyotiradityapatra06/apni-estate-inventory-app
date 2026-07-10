@@ -1,0 +1,17 @@
+export const C = {
+  blue: "#2A4CD6",
+  navy: "#1F3BB3",
+  bg: "#EEECE3",
+  white: "#FFFFFF",
+  success: "#10B981",
+  error: "#EF4444",
+  warning: "#FFB300",
+  ink: "#14120E",
+  muted: "#6B6558",
+  border: "rgba(20,18,14,0.1)",
+  card: "#FFFFFF",
+  surface: "#F5F3EC",
+  dark: "#0E1823",
+  darkCard: "#162130",
+  darkBorder: "rgba(255,255,255,0.08)",
+};
