@@ -3,6 +3,7 @@ import {
   Plus, Search, Filter, ChevronRight, Share2, Phone, FileText, X,
   CheckCircle, ArrowLeft, Edit3, Eye, AlertTriangle, Download
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { C } from "../../constants/colors";
 import { fmt, fmtK } from "../../utils/currency";
@@ -387,89 +388,97 @@ export const SalesPage = () => {
           <div className="lg:col-span-1">
             <SectionLabel>{seg === "recv" ? "Receivables" : "Payables"} — {list.length} parties</SectionLabel>
             <div style={{ border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden", background: C.white }}>
-              {list.map((r, i) => {
-                const remaining = r.total - r.paid;
-                const pct = (r.paid / r.total) * 100;
-                const isHigh = r.risk === "high";
-                const isSel = selected === r.id;
-                return (
-                  <div key={r.id}>
-                    {i > 0 && <Divider />}
-                    <button
-                      className="w-full text-left px-4 py-3 cursor-pointer"
-                      onClick={() => setSelected(isSel ? null : r.id)}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span style={{ color: C.ink }} className="text-[13px] font-semibold truncate">{r.name}</span>
-                            {isHigh && <Badge label="HIGH RISK" color="error" />}
-                            {r.overdue > 0 && !isHigh && <Badge label={`${r.overdue}d overdue`} color="warning" />}
-                          </div>
-                          <div style={{ color: C.muted }} className="text-[11px]">{r.terms} · {r.gstin || "N/A"}</div>
-                          <div className="mt-2">
-                            <div className="flex justify-between mb-1">
-                              <span style={{ color: C.muted }} className="text-[10px]">Paid {fmt(r.paid)}</span>
-                              <span style={{ color: C.ink, fontFamily: "'Space Grotesk'" }} className="text-[11px] font-semibold">{fmt(remaining)} remaining</span>
+              {list.length > 0 ? (
+                list.map((r, i) => {
+                  const remaining = r.total - r.paid;
+                  const pct = (r.paid / r.total) * 100;
+                  const isHigh = r.risk === "high";
+                  const isSel = selected === r.id;
+                  return (
+                    <div key={r.id}>
+                      {i > 0 && <Divider />}
+                      <button
+                        className="w-full text-left px-4 py-3 cursor-pointer"
+                        onClick={() => setSelected(isSel ? null : r.id)}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span style={{ color: C.ink }} className="text-[13px] font-semibold truncate">{r.name}</span>
+                              {isHigh && <Badge label="HIGH RISK" color="error" />}
+                              {r.overdue > 0 && !isHigh && <Badge label={`${r.overdue}d overdue`} color="warning" />}
                             </div>
-                            <div style={{ background: "#F0EEE6", borderRadius: 99, height: 4 }}>
-                              <div style={{ background: isHigh ? C.error : C.success, borderRadius: 99, width: `${pct}%`, height: "100%" }} />
+                            <div style={{ color: C.muted }} className="text-[11px]">{r.terms} · {r.gstin || "N/A"}</div>
+                            <div className="mt-2">
+                              <div className="flex justify-between mb-1">
+                                <span style={{ color: C.muted }} className="text-[10px]">Paid {fmt(r.paid)}</span>
+                                <span style={{ color: C.ink, fontFamily: "'Space Grotesk'" }} className="text-[11px] font-semibold">{fmt(remaining)} remaining</span>
+                              </div>
+                              <div style={{ background: "#F0EEE6", borderRadius: 99, height: 4 }}>
+                                <div style={{ background: isHigh ? C.error : C.success, borderRadius: 99, width: `${pct}%`, height: "100%" }} />
+                              </div>
                             </div>
                           </div>
+                          <ChevronRight size={14} color={C.muted} className="mt-1 flex-shrink-0" />
                         </div>
-                        <ChevronRight size={14} color={C.muted} className="mt-1 flex-shrink-0" />
-                      </div>
-                      {isSel && (
-                        <div className="lg:hidden mt-3 grid grid-cols-3 gap-2 pt-3" style={{ borderTop: `1px solid ${C.border}` }}>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setPaymentSheet(true); }}
-                            style={{ background: C.blue }}
-                            className="col-span-3 py-2.5 rounded-lg text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
-                          >
-                            <Plus size={13} /> Record Payment
-                          </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setSelected(r.id); setShowStatement(true); }}
-                            style={{ background: C.surface, border: `1px solid ${C.border}` }}
-                            className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer hover:bg-black/5 active:scale-95 transition-all"
-                          >
-                            <Share2 size={12} color={C.muted} />
-                            <span style={{ color: C.ink }}>Statement</span>
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (r.phone) {
-                                window.open(`tel:${r.phone}`, "_self");
-                              }
-                            }}
-                            disabled={!r.phone}
-                            title={!r.phone ? "Phone number unavailable" : undefined}
-                            style={{
-                              background: C.surface,
-                              border: `1px solid ${C.border}`,
-                              opacity: !r.phone ? 0.5 : 1,
-                              cursor: !r.phone ? "not-allowed" : "pointer"
-                            }}
-                            className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer active:scale-95 transition-all"
-                          >
-                            <Phone size={12} color={C.muted} />
-                            <span style={{ color: C.ink }}>Call</span>
-                          </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setSelected(r.id); setShowLedger(true); }}
-                            style={{ background: C.surface, border: `1px solid ${C.border}` }}
-                            className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer hover:bg-black/5 active:scale-95 transition-all"
-                          >
-                            <FileText size={12} color={C.muted} />
-                            <span style={{ color: C.ink }}>Ledger</span>
-                          </button>
-                        </div>
-                      )}
-                    </button>
-                  </div>
-                );
-              })}
+                        {isSel && (
+                          <div className="lg:hidden mt-3 grid grid-cols-3 gap-2 pt-3" style={{ borderTop: `1px solid ${C.border}` }}>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setPaymentSheet(true); }}
+                              style={{ background: C.blue }}
+                              className="col-span-3 py-2.5 rounded-lg text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                              <Plus size={13} /> Record Payment
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setSelected(r.id); setShowStatement(true); }}
+                              style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                              className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer hover:bg-black/5 active:scale-95 transition-all"
+                            >
+                              <Share2 size={12} color={C.muted} />
+                              <span style={{ color: C.ink }}>Statement</span>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (r.phone) {
+                                  window.open(`tel:${r.phone}`, "_self");
+                                }
+                              }}
+                              disabled={!r.phone}
+                              title={!r.phone ? "Phone number unavailable" : undefined}
+                              style={{
+                                background: C.surface,
+                                border: `1px solid ${C.border}`,
+                                opacity: !r.phone ? 0.5 : 1,
+                                cursor: !r.phone ? "not-allowed" : "pointer"
+                              }}
+                              className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer active:scale-95 transition-all"
+                            >
+                              <Phone size={12} color={C.muted} />
+                              <span style={{ color: C.ink }}>Call</span>
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setSelected(r.id); setShowLedger(true); }}
+                              style={{ background: C.surface, border: `1px solid ${C.border}` }}
+                              className="py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 cursor-pointer hover:bg-black/5 active:scale-95 transition-all"
+                            >
+                              <FileText size={12} color={C.muted} />
+                              <span style={{ color: C.ink }}>Ledger</span>
+                            </button>
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center p-8 text-center min-h-[160px]">
+                  <span style={{ color: C.muted }} className="text-xs">
+                    {seg === "recv" ? "No sales records yet" : "No purchase/payment records yet"}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -598,7 +607,10 @@ export const SalesPage = () => {
                   ))}
                 </div>
                 <button
-                  onClick={() => setPayConfirmed(true)}
+                  onClick={() => {
+                    setPayConfirmed(true);
+                    toast.success("Payment recorded successfully");
+                  }}
                   style={{ background: C.blue }}
                   className="w-full py-3.5 rounded-xl text-white font-bold text-sm cursor-pointer"
                 >

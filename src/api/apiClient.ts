@@ -57,6 +57,18 @@ export async function apiClient<T = unknown>(
   if (!response.ok) {
     const payload = result as ApiErrorPayload | null;
 
+    if (
+      response.status === 401 &&
+      !path.includes("/auth/login") &&
+      !path.includes("/auth/register")
+    ) {
+      localStorage.removeItem("token");
+      if (!window.location.pathname.includes("/login")) {
+        sessionStorage.setItem("session_expired_toast", "true");
+        window.location.replace("/login");
+      }
+    }
+
     const error = new Error(
       payload?.message ??
       `API request failed with status ${response.status}`,

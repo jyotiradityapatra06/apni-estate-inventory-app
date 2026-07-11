@@ -3,6 +3,7 @@ import { tabs, badges } from "../../../constants/navigation";
 import { C } from "../../../constants/colors";
 import { Building2, LogOut } from "lucide-react";
 import { useAuth } from "../../../hooks/useAuth";
+import { toast } from "sonner";
 
 export interface DesktopSidebarProps {
   isDark: boolean;
@@ -19,6 +20,7 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
 
   const handleLogout = () => {
     logout();
+    toast.success("Logged out successfully");
     navigate("/login", { replace: true });
   };
 

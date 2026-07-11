@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../hooks/useAuth";
 import { C } from "../../constants/colors";
 import { Building2, Mail, Lock, User, PlusCircle, LogIn, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -17,8 +18,17 @@ export const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (sessionStorage.getItem("session_expired_toast") === "true") {
+      sessionStorage.removeItem("session_expired_toast");
+      setError("Your session has expired. Please sign in again.");
+      toast.error("Your session has expired. Please sign in again.");
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setError(null);
 
@@ -28,16 +38,20 @@ export const LoginPage = () => {
           throw new Error("All registration fields are required.");
         }
         await register({ name, email, password, businessName });
+        toast.success("Account created successfully");
       } else {
         if (!email || !password) {
           throw new Error("Email and password are required.");
         }
         await login({ email, password });
+        toast.success("Login successful");
       }
       navigate("/dashboard");
     } catch (err: any) {
       console.error("Authentication error:", err);
-      setError(err?.message || "An unexpected validation or network error occurred.");
+      const msg = err?.message || "An unexpected validation or network error occurred.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -201,7 +215,10 @@ export const LoginPage = () => {
             className="w-full mt-2 py-3 rounded-xl text-white font-bold text-xs cursor-pointer flex items-center justify-center gap-2 hover:opacity-95 disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>{isRegister ? "Creating account..." : "Signing in..."}</span>
+              </>
             ) : isRegister ? (
               "Create Account & Sign In"
             ) : (
@@ -210,13 +227,27 @@ export const LoginPage = () => {
           </button>
         </form>
 
-        {/* Demo login helper */}
+        {/* Demo credentials helper */}
         {!isRegister && (
-          <div style={{ background: C.surface, borderRadius: 10 }} className="p-3 text-[10px] text-gray-500">
-            <span className="font-semibold block mb-0.5">Quick Demo Login:</span>
-            Email: <span className="text-gray-700 font-medium select-all">admin@shrikrishnatraders.com</span>
-            <br />
-            Password: <span className="text-gray-700 font-medium select-all">Admin@123</span>
+          <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12 }} className="p-3 text-[11px] text-gray-500 flex flex-col gap-2">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-gray-700">Demo Account</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("admin@shrikrishnatraders.com");
+                  setPassword("Admin@123");
+                }}
+                className="px-2 py-1 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded text-[10px] font-semibold cursor-pointer transition-all"
+              >
+                Use Demo Credentials
+              </button>
+            </div>
+            <div className="text-[10px] text-gray-400">
+              Email: <span className="text-gray-700 select-all font-medium">admin@shrikrishnatraders.com</span>
+              &nbsp;|&nbsp;
+              Password: <span className="text-gray-700 select-all font-medium">Admin@123</span>
+            </div>
           </div>
         )}
       </div>

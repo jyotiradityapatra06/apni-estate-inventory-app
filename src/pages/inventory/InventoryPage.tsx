@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, AlertTriangle, CheckCircle, ClipboardList, Search, Plus, Trash2, Edit3 } from "lucide-react";
+import { toast } from "sonner";
 
 import { C } from "../../constants/colors";
 import { Badge } from "../../app/components/common/Badge";
@@ -98,8 +99,23 @@ export const InventoryPage = () => {
     setShowDeleteConfirm(true);
   };
 
+  // Escape key handler to close dialogs
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowAddEdit(false);
+        setShowAdjust(false);
+        setShowDeleteConfirm(false);
+        setShowReconcile(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleAddEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (mutationLoading) return;
     setFeedback(null);
 
     const inputData = {
@@ -118,23 +134,37 @@ export const InventoryPage = () => {
       if (editingItem) {
         await updateItem(editingItem.id, inputData);
         setFeedback({ type: "success", msg: "Inventory material updated successfully." });
+        toast.success("Material updated");
       } else {
         await createItem(inputData);
         setFeedback({ type: "success", msg: "Inventory material created successfully." });
+        toast.success("Material added");
       }
       setShowAddEdit(false);
       refresh();
     } catch (err: any) {
-      setFeedback({ type: "error", msg: err?.message || "Failed to save inventory item." });
+      const msg = err?.message || "This material could not be saved.";
+      setFeedback({ type: "error", msg });
+      toast.error(msg);
     }
   };
 
   const handleAdjustSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (mutationLoading) return;
     setFeedback(null);
 
     if (!adjustQty || Number(adjustQty) <= 0) {
-      setFeedback({ type: "error", msg: "Please enter a valid adjustment quantity greater than zero." });
+      const errMsg = "Please enter a valid adjustment quantity greater than zero.";
+      setFeedback({ type: "error", msg: errMsg });
+      toast.error(errMsg);
+      return;
+    }
+
+    if (adjustType === "OUT" && Number(adjustQty) > adjustingItem.quantity) {
+      const errMsg = "Stock cannot be reduced below zero.";
+      setFeedback({ type: "error", msg: errMsg });
+      toast.error(errMsg);
       return;
     }
 
@@ -148,22 +178,29 @@ export const InventoryPage = () => {
         type: "success",
         msg: `Recorded stock ${adjustType === "IN" ? "addition" : "deduction"} for ${adjustingItem.materialName}.`,
       });
+      toast.success(adjustType === "IN" ? "Stock added" : "Stock removed");
       setShowAdjust(false);
       refresh();
     } catch (err: any) {
-      setFeedback({ type: "error", msg: err?.message || "Failed to adjust stock." });
+      const msg = err?.message || "Failed to adjust stock.";
+      setFeedback({ type: "error", msg });
+      toast.error(msg);
     }
   };
 
   const handleDeleteSubmit = async () => {
+    if (mutationLoading) return;
     setFeedback(null);
     try {
       await deleteItem(deletingItem.id);
       setFeedback({ type: "success", msg: `Deleted ${deletingItem.materialName} successfully.` });
+      toast.success("Material deleted");
       setShowDeleteConfirm(false);
       refresh();
     } catch (err: any) {
-      setFeedback({ type: "error", msg: err?.message || "Failed to delete item." });
+      const msg = err?.message || "Failed to delete item.";
+      setFeedback({ type: "error", msg });
+      toast.error(msg);
     }
   };
 
@@ -428,8 +465,32 @@ export const InventoryPage = () => {
           {/* Empty state */}
           {!loading && stockItems.length === 0 && (
             <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-[rgba(20,18,14,0.1)] rounded-xl h-48 border-dashed">
-              <span style={{ color: C.muted }} className="text-xs">No materials found matching filters.</span>
-              <button onClick={handleOpenAdd} style={{ color: C.blue }} className="text-xs font-bold mt-2 hover:underline cursor-pointer">+ Add your first material</button>
+              {searchQuery || activeLocation !== "All" ? (
+                <>
+                  <span style={{ color: C.muted }} className="text-xs">No materials match your current filters</span>
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setActiveLocation("All");
+                    }}
+                    style={{ color: C.blue }}
+                    className="text-xs font-bold mt-2 hover:underline cursor-pointer"
+                  >
+                    Clear filters
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span style={{ color: C.muted }} className="text-xs">No materials added yet</span>
+                  <button
+                    onClick={handleOpenAdd}
+                    style={{ color: C.blue }}
+                    className="text-xs font-bold mt-2 hover:underline cursor-pointer"
+                  >
+                    Add your first material
+                  </button>
+                </>
+              )}
             </div>
           )}
 
@@ -710,7 +771,11 @@ export const InventoryPage = () => {
                 style={{ background: C.blue }}
                 className="w-full mt-2 py-3 rounded-xl text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               >
-                {mutationLoading ? "Saving..." : editingItem ? "Update Material" : "Create Material"}
+                {mutationLoading ? (
+                  editingItem ? "Saving..." : "Adding..."
+                ) : (
+                  editingItem ? "Update Material" : "Create Material"
+                )}
               </button>
             </form>
           </div>
@@ -762,7 +827,7 @@ export const InventoryPage = () => {
                 style={{ background: adjustType === "IN" ? C.success : C.error }}
                 className="w-full py-3.5 rounded-xl text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               >
-                {mutationLoading ? "Processing..." : `Confirm ${adjustType === "IN" ? "Stock-In" : "Stock-Out"}`}
+                {mutationLoading ? "Updating stock..." : `Confirm ${adjustType === "IN" ? "Stock-In" : "Stock-Out"}`}
               </button>
             </form>
           </div>
