@@ -103,7 +103,7 @@ const InvoiceFlow = ({ step, setStep, onClose }: InvoiceFlowProps) => {
                 <div className="flex gap-3 text-[11px]">
                   <span style={{ color: C.muted }}>Discount: {item.discount}%</span>
                   <span style={{ color: C.muted }}>Loading: ₹{item.loading.toLocaleString("en-IN")}</span>
-                  <Badge label="GST 18%" color="blue" />
+                  <Badge label="GST 18%" variant="info" />
                 </div>
               </Card>
             ))}
@@ -122,7 +122,7 @@ const InvoiceFlow = ({ step, setStep, onClose }: InvoiceFlowProps) => {
             <Card className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <span style={{ color: C.ink }} className="text-sm font-bold">Invoice Preview</span>
-                <Badge label="DRAFT" color="neutral" />
+                <Badge label="DRAFT" variant="neutral" />
               </div>
               <div className="flex justify-between mb-1">
                 <span style={{ color: C.muted }} className="text-[12px]">Invoice No.</span>
@@ -405,8 +405,8 @@ export const SalesPage = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-0.5">
                               <span style={{ color: C.ink }} className="text-[13px] font-semibold truncate">{r.name}</span>
-                              {isHigh && <Badge label="HIGH RISK" color="error" />}
-                              {r.overdue > 0 && !isHigh && <Badge label={`${r.overdue}d overdue`} color="warning" />}
+                              {isHigh && <Badge label="HIGH RISK" variant="danger" />}
+                              {r.overdue > 0 && !isHigh && <Badge label={`${r.overdue}d overdue`} variant="warning" />}
                             </div>
                             <div style={{ color: C.muted }} className="text-[11px]">{r.terms} · {r.gstin || "N/A"}</div>
                             <div className="mt-2">
@@ -491,8 +491,8 @@ export const SalesPage = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h2 style={{ color: C.ink }} className="text-base font-bold">{sel.name}</h2>
-                      {sel.risk === "high" && <Badge label="HIGH RISK" color="error" />}
-                      {sel.overdue > 0 && <Badge label={`${sel.overdue}d overdue`} color="warning" />}
+                      {sel.risk === "high" && <Badge label="HIGH RISK" variant="danger" />}
+                      {sel.overdue > 0 && <Badge label={`${sel.overdue}d overdue`} variant="warning" />}
                     </div>
                     <div style={{ color: C.muted }} className="text-xs">{sel.terms} · {sel.gstin || "N/A"}</div>
                   </div>
@@ -717,7 +717,7 @@ export const SalesPage = () => {
                           <td className="p-3 text-right font-semibold">{t.debit > 0 ? fmt(t.debit) : "-"}</td>
                           <td className="p-3 text-right font-semibold">{t.credit > 0 ? fmt(t.credit) : "-"}</td>
                           <td className="p-3 text-right font-bold text-gray-955">{fmt(t.runningBalance)}</td>
-                          <td className="p-3"><Badge label={t.status.toUpperCase()} color={t.status === "completed" ? "success" : "warning"} /></td>
+                          <td className="p-3"><Badge label={t.status.toUpperCase()} variant={t.status === "completed" ? "success" : "warning"} /></td>
                         </tr>
                       ))
                     ) : (

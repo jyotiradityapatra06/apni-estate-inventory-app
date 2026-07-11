@@ -18,8 +18,8 @@ export const update = async (
   userRole: string,
   input: { name?: string; gstNumber?: string; phone?: string; address?: string }
 ) => {
-  if (userRole !== "ADMIN") {
-    throw new ApiError(403, "Only business administrators can update company settings.");
+  if (userRole !== "OWNER") {
+    throw new ApiError(403, "Only business owners can update company settings.");
   }
 
   const business = await prisma.business.findUnique({

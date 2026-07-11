@@ -6,7 +6,9 @@ export interface User {
   name: string;
   email: string;
   role: string;
-  createdAt: string;
+  businessId: string;
+  isActive: boolean;
+  permissions: string[];
 }
 
 export interface Business {
@@ -15,6 +17,7 @@ export interface Business {
   gstNumber?: string;
   phone?: string;
   address?: string;
+  workerSeatLimit?: number;
 }
 
 interface AuthContextType {
@@ -23,8 +26,8 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (data: LoginInput) => Promise<void>;
-  register: (data: RegisterInput) => Promise<void>;
+  login: (data: LoginInput) => Promise<any>;
+  register: (data: RegisterInput) => Promise<any>;
   logout: () => void;
   refreshSession: () => Promise<void>;
 }
@@ -49,11 +52,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const res = await authApi.getMe();
       if (res.success && res.data) {
         setUser({
-          id: res.data.id,
-          name: res.data.name,
-          email: res.data.email,
-          role: res.data.role,
-          createdAt: res.data.createdAt,
+          id: res.data.user.id,
+          name: res.data.user.name,
+          email: res.data.user.email,
+          role: res.data.user.role,
+          businessId: res.data.user.businessId,
+          isActive: res.data.user.isActive,
+          permissions: res.data.permissions || [],
         });
         setBusiness(res.data.business);
       }
@@ -80,8 +85,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (res.success && res.data) {
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
-        setUser(res.data.user);
+        setUser({
+          id: res.data.user.id,
+          name: res.data.user.name,
+          email: res.data.user.email,
+          role: res.data.user.role,
+          businessId: res.data.user.businessId,
+          isActive: res.data.user.isActive,
+          permissions: res.data.permissions || [],
+        });
         setBusiness(res.data.business);
+        return res.data;
       }
     } catch (err) {
       throw err;
@@ -97,8 +111,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (res.success && res.data) {
         localStorage.setItem("token", res.data.token);
         setToken(res.data.token);
-        setUser(res.data.user);
+        setUser({
+          id: res.data.user.id,
+          name: res.data.user.name,
+          email: res.data.user.email,
+          role: res.data.user.role,
+          businessId: res.data.user.businessId,
+          isActive: res.data.user.isActive,
+          permissions: res.data.permissions || [],
+        });
         setBusiness(res.data.business);
+        return res.data;
       }
     } catch (err) {
       throw err;

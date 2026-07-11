@@ -6,40 +6,88 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding database...");
 
-  // Clean existing records
-  await prisma.stockTransaction.deleteMany();
-  await prisma.inventoryItem.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.business.deleteMany();
-
-  // Create Business
-  const business = await prisma.business.create({
-    data: {
-      name: "Shri Krishna Traders",
-      gstNumber: "27AABFR5987M1ZP",
-      phone: "+91 98765 00001",
-      address: "Plot 14, Bhosari MIDC, Pune 411026",
-    },
+  // Find or create Business
+  let business = await prisma.business.findFirst({
+    where: { name: "Shri Krishna Traders" },
   });
 
-  console.log(`Created Business: ${business.name} (${business.id})`);
+  if (!business) {
+    business = await prisma.business.create({
+      data: {
+        name: "Shri Krishna Traders",
+        gstNumber: "27AABFR5987M1ZP",
+        phone: "+91 98765 00001",
+        address: "Plot 14, Bhosari MIDC, Pune 411026",
+      },
+    });
+    console.log(`Created Business: ${business.name} (${business.id})`);
+  } else {
+    console.log(`Found existing Business: ${business.name} (${business.id})`);
+  }
 
   // Hash password
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash("Admin@123", salt);
 
-  // Create Admin User
-  const admin = await prisma.user.create({
-    data: {
-      name: "Ramank Kumar",
+  // Setup Users to seed
+  const usersToSeed = [
+    {
       email: "admin@shrikrishnatraders.com",
-      passwordHash,
-      role: "ADMIN",
-      businessId: business.id,
+      name: "Ramank Kumar",
+      role: "OWNER",
+      phone: "+91 98765 00001",
     },
-  });
+    {
+      email: "owner@apniestate.com",
+      name: "Owner User",
+      role: "OWNER",
+      phone: "+91 98765 00002",
+    },
+    {
+      email: "manager@apniestate.com",
+      name: "Manager User",
+      role: "MANAGER",
+      phone: "+91 98765 00003",
+    },
+    {
+      email: "staff@apniestate.com",
+      name: "Staff User",
+      role: "STAFF",
+      phone: "+91 98765 00004",
+    },
+    {
+      email: "driver@apniestate.com",
+      name: "Driver User",
+      role: "DRIVER",
+      phone: "+91 98765 00005",
+    },
+  ];
 
-  console.log(`Created User: ${admin.name} (${admin.email})`);
+  const seededUsers: Record<string, any> = {};
+
+  for (const u of usersToSeed) {
+    const user = await prisma.user.upsert({
+      where: { email: u.email },
+      update: {
+        name: u.name,
+        role: u.role,
+        phone: u.phone,
+        isActive: true,
+        businessId: business.id,
+      },
+      create: {
+        name: u.name,
+        email: u.email,
+        phone: u.phone,
+        passwordHash,
+        role: u.role,
+        isActive: true,
+        businessId: business.id,
+      },
+    });
+    seededUsers[u.email] = user;
+    console.log(`Upserted User: ${user.name} (${user.email}) as ${user.role}`);
+  }
 
   // Seed 8 Inventory Items
   const items = [
@@ -134,26 +182,38 @@ async function main() {
   ];
 
   for (const item of items) {
-    const createdItem = await prisma.inventoryItem.create({
-      data: {
-        ...item,
+    let existingItem = await prisma.inventoryItem.findFirst({
+      where: {
+        sku: item.sku,
         businessId: business.id,
       },
     });
 
-    // Create a matching starting stock-in transaction
-    await prisma.stockTransaction.create({
-      data: {
-        type: "IN",
-        quantity: item.quantity,
-        note: "Initial system seeding",
-        inventoryItemId: createdItem.id,
-        userId: admin.id,
-      },
-    });
+    if (!existingItem) {
+      existingItem = await prisma.inventoryItem.create({
+        data: {
+          ...item,
+          businessId: business.id,
+        },
+      });
+      console.log(`Created Inventory Item: ${existingItem.materialName} (${existingItem.sku})`);
+
+      // Create a matching starting stock-in transaction
+      await prisma.stockTransaction.create({
+        data: {
+          type: "IN",
+          quantity: item.quantity,
+          note: "Initial system seeding",
+          inventoryItemId: existingItem.id,
+          userId: seededUsers["owner@apniestate.com"].id,
+        },
+      });
+    } else {
+      console.log(`Found existing Inventory Item: ${existingItem.materialName} (${existingItem.sku})`);
+    }
   }
 
-  console.log("Database seeded successfully with 8 inventory items.");
+  console.log("Database seeded successfully.");
 }
 
 main()

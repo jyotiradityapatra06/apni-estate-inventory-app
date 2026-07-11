@@ -1,6 +1,8 @@
 import { useLocation, useNavigate } from "react-router";
-import { tabs, badges } from "../../../constants/navigation";
+import { tabs, driverTabs, badges } from "../../../constants/navigation";
 import { C } from "../../../constants/colors";
+import { useAuth } from "../../../hooks/useAuth";
+import { hasPermission } from "../../../utils/permissions";
 
 export interface MobileBottomNavigationProps {
   isDark: boolean;
@@ -9,10 +11,15 @@ export interface MobileBottomNavigationProps {
 export const MobileBottomNavigation = ({ isDark }: MobileBottomNavigationProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleNavigate = (path: string) => {
     navigate(path);
   };
+
+  const visibleTabs = user?.role === "DRIVER"
+    ? driverTabs
+    : tabs.filter((tab) => !tab.requiredPermission || hasPermission(user, tab.requiredPermission));
 
   return (
     <div
@@ -24,7 +31,7 @@ export const MobileBottomNavigation = ({ isDark }: MobileBottomNavigationProps) 
       }}
     >
       <div className="flex">
-        {tabs.map((tab) => {
+        {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = location.pathname === tab.path;
           const badge = badges[tab.path];

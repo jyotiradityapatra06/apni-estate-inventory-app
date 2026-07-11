@@ -3,7 +3,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { C } from "../../constants/colors";
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user, logout } = useAuth();
 
   if (isLoading) {
     return (
@@ -26,6 +26,11 @@ export const ProtectedRoute = () => {
   }
 
   if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user && !user.isActive) {
+    logout();
     return <Navigate to="/login" replace />;
   }
 

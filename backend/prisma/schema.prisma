@@ -8,27 +8,34 @@ generator client {
 }
 
 model Business {
-  id             String          @id @default(uuid())
-  name           String
-  gstNumber      String?
-  phone          String?
-  address        String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  users          User[]
-  inventoryItems InventoryItem[]
+  id              String          @id @default(uuid())
+  name            String
+  gstNumber       String?
+  phone           String?
+  address         String?
+  workerSeatLimit Int             @default(5)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  users           User[]
+  inventoryItems  InventoryItem[]
 }
 
 model User {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   name         String
-  email        String   @unique
+  email        String    @unique
+  phone        String?
   passwordHash String
-  role         String   @default("ADMIN") // e.g. "ADMIN", "STAFF"
+  role         String    @default("STAFF") // "OWNER", "MANAGER", "STAFF", "DRIVER"
+  isActive     Boolean   @default(true)
+  joiningDate  DateTime  @default(now())
+  lastLogin    DateTime?
   businessId   String
-  business     Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  business     Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([businessId])
 }
 
 model InventoryItem {
@@ -47,15 +54,20 @@ model InventoryItem {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   stockTransactions StockTransaction[]
+
+  @@index([businessId])
 }
 
 model StockTransaction {
   id              String        @id @default(uuid())
-  type            String        // "IN" or "OUT"
+  type            String // "IN" or "OUT"
   quantity        Float
   note            String?
   inventoryItemId String
   inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
-  userId          String        // User who made the adjustment
+  userId          String // User who made the adjustment
   createdAt       DateTime      @default(now())
+
+  @@index([inventoryItemId])
+  @@index([userId])
 }

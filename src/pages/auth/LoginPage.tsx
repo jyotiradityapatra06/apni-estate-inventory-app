@@ -4,6 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { C } from "../../constants/colors";
 import { Building2, Mail, Lock, User, PlusCircle, LogIn, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { getHomePathForRole } from "../../utils/permissions";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -33,20 +34,22 @@ export const LoginPage = () => {
     setError(null);
 
     try {
+      let data: any;
       if (isRegister) {
         if (!name || !email || !password || !businessName) {
           throw new Error("All registration fields are required.");
         }
-        await register({ name, email, password, businessName });
+        data = await register({ name, email, password, businessName });
         toast.success("Account created successfully");
       } else {
         if (!email || !password) {
           throw new Error("Email and password are required.");
         }
-        await login({ email, password });
+        data = await login({ email, password });
         toast.success("Login successful");
       }
-      navigate("/dashboard");
+      const role = data?.user?.role;
+      navigate(getHomePathForRole(role));
     } catch (err: any) {
       console.error("Authentication error:", err);
       const msg = err?.message || "An unexpected validation or network error occurred.";
@@ -230,23 +233,31 @@ export const LoginPage = () => {
         {/* Demo credentials helper */}
         {!isRegister && (
           <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12 }} className="p-3 text-[11px] text-gray-500 flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <span className="font-semibold text-gray-700">Demo Account</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail("admin@shrikrishnatraders.com");
-                  setPassword("Admin@123");
-                }}
-                className="px-2 py-1 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded text-[10px] font-semibold cursor-pointer transition-all"
-              >
-                Use Demo Credentials
-              </button>
+            <div className="flex justify-between items-center mb-1">
+              <span className="font-semibold text-gray-700">Quick Demo Log In:</span>
             </div>
-            <div className="text-[10px] text-gray-400">
-              Email: <span className="text-gray-700 select-all font-medium">admin@shrikrishnatraders.com</span>
-              &nbsp;|&nbsp;
-              Password: <span className="text-gray-700 select-all font-medium">Admin@123</span>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: "OWNER", email: "owner@apniestate.com" },
+                { label: "MANAGER", email: "manager@apniestate.com" },
+                { label: "STAFF", email: "staff@apniestate.com" },
+                { label: "DRIVER", email: "driver@apniestate.com" },
+              ].map((role) => (
+                <button
+                  key={role.label}
+                  type="button"
+                  onClick={() => {
+                    setEmail(role.email);
+                    setPassword("Admin@123");
+                  }}
+                  className="px-2 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded text-[10px] font-semibold cursor-pointer transition-all active:scale-[0.97]"
+                >
+                  {role.label}
+                </button>
+              ))}
+            </div>
+            <div className="text-[9px] text-gray-400 text-center mt-1">
+              Password for all accounts is <span className="text-gray-700 font-semibold select-all">Admin@123</span>
             </div>
           </div>
         )}

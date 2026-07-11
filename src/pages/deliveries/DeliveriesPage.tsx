@@ -70,9 +70,9 @@ export const DeliveriesPage = () => {
                       <div className="text-white/50 text-[11px]">{d.avail ? `${d.trips} active trip${d.trips !== 1 ? "s" : ""}` : d.note}</div>
                     </div>
                     {d.avail ? (
-                      <Badge label="Available" color="success" />
+                      <Badge label="Available" variant="success" />
                     ) : (
-                      <Badge label="Busy" color="error" />
+                      <Badge label="Busy" variant="danger" />
                     )}
                   </div>
                 ))}
@@ -89,7 +89,7 @@ export const DeliveriesPage = () => {
                       <div style={{ fontFamily: "'Space Grotesk'" }} className="text-white text-sm font-bold">{v.reg}</div>
                       <div className="text-white/50 text-[11px]">Capacity {v.cap} · {v.load}</div>
                     </div>
-                    {v.avail ? <Badge label="Available" color="success" /> : <Badge label="Busy" color="warning" />}
+                    {v.avail ? <Badge label="Available" variant="success" /> : <Badge label="Busy" variant="warning" />}
                   </div>
                 ))}
               </div>
@@ -173,7 +173,7 @@ export const DeliveriesPage = () => {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <span style={{ color: "white", fontFamily: "'Space Grotesk'" }} className="text-[12px] font-bold">MH-12 AB 7890</span>
-                <Badge label="ON THE WAY" color="blue" />
+                <Badge label="ON THE WAY" variant="info" />
               </div>
               <div className="text-white/50 text-[10px]">Prakash Yadav · 42 km/h · Updated 1m ago</div>
             </div>
@@ -308,7 +308,7 @@ export const DeliveriesPage = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span style={{ color: "white", fontFamily: "'Space Grotesk'" }} className="text-[12px] font-bold">{active.vehicle || "N/A"}</span>
-                    <Badge label={active.status.toUpperCase()} color="blue" />
+                    <Badge label={active.status.toUpperCase()} variant="info" />
                   </div>
                   <div className="text-white/50 text-[10px]">{active.driver || "Unassigned"} · ETA {active.eta || "N/A"}</div>
                 </div>

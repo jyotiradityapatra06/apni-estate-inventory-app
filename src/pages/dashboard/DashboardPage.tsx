@@ -173,7 +173,7 @@ export const DashboardPage = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <Badge label={a.tag} color={sev === "error" ? "error" : "warning"} />
+                          <Badge label={a.tag} variant={sev === "error" ? "danger" : "warning"} />
                         </div>
                         <div style={{ color: C.ink }} className="text-[13px] font-semibold leading-snug">{a.title}</div>
                         <div style={{ color: C.muted }} className="text-[11px] mt-0.5">{a.impact}</div>

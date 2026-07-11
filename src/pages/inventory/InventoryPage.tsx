@@ -244,7 +244,7 @@ export const InventoryPage = () => {
               <Card className="p-4 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <span style={{ color: C.ink }} className="text-xs font-bold uppercase tracking-wider">Items Ordered</span>
-                  <Badge label="Cement" color="blue" />
+                  <Badge label="Cement" variant="info" />
                 </div>
                 <div className="flex justify-between text-xs">
                   <span style={{ color: C.muted }}>Expected Qty</span>
@@ -511,7 +511,7 @@ export const InventoryPage = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-0.5">
                             <span style={{ color: C.ink }} className="text-[13px] font-semibold">{item.materialName}</span>
-                            {isCritical && <Badge label="LOW" color="error" />}
+                            {isCritical && <Badge label="LOW" variant="danger" />}
                           </div>
                           <div style={{ color: C.muted }} className="text-[11px]">{item.category} · {item.sku} · {item.location}</div>
                         </div>
@@ -597,7 +597,7 @@ export const InventoryPage = () => {
                         <td className="px-4 py-3.5 text-right font-bold text-gray-900">{available.toLocaleString("en-IN")} {item.unit}</td>
                         <td className="px-4 py-3.5 text-right text-gray-500">{item.reorderLevel.toLocaleString("en-IN")} {item.unit}</td>
                         <td className="px-4 py-3.5">
-                          {isCritical ? <Badge label="LOW STOCK" color="error" /> : <Badge label="NORMAL" color="success" />}
+                          {isCritical ? <Badge label="LOW STOCK" variant="danger" /> : <Badge label="NORMAL" variant="success" />}
                         </td>
                         <td className="px-4 py-3.5 text-right flex items-center justify-end gap-1.5">
                           <button

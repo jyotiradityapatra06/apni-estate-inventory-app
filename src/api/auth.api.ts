@@ -21,9 +21,12 @@ export interface AuthResponse {
       id: string;
       name: string;
       email: string;
+      phone?: string | null;
       role: string;
-      createdAt: string;
+      businessId: string;
+      isActive: boolean;
     };
+    permissions: string[];
     business: {
       id: string;
       name: string;
@@ -37,12 +40,16 @@ export interface AuthResponse {
 export interface MeResponse {
   success: boolean;
   data: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    createdAt: string;
-    updatedAt: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      phone?: string | null;
+      role: string;
+      businessId: string;
+      isActive: boolean;
+    };
+    permissions: string[];
     business: {
       id: string;
       name: string;

@@ -14,6 +14,8 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
     switch (pathname) {
       case "/dashboard":
         return "Dashboard";
+      case "/driver":
+        return "Driver Dashboard";
       case "/sales":
         return "Sales & Ledger";
       case "/inventory":

@@ -1,15 +1,21 @@
 import { Router } from "express";
 import * as inventoryController from "../controllers/inventory.controller";
-import { protect } from "../middleware/auth.middleware";
+import { protect, requirePermission } from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.get("/", protect, inventoryController.getAll);
-router.get("/:id", protect, inventoryController.getById);
-router.post("/", protect, inventoryController.create);
-router.put("/:id", protect, inventoryController.update);
-router.delete("/:id", protect, inventoryController.remove);
-router.patch("/:id/stock", protect, inventoryController.adjustStock);
-router.get("/:id/transactions", protect, inventoryController.getTransactions);
+router.get("/", protect, requirePermission("inventory:view"), inventoryController.getAll);
+router.get("/:id", protect, requirePermission("inventory:view"), inventoryController.getById);
+router.post("/", protect, requirePermission("inventory:create"), inventoryController.create);
+router.put("/:id", protect, requirePermission("inventory:update"), inventoryController.update);
+router.delete("/:id", protect, requirePermission("inventory:delete"), inventoryController.remove);
+
+router.patch("/:id/stock", protect, (req, res, next) => {
+  const type = req.body.type;
+  const permission = type === "IN" ? "stock:in" : "stock:out";
+  return requirePermission(permission)(req, res, next);
+}, inventoryController.adjustStock);
+
+router.get("/:id/transactions", protect, requirePermission("ledger:view"), inventoryController.getTransactions);
 
 export default router;

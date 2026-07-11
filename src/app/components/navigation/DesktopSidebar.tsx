@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from "react-router";
-import { tabs, badges } from "../../../constants/navigation";
+import { tabs, driverTabs, badges } from "../../../constants/navigation";
 import { C } from "../../../constants/colors";
 import { Building2, LogOut } from "lucide-react";
 import { useAuth } from "../../../hooks/useAuth";
 import { toast } from "sonner";
+import { hasPermission } from "../../../utils/permissions";
 
 export interface DesktopSidebarProps {
   isDark: boolean;
@@ -37,6 +38,10 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
         .substring(0, 2)
     : "RK";
 
+  const visibleTabs = user?.role === "DRIVER"
+    ? driverTabs
+    : tabs.filter((tab) => !tab.requiredPermission || hasPermission(user, tab.requiredPermission));
+
   return (
     <aside
       style={{
@@ -65,7 +70,7 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
 
       {/* Navigation List */}
       <nav className="flex-1 py-4 flex flex-col gap-1 overflow-y-auto px-2">
-        {tabs.map((tab) => {
+        {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = location.pathname === tab.path;
           const badge = badges[tab.path];
@@ -127,7 +132,7 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
         </div>
         <div className="hidden lg:flex flex-col flex-1 min-w-0">
           <span style={{ color: textColor }} className="text-xs font-bold leading-tight truncate">{user?.name || "Ramesh Kumar"}</span>
-          <span className="text-[10px] text-white/50">{user?.role || "Owner"} · Admin</span>
+          <span className="text-[10px] text-white/50">{user?.role || "OWNER"}</span>
         </div>
         <button
           onClick={handleLogout}

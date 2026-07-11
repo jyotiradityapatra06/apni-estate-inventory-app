@@ -24,13 +24,13 @@ export const errorHandler = (
       message: e.message,
     }));
   } else if (err.name === "PrismaClientKnownRequestError") {
-    // Handling database constraint or other Prisma specific errors
-    statusCode = 400;
     const anyErr = err as any;
-    message = anyErr.meta?.cause || err.message;
     if (anyErr.code === "P2002") {
       statusCode = 409;
-      message = `Unique constraint failed on field(s): ${(anyErr.meta?.target as string[] || []).join(", ")}`;
+      message = "Unique constraint conflict: A record with this value already exists.";
+    } else {
+      statusCode = 400;
+      message = "Database operation failed due to a constraint or invalid reference.";
     }
   } else {
     // Unexpected system error

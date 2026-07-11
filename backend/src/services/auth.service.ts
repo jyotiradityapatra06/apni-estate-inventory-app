@@ -3,6 +3,7 @@ import { registerSchema, loginSchema } from "../validations/auth.validation";
 import { ApiError } from "../utils/apiError";
 import * as bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt";
+import { ROLE_PERMISSIONS, UserRole } from "../config/permissions";
 
 export const register = async (input: any) => {
   const data = registerSchema.parse(input);
@@ -32,7 +33,7 @@ export const register = async (input: any) => {
         name: data.name,
         email: data.email,
         passwordHash,
-        role: "ADMIN",
+        role: "OWNER",
         businessId: business.id,
       },
     });
@@ -52,9 +53,12 @@ export const register = async (input: any) => {
       id: result.user.id,
       name: result.user.name,
       email: result.user.email,
+      phone: result.user.phone,
       role: result.user.role,
-      createdAt: result.user.createdAt,
+      businessId: result.user.businessId,
+      isActive: result.user.isActive,
     },
+    permissions: ROLE_PERMISSIONS[result.user.role as UserRole] || [],
     business: result.business,
   };
 };
@@ -71,10 +75,20 @@ export const login = async (input: any) => {
     throw new ApiError(401, "Invalid email or password combination.");
   }
 
+  if (!user.isActive) {
+    throw new ApiError(403, "Your account has been deactivated. Please contact your administrator.");
+  }
+
   const isValidPassword = await bcrypt.compare(data.password, user.passwordHash);
   if (!isValidPassword) {
     throw new ApiError(401, "Invalid email or password combination.");
   }
+
+  // Update last login timestamp
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { lastLogin: new Date() },
+  });
 
   const token = generateToken({
     userId: user.id,
@@ -88,9 +102,12 @@ export const login = async (input: any) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       role: user.role,
-      createdAt: user.createdAt,
+      businessId: user.businessId,
+      isActive: user.isActive,
     },
+    permissions: ROLE_PERMISSIONS[user.role as UserRole] || [],
     business: user.business,
   };
 };
@@ -98,13 +115,7 @@ export const login = async (input: any) => {
 export const getMe = async (userId: string) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
+    include: {
       business: true,
     },
   });
@@ -113,5 +124,21 @@ export const getMe = async (userId: string) => {
     throw new ApiError(404, "User session not found.");
   }
 
-  return user;
+  if (!user.isActive) {
+    throw new ApiError(403, "Your account has been deactivated.");
+  }
+
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      businessId: user.businessId,
+      isActive: user.isActive,
+    },
+    permissions: ROLE_PERMISSIONS[user.role as UserRole] || [],
+    business: user.business,
+  };
 };
