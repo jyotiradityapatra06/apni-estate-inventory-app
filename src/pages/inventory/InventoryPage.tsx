@@ -11,9 +11,10 @@ import { useGetInventory, useInventoryMutations } from "../../hooks/useInventory
 
 export const InventoryPage = () => {
   const [showReconcile, setShowReconcile] = useState(false);
-  const [reconcileStep, setReconcileStep] = useState(0);
-  const [shortage, setShortage] = useState(false);
-  const [reconciled, setReconciled] = useState(false);
+  const [reconcileItemId, setReconcileItemId] = useState("");
+  const [reconcileQty, setReconcileQty] = useState("");
+  const [reconcileSupplier, setReconcileSupplier] = useState("");
+  const [reconcileNote, setReconcileNote] = useState("");
 
   // Filter States
   const [activeLocation, setActiveLocation] = useState("All");
@@ -207,98 +208,151 @@ export const InventoryPage = () => {
   const lowStock = stockItems.filter((s) => s.quantity < s.reorderLevel);
 
   if (showReconcile) {
+    const handleReconcileSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (mutationLoading) return;
+      setFeedback(null);
+
+      if (!reconcileItemId) {
+        const errMsg = "Please select a material.";
+        setFeedback({ type: "error", msg: errMsg });
+        toast.error(errMsg);
+        return;
+      }
+
+      if (!reconcileQty || Number(reconcileQty) <= 0) {
+        const errMsg = "Please enter a valid received quantity greater than zero.";
+        setFeedback({ type: "error", msg: errMsg });
+        toast.error(errMsg);
+        return;
+      }
+
+      try {
+        const selectedItem = stockItems.find((item) => item.id === reconcileItemId);
+        const combinedNote = `Supplier: ${reconcileSupplier || "N/A"}${reconcileNote ? ` · Note: ${reconcileNote}` : ""}`;
+        await adjustStock(reconcileItemId, {
+          type: "IN",
+          quantity: Number(reconcileQty),
+          note: combinedNote,
+        });
+
+        toast.success(`Successfully stocked in ${reconcileQty} ${selectedItem?.unit || "units"} of ${selectedItem?.materialName}`);
+        
+        // Reset fields
+        setReconcileItemId("");
+        setReconcileQty("");
+        setReconcileSupplier("");
+        setReconcileNote("");
+        
+        setShowReconcile(false);
+        refresh();
+      } catch (err: any) {
+        const msg = err?.message || "Failed to confirm stock in.";
+        setFeedback({ type: "error", msg });
+        toast.error(msg);
+      }
+    };
+
     return (
       <div className="flex flex-col h-full">
         <div style={{ background: C.blue }} className="px-4 pt-12 pb-5">
           <div className="flex items-center gap-3 mb-1">
-            <button onClick={() => { setShowReconcile(false); setReconcileStep(0); setReconciled(false); }} className="cursor-pointer">
+            <button onClick={() => { setShowReconcile(false); }} className="cursor-pointer">
               <ArrowLeft size={20} color="white" />
             </button>
             <div>
-              <div className="text-white/60 text-[11px] uppercase tracking-wider">Supplier Verification</div>
-              <div className="text-white text-base font-bold">Incoming Shipment</div>
+              <div className="text-white/60 text-[11px] uppercase tracking-wider">Inventory Entry</div>
+              <div className="text-white text-base font-bold">Incoming Stock</div>
             </div>
           </div>
         </div>
+
         <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
-          {!reconciled ? (
-            <>
-              <Card className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span style={{ color: C.ink }} className="text-sm font-bold">PO Reference</span>
-                  <span style={{ color: C.blue, fontFamily: "'Space Grotesk'" }} className="text-sm font-bold">PO-2025-0192</span>
-                </div>
-                <div className="flex justify-between mb-1">
-                  <span style={{ color: C.muted }} className="text-xs">Supplier</span>
-                  <span style={{ color: C.ink }} className="text-xs font-semibold">UltraTech Cement Ltd</span>
-                </div>
-                <div className="flex justify-between mb-1">
-                  <span style={{ color: C.muted }} className="text-xs">Vehicle</span>
-                  <span style={{ color: C.ink, fontFamily: "'Space Grotesk'" }} className="text-xs font-semibold">MH-12 CD 4521</span>
-                </div>
-                <div className="flex justify-between">
-                  <span style={{ color: C.muted }} className="text-xs">Challan No.</span>
-                  <span style={{ color: C.ink, fontFamily: "'Space Grotesk'" }} className="text-xs font-semibold">CH-8472</span>
-                </div>
-              </Card>
-              <Card className="p-4 flex flex-col gap-3">
-                <div className="flex justify-between items-center">
-                  <span style={{ color: C.ink }} className="text-xs font-bold uppercase tracking-wider">Items Ordered</span>
-                  <Badge label="Cement" variant="info" />
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span style={{ color: C.muted }}>Expected Qty</span>
-                  <span style={{ color: C.ink }} className="font-bold">1,000 Bags</span>
-                </div>
-                {reconcileStep === 0 ? (
-                  <button onClick={() => setReconcileStep(1)} style={{ background: C.blue }} className="w-full py-3 rounded-xl text-white font-semibold text-xs mt-2 cursor-pointer">
-                    Verify Quantity Received
-                  </button>
-                ) : (
-                  <>
-                    <div className="flex justify-between text-xs">
-                      <span style={{ color: C.muted }}>Actual Received</span>
-                      <span style={{ color: shortage ? C.error : C.success }} className="font-bold">{shortage ? "940" : "1,000"} Bags</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => setShortage(true)} style={{ border: `1.5px solid ${C.error}` }} className="flex-1 py-2.5 rounded-lg text-red-600 font-semibold text-xs cursor-pointer">
-                        Report Shortage (-60)
-                      </button>
-                      <button onClick={() => setShortage(false)} style={{ border: `1.5px solid ${C.success}` }} className="flex-1 py-2.5 rounded-lg text-green-700 font-semibold text-xs cursor-pointer">
-                        Matches PO (1,000)
-                      </button>
-                    </div>
-                    <button onClick={() => setReconciled(true)} style={{ background: C.blue }} className="w-full py-3.5 rounded-xl text-white font-bold cursor-pointer mt-2 text-xs">
-                      Confirm Verification
-                    </button>
-                  </>
-                )}
-              </Card>
-            </>
-          ) : (
-            <div className="flex flex-col items-center py-6">
-              <div style={{ background: "#ECFDF5" }} className="w-20 h-20 rounded-full flex items-center justify-center mb-4">
-                <CheckCircle size={40} color={C.success} />
+          <Card className="p-4">
+            <h3 style={{ color: C.ink }} className="text-sm font-bold mb-4">Stock-In Form</h3>
+            {stockItems.length === 0 ? (
+              <div className="text-center py-6">
+                <AlertTriangle size={32} color={C.error} className="mx-auto mb-2" />
+                <div style={{ color: C.ink }} className="text-sm font-semibold mb-1">No Materials Available</div>
+                <div style={{ color: C.muted }} className="text-xs mb-4">You need to add a material to inventory first.</div>
+                <button
+                  onClick={() => {
+                    setShowReconcile(false);
+                    handleOpenAdd();
+                  }}
+                  style={{ background: C.blue }}
+                  className="px-4 py-2 rounded-xl text-white font-bold text-xs cursor-pointer"
+                >
+                  Create Material
+                </button>
               </div>
-              <div style={{ color: C.ink }} className="text-lg font-bold mb-1">{shortage ? "Dispute Raised" : "Shipment Verified"}</div>
-              <div style={{ color: C.muted }} className="text-sm mb-1">PO-2025-0192 · UltraTech Cement Ltd</div>
-              <div style={{ color: C.muted }} className="text-xs mb-2">Verified by Suresh Patil · 10 Jul 2025, 11:15</div>
-              {shortage && <div style={{ color: C.muted }} className="text-xs mb-5">Credit note request: ₹15,400 sent to supplier</div>}
-              <div style={{ background: C.surface, borderRadius: 10 }} className="w-full px-4 py-3 mb-4">
-                <div className="flex justify-between text-xs">
-                  <span style={{ color: C.muted }}>Stock updated</span>
-                  <span style={{ color: C.success, fontFamily: "'Space Grotesk'" }} className="font-semibold">+{shortage ? "940" : "1,000"} Bags</span>
+            ) : (
+              <form onSubmit={handleReconcileSubmit} className="flex flex-col gap-4 text-xs font-medium">
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Select Material</label>
+                  <select
+                    required
+                    value={reconcileItemId}
+                    onChange={(e) => setReconcileItemId(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                  >
+                    <option value="">-- Choose Material --</option>
+                    {stockItems.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.materialName} ({item.location} · Current: {item.quantity} {item.unit})
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="flex justify-between text-xs mt-1">
-                  <span style={{ color: C.muted }}>Audit entry</span>
-                  <span style={{ color: C.blue, fontFamily: "'Space Grotesk'" }} className="font-semibold">#STK-2025-0391</span>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Received Quantity</label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="Enter received quantity"
+                    value={reconcileQty}
+                    onChange={(e) => setReconcileQty(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                  />
                 </div>
-              </div>
-              <button onClick={() => { setShowReconcile(false); setReconcileStep(0); setReconciled(false); setShortage(false); }} style={{ background: C.blue }} className="w-full py-3.5 rounded-xl text-white font-bold cursor-pointer">
-                Done
-              </button>
-            </div>
-          )}
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Supplier Name (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. UltraTech Cement Ltd"
+                    value={reconcileSupplier}
+                    onChange={(e) => setReconcileSupplier(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Add Note (Optional)</label>
+                  <textarea
+                    placeholder="e.g. Gate pass no. 5422, received by security"
+                    value={reconcileNote}
+                    onChange={(e) => setReconcileNote(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none h-16"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={mutationLoading}
+                  style={{ background: C.blue }}
+                  className="w-full py-3.5 rounded-xl text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 mt-2"
+                >
+                  {mutationLoading ? "Confirming..." : "Confirm Stock In"}
+                </button>
+              </form>
+            )}
+          </Card>
         </div>
       </div>
     );
@@ -327,7 +381,7 @@ export const InventoryPage = () => {
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg cursor-pointer"
             >
               <ClipboardList size={14} color="white" />
-              <span className="text-white text-xs font-semibold">Verify</span>
+              <span className="text-white text-xs font-semibold">Stock In</span>
             </button>
           </div>
         </div>
@@ -402,7 +456,7 @@ export const InventoryPage = () => {
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg cursor-pointer text-gray-700 text-xs font-semibold hover:bg-black/5"
             >
               <ClipboardList size={14} color={C.muted} />
-              <span>Verify Shipment</span>
+              <span>Incoming Stock</span>
             </button>
           </div>
         </div>
