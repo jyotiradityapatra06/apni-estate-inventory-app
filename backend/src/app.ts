@@ -7,6 +7,9 @@ import authRoutes from "./routes/auth.routes";
 import businessRoutes from "./routes/business.routes";
 import inventoryRoutes from "./routes/inventory.routes";
 import teamRoutes from "./routes/team.routes";
+import deliveryRoutes from "./routes/delivery.routes";
+import * as deliveryController from "./controllers/delivery.controller";
+import { protect, restrictTo } from "./middleware/auth.middleware";
 import { notFound } from "./middleware/notFound.middleware";
 import { errorHandler } from "./middleware/error.middleware";
 import { env } from "./config/env";
@@ -34,6 +37,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/team", teamRoutes);
+app.use("/api/deliveries", deliveryRoutes);
+app.get("/api/driver/deliveries", protect, restrictTo("DRIVER"), deliveryController.getDriverDeliveries);
 
 // Fallbacks
 app.use(notFound);

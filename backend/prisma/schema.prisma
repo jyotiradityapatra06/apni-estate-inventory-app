@@ -18,22 +18,25 @@ model Business {
   updatedAt       DateTime        @updatedAt
   users           User[]
   inventoryItems  InventoryItem[]
+  deliveries      Delivery[]
 }
 
 model User {
-  id           String    @id @default(uuid())
-  name         String
-  email        String    @unique
-  phone        String?
-  passwordHash String
-  role         String    @default("STAFF") // "OWNER", "MANAGER", "STAFF", "DRIVER"
-  isActive     Boolean   @default(true)
-  joiningDate  DateTime  @default(now())
-  lastLogin    DateTime?
-  businessId   String
-  business     Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                 String     @id @default(uuid())
+  name               String
+  email              String     @unique
+  phone              String?
+  passwordHash       String
+  role               String     @default("STAFF") // "OWNER", "MANAGER", "STAFF", "DRIVER"
+  isActive           Boolean    @default(true)
+  joiningDate        DateTime   @default(now())
+  lastLogin          DateTime?
+  businessId         String
+  business           Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  createdDeliveries  Delivery[] @relation("CreatedDeliveries")
+  assignedDeliveries Delivery[] @relation("DriverDeliveries")
 
   @@index([businessId])
 }
@@ -70,4 +73,31 @@ model StockTransaction {
 
   @@index([inventoryItemId])
   @@index([userId])
+}
+
+model Delivery {
+  id              String    @id @default(uuid())
+  businessId      String
+  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  deliveryNumber  String
+  customerName    String
+  customerPhone   String?
+  deliveryAddress String
+  materialName    String
+  quantity        Float
+  unit            String
+  driverId        String?
+  driver          User?     @relation("DriverDeliveries", fields: [driverId], references: [id], onDelete: SetNull)
+  vehicleNumber   String?
+  status          String    @default("PENDING") // "PENDING", "ASSIGNED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"
+  scheduledDate   DateTime?
+  notes           String?
+  createdById     String
+  createdBy       User      @relation("CreatedDeliveries", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([businessId])
+  @@index([driverId])
+  @@index([createdById])
 }
