@@ -1,4 +1,4 @@
-import { Home, BarChart2, Package, Truck, User, Users } from "lucide-react";
+import { Home, Package, Truck, User } from "lucide-react";
 
 export interface TabItem {
   id: string;
@@ -11,21 +11,14 @@ export interface TabItem {
 
 export const tabs: TabItem[] = [
   { id: "home", label: "Home", icon: Home, path: "/dashboard", requiredPermission: "dashboard:view" },
-  { id: "finance", label: "Finance", icon: BarChart2, path: "/sales", requiredPermission: "sales:view" },
   { id: "stock", label: "Stock", icon: Package, path: "/inventory", requiredPermission: "inventory:view" },
   { id: "delivery", label: "Delivery", icon: Truck, path: "/deliveries", requiredPermission: "deliveries:view" },
-  { id: "team", label: "Team", icon: Users, path: "/team", requiredPermission: "team:manage" },
-  { id: "profile", label: "Profile", icon: User, path: "/profile" },
+  { id: "management", label: "Management", icon: User, path: "/management" },
 ];
 
-export const driverTabs: TabItem[] = [
-  { id: "driver-home", label: "Home", icon: Home, path: "/driver" },
-  { id: "driver-trips", label: "My Trips", icon: Truck, path: "/driver" },
-  { id: "profile", label: "Profile", icon: User, path: "/profile" },
-];
+export const driverTabs: TabItem[] = [];
 
 export const badges: Record<string, number> = {
-  "/sales": 2,
   "/inventory": 8,
   "/deliveries": 3,
 };

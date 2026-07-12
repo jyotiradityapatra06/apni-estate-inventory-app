@@ -8,7 +8,7 @@ import { C } from "../../constants/colors";
 export const AppLayout = () => {
   const location = useLocation();
   const mainScrollRef = useRef<HTMLDivElement>(null);
-  const isDark = location.pathname === "/deliveries";
+  const isDark = false;
 
   useEffect(() => {
     mainScrollRef.current?.scrollTo({ top: 0 });

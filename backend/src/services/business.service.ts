@@ -16,7 +16,7 @@ export const getById = async (businessId: string) => {
 export const update = async (
   businessId: string,
   userRole: string,
-  input: { name?: string; gstNumber?: string; phone?: string; address?: string }
+  input: { name?: string; gstNumber?: string; phone?: string; address?: string; workerSeatLimit?: number }
 ) => {
   if (userRole !== "OWNER") {
     throw new ApiError(403, "Only business owners can update company settings.");
@@ -37,6 +37,7 @@ export const update = async (
       gstNumber: input.gstNumber !== undefined ? input.gstNumber : undefined,
       phone: input.phone !== undefined ? input.phone : undefined,
       address: input.address !== undefined ? input.address : undefined,
+      workerSeatLimit: input.workerSeatLimit !== undefined ? Number(input.workerSeatLimit) : undefined,
     },
   });
 

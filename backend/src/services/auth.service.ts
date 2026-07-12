@@ -79,6 +79,10 @@ export const login = async (input: any) => {
     throw new ApiError(403, "Your account has been deactivated. Please contact your administrator.");
   }
 
+  if (user.role === "DRIVER") {
+    throw new ApiError(403, "Driver login is not available.");
+  }
+
   const isValidPassword = await bcrypt.compare(data.password, user.passwordHash);
   if (!isValidPassword) {
     throw new ApiError(401, "Invalid email or password combination.");

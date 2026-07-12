@@ -5,6 +5,7 @@ export interface BusinessUpdateInput {
   gstNumber?: string;
   phone?: string;
   address?: string;
+  workerSeatLimit?: number;
 }
 
 export interface BusinessResponse {

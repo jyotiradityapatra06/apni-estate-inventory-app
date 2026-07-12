@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes";
 import businessRoutes from "./routes/business.routes";
 import inventoryRoutes from "./routes/inventory.routes";
 import teamRoutes from "./routes/team.routes";
+import notificationRoutes from "./routes/notification.routes";
 import { notFound } from "./middleware/notFound.middleware";
 import { errorHandler } from "./middleware/error.middleware";
 import { env } from "./config/env";
@@ -34,6 +35,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/team", teamRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Fallbacks
 app.use(notFound);

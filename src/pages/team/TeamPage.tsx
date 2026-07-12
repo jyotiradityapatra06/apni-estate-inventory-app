@@ -10,15 +10,44 @@ import { Divider } from "../../app/components/common/Divider";
 import { StatChip } from "../../app/components/common/StatChip";
 import { useAuth } from "../../hooks/useAuth";
 import { teamApi, Worker } from "../../api/team.api";
+import { businessApi } from "../../api/business.api";
 import { toast } from "sonner";
 
 export const TeamPage = () => {
-  const { business } = useAuth();
+  const { business, user, refreshSession } = useAuth();
   const seatLimit = business?.workerSeatLimit || 5;
+  const isOwner = user?.role === "OWNER";
 
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [activeCount, setActiveCount] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // Seat Limit Edit States
+  const [showSeatEdit, setShowSeatEdit] = useState(false);
+  const [newSeatLimit, setNewSeatLimit] = useState(String(seatLimit));
+  const [seatLoading, setSeatLoading] = useState(false);
+
+  const handleSeatLimitSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const limitNum = Number(newSeatLimit);
+    if (isNaN(limitNum) || limitNum < activeCount) {
+      toast.error(`Seat limit cannot be lower than the current active members count (${activeCount}).`);
+      return;
+    }
+    setSeatLoading(true);
+    try {
+      await businessApi.updateBusiness({
+        workerSeatLimit: limitNum,
+      });
+      await refreshSession();
+      toast.success("Worker seat limit updated successfully!");
+      setShowSeatEdit(false);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update seat limit");
+    } finally {
+      setSeatLoading(false);
+    }
+  };
 
   // Filters state
   const [search, setSearch] = useState("");
@@ -99,6 +128,16 @@ export const TeamPage = () => {
     e.preventDefault();
     if (!formName || !formPhone || !formEmail || (!selectedWorker && !formPassword)) {
       toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    // Client-side seat limit checks
+    if (!selectedWorker && formIsActive && activeCount >= seatLimit) {
+      toast.error(`Cannot add active team member. Active seats limit reached (${seatLimit}). Please edit the seat limit or deactivate a member first.`);
+      return;
+    }
+    if (selectedWorker && !selectedWorker.isActive && formIsActive && activeCount >= seatLimit) {
+      toast.error(`Cannot activate team member. Active seats limit reached (${seatLimit}).`);
       return;
     }
 
@@ -204,8 +243,9 @@ export const TeamPage = () => {
   const staffCount = workers.filter(w => w.role === "STAFF").length;
   const driverCount = workers.filter(w => w.role === "DRIVER").length;
   const activeWorkers = activeCount;
+  const seatsRemaining = Math.max(0, seatLimit - activeWorkers);
+  // Summary Cards
   const inactiveWorkers = workers.length - activeWorkers;
-  const seatsRemaining = seatLimit - activeWorkers;
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return "Never";
@@ -236,7 +276,7 @@ export const TeamPage = () => {
             Team Management
           </h1>
           <p style={{ color: C.muted }} className="text-xs mt-1">
-            Manage your managers, staff, and drivers and control seat allocation.
+            Manage your managers, staff and control seat allocation.
           </p>
         </div>
         <button
@@ -255,7 +295,7 @@ export const TeamPage = () => {
           <ShieldAlert size={16} className="text-amber-600 flex-shrink-0" />
           <span>
             {seatsRemaining === 0 
-              ? "Worker seat limit reached! Deactivate existing workers before adding or activating new ones." 
+              ? "Worker seat limit reached! Deactivate existing workers or increase the seat limit before adding or activating new ones." 
               : "Warning: Only 1 seat remains under your current seat limit."}
           </span>
         </div>
@@ -263,26 +303,72 @@ export const TeamPage = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Seat Limit Card */}
+        <Card className="p-4 flex flex-col justify-between shadow-sm bg-white border border-slate-200">
+          <div>
+            <span style={{ color: C.muted }} className="block text-[10px] uppercase font-bold tracking-wider mb-1">Worker Seat Limit</span>
+            {showSeatEdit ? (
+              <form onSubmit={handleSeatLimitSubmit} className="flex items-center gap-1.5 mt-1">
+                <input
+                  type="number"
+                  required
+                  value={newSeatLimit}
+                  onChange={(e) => setNewSeatLimit(e.target.value)}
+                  style={{ color: C.ink, background: C.surface, border: `1px solid ${C.border}` }}
+                  className="w-16 px-2 py-1 rounded text-xs font-bold outline-none"
+                />
+                <button
+                  type="submit"
+                  disabled={seatLoading}
+                  style={{ background: C.blue }}
+                  className="px-2 py-1 text-white text-[10px] font-bold rounded cursor-pointer"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSeatEdit(false)}
+                  className="px-2.5 py-1 border border-slate-200 text-slate-700 text-[10px] rounded cursor-pointer bg-white"
+                >
+                  X
+                </button>
+              </form>
+            ) : (
+              <div className="flex items-center gap-2 mt-1">
+                <span style={{ color: C.ink }} className="text-xl font-bold font-mono">{seatLimit}</span>
+                {isOwner && (
+                  <button
+                    onClick={() => {
+                      setNewSeatLimit(String(seatLimit));
+                      setShowSeatEdit(true);
+                    }}
+                    style={{ color: C.blue }}
+                    className="text-[10px] font-bold hover:underline cursor-pointer flex items-center gap-0.5"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+            )}
+            <p style={{ color: C.muted }} className="text-[10px] mt-1.5">Max active slots</p>
+          </div>
+        </Card>
+
         <StatChip 
-          label="Active Seats Used" 
-          value={`${activeWorkers} / ${seatLimit}`} 
-          sub={`${seatsRemaining} remaining`} 
-          trend={seatsRemaining <= 1 ? "down" : "up"} 
+          label="Current Members" 
+          value={String(activeWorkers)} 
+          sub={`${inactiveWorkers} inactive accounts`} 
         />
         <StatChip 
-          label="Total Workers" 
-          value={String(workers.length)} 
-          sub={`${activeWorkers} active · ${inactiveWorkers} inactive`} 
+          label="Available Seats" 
+          value={String(seatsRemaining)} 
+          sub="Vacant active slots" 
+          trend={seatsRemaining <= 1 ? "down" : "up"} 
         />
         <StatChip 
           label="Managers & Staff" 
           value={`${managerCount} M · ${staffCount} S`} 
-          sub="Operational personnel" 
-        />
-        <StatChip 
-          label="Drivers Onboarded" 
-          value={String(driverCount)} 
-          sub="Logistics delivery team" 
+          sub="Role permissions breakdown" 
         />
       </div>
 
@@ -321,7 +407,6 @@ export const TeamPage = () => {
               <option value="">All Roles</option>
               <option value="MANAGER">Manager</option>
               <option value="STAFF">Staff</option>
-              <option value="DRIVER">Driver</option>
             </select>
             <Filter size={12} className="absolute right-3 top-4 text-slate-400 pointer-events-none" />
           </div>
@@ -679,11 +764,10 @@ export const TeamPage = () => {
                   <select
                     value={formRole}
                     onChange={(e) => setFormRole(e.target.value as any)}
-                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-3.5 py-2.5 text-xs outline-none cursor-pointer focus:bg-white focus:border-slate-300 transition-all"
+                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-3.5 py-2.5 text-xs outline-none cursor-pointer focus:bg-white focus:border-slate-300 transition-all font-semibold"
                   >
                     <option value="MANAGER">Manager</option>
                     <option value="STAFF">Staff</option>
-                    <option value="DRIVER">Driver</option>
                   </select>
                   <Filter size={12} className="absolute right-3 top-3 text-slate-400 pointer-events-none" />
                 </div>

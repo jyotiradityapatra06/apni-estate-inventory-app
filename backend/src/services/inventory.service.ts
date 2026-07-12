@@ -181,3 +181,23 @@ export const getTransactions = async (businessId: string, itemId: string) => {
 
   return transactions;
 };
+
+export const getAllTransactions = async (businessId: string) => {
+  return await prisma.stockTransaction.findMany({
+    where: {
+      inventoryItem: {
+        businessId,
+      },
+    },
+    include: {
+      inventoryItem: {
+        select: {
+          materialName: true,
+          unit: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+};

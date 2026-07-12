@@ -29,7 +29,6 @@ export const getHomePathForRole = (role?: string): string => {
     case "STAFF":
       return "/inventory";
     case "DRIVER":
-      return "/driver";
     default:
       return "/login";
   }

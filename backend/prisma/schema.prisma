@@ -18,6 +18,7 @@ model Business {
   updatedAt       DateTime        @updatedAt
   users           User[]
   inventoryItems  InventoryItem[]
+  notifications   Notification[]
 }
 
 model User {
@@ -70,4 +71,16 @@ model StockTransaction {
 
   @@index([inventoryItemId])
   @@index([userId])
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  title      String
+  message    String
+  isRead     Boolean  @default(false)
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([businessId])
 }

@@ -120,3 +120,18 @@ export const getTransactions = async (req: Request, res: Response, next: NextFun
     next(err);
   }
 };
+
+export const getAllTransactions = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "Unauthorized access." });
+    }
+    const transactions = await inventoryService.getAllTransactions(req.user.businessId);
+    res.status(200).json({
+      success: true,
+      data: transactions,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

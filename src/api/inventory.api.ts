@@ -112,5 +112,11 @@ export const inventoryApi = {
       method: "GET",
     });
   },
+
+  getAllTransactions: () => {
+    return apiClient<TransactionListResponse>("/inventory/transactions", {
+      method: "GET",
+    });
+  },
 };
 export default inventoryApi;

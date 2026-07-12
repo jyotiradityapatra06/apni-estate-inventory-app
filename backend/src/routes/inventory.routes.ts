@@ -5,6 +5,7 @@ import { protect, requirePermission } from "../middleware/auth.middleware";
 const router = Router();
 
 router.get("/", protect, requirePermission("inventory:view"), inventoryController.getAll);
+router.get("/transactions", protect, requirePermission("inventory:view"), inventoryController.getAllTransactions);
 router.get("/:id", protect, requirePermission("inventory:view"), inventoryController.getById);
 router.post("/", protect, requirePermission("inventory:create"), inventoryController.create);
 router.put("/:id", protect, requirePermission("inventory:update"), inventoryController.update);

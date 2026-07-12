@@ -114,22 +114,41 @@ export const InventoryPage = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Trigger stock-in quick adjustment on mount if action parameter is present
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("action") === "stock-in") {
+      if (stockItems && stockItems.length > 0) {
+        setAdjustingItem(stockItems[0]);
+        setAdjustType("IN");
+        setAdjustQty("");
+        setAdjustNote("");
+        setFeedback(null);
+        setShowAdjust(true);
+        // Clear parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, [stockItems]);
+
   const handleAddEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mutationLoading) return;
     setFeedback(null);
 
-    const inputData = {
+    const inputData: any = {
       materialName,
       category,
       sku,
       unit,
-      quantity: Number(quantity) || 0,
       reorderLevel: Number(reorderLevel) || 0,
       location: locationInput,
       costPrice: costPrice ? Number(costPrice) : null,
       sellingPrice: sellingPrice ? Number(sellingPrice) : null,
     };
+    if (!editingItem) {
+      inputData.quantity = Number(quantity) || 0;
+    }
 
     try {
       if (editingItem) {
@@ -771,7 +790,9 @@ export const InventoryPage = () => {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Initial Qty</label>
+                  <label className="text-gray-500 text-[10px] uppercase font-semibold">
+                    {editingItem ? "Current Stock" : "Initial Qty"}
+                  </label>
                   <input
                     type="number"
                     disabled={!!editingItem}
@@ -848,8 +869,20 @@ export const InventoryPage = () => {
             </div>
             <div style={{ background: C.surface }} className="rounded-lg p-3 text-xs">
               <div className="text-gray-500 uppercase text-[9px] mb-0.5">Material</div>
-              <div style={{ color: C.ink }} className="font-bold">{adjustingItem.materialName}</div>
-              <div className="text-gray-500 mt-1">Current Stock: <span className="font-semibold text-gray-800">{adjustingItem.quantity} {adjustingItem.unit}</span></div>
+              <select
+                value={adjustingItem.id}
+                onChange={(e) => {
+                  const selected = stockItems.find(s => s.id === e.target.value);
+                  if (selected) setAdjustingItem(selected);
+                }}
+                style={{ background: C.white, border: `1px solid ${C.border}`, color: C.ink }}
+                className="w-full px-2 py-1.5 rounded outline-none font-semibold mt-1 cursor-pointer"
+              >
+                {stockItems.map(s => (
+                  <option key={s.id} value={s.id}>{s.materialName} ({s.quantity} {s.unit})</option>
+                ))}
+              </select>
+              <div className="text-gray-500 mt-2">Current Stock: <span className="font-semibold text-gray-800">{adjustingItem.quantity} {adjustingItem.unit}</span></div>
             </div>
             <form onSubmit={handleAdjustSubmit} className="flex flex-col gap-3 text-xs">
               <div className="flex flex-col gap-1">
