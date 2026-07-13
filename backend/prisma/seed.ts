@@ -72,6 +72,7 @@ async function main() {
         name: u.name,
         role: u.role,
         phone: u.phone,
+        passwordHash,
         isActive: true,
         businessId: business.id,
       },
