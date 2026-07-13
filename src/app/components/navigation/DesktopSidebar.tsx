@@ -13,7 +13,7 @@ export interface DesktopSidebarProps {
 export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, business, logout } = useAuth();
+  const { user, business, logout, isLoading } = useAuth();
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -38,9 +38,17 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
         .substring(0, 2)
     : "RK";
 
-  const visibleTabs = user?.role === "DRIVER"
-    ? driverTabs
-    : tabs.filter((tab) => !tab.requiredPermission || hasPermission(user, tab.requiredPermission));
+  const visibleTabs = isLoading || !user
+    ? []
+    : user.role.toUpperCase() === "DRIVER"
+      ? driverTabs
+      : tabs.filter((tab) => {
+          if (tab.id === "delivery") {
+            const role = user.role.toUpperCase();
+            return role === "OWNER" || role === "MANAGER";
+          }
+          return !tab.requiredPermission || hasPermission(user, tab.requiredPermission);
+        });
 
   return (
     <aside

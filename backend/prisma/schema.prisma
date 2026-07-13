@@ -19,6 +19,7 @@ model Business {
   users           User[]
   inventoryItems  InventoryItem[]
   notifications   Notification[]
+  deliveries      Delivery[]
 }
 
 model User {
@@ -81,6 +82,27 @@ model Notification {
   businessId String
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+
+  @@index([businessId])
+}
+
+model Delivery {
+  id              String          @id @default(uuid())
+  deliveryNumber  String
+  customerName    String
+  customerPhone   String?
+  deliveryAddress String
+  materialName    String
+  quantity        Float
+  unit            String
+  scheduledDate   DateTime?
+  notes           String?
+  status          String          @default("PENDING") // "PENDING", "OUT_FOR_DELIVERY", "DELIVERED"
+  paymentStatus   String          @default("PENDING") // "PENDING", "RECEIVED"
+  businessId      String
+  business        Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   @@index([businessId])
 }

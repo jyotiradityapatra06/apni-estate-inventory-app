@@ -11,15 +11,23 @@ export interface MobileBottomNavigationProps {
 export const MobileBottomNavigation = ({ isDark }: MobileBottomNavigationProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
   const handleNavigate = (path: string) => {
     navigate(path);
   };
 
-  const visibleTabs = user?.role === "DRIVER"
-    ? driverTabs
-    : tabs.filter((tab) => !tab.requiredPermission || hasPermission(user, tab.requiredPermission));
+  const visibleTabs = isLoading || !user
+    ? []
+    : user.role.toUpperCase() === "DRIVER"
+      ? driverTabs
+      : tabs.filter((tab) => {
+          if (tab.id === "delivery") {
+            const role = user.role.toUpperCase();
+            return role === "OWNER" || role === "MANAGER";
+          }
+          return !tab.requiredPermission || hasPermission(user, tab.requiredPermission);
+        });
 
   return (
     <div

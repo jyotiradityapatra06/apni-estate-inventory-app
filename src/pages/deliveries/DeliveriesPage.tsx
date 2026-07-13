@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, ClipboardList, X } from "lucide-react";
+import { Plus, ClipboardList, X, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { C } from "../../constants/colors";
@@ -12,6 +12,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useGetInventory } from "../../hooks/useInventory";
 import { hasPermission, hasRole } from "../../utils/permissions";
 import { notificationApi } from "../../api/notification.api";
+import { deliveryApi } from "../../api/delivery.api";
 
 export interface LocalDelivery {
   id: string;
@@ -51,11 +52,11 @@ export const DeliveriesPage = () => {
   const [deliveries, setDeliveries] = useState<LocalDelivery[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Modal / Form States
+  // Modal / Form States (Create)
   const [showCreate, setShowCreate] = useState<boolean>(false);
-
-  // Form inputs (Create)
   const [customerName, setCustomerName] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
@@ -65,12 +66,24 @@ export const DeliveriesPage = () => {
   const [scheduledDate, setScheduledDate] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
 
+  // Modal / Form States (Edit)
+  const [showEdit, setShowEdit] = useState<boolean>(false);
+  const [editCustomerName, setEditCustomerName] = useState<string>("");
+  const [editCustomerPhone, setEditCustomerPhone] = useState<string>("");
+  const [editDeliveryAddress, setEditDeliveryAddress] = useState<string>("");
+  const [editMaterialName, setEditMaterialName] = useState<string>("");
+  const [editQuantity, setEditQuantity] = useState<string>("");
+  const [editUnit, setEditUnit] = useState<string>("");
+  const [editScheduledDate, setEditScheduledDate] = useState<string>("");
+  const [editNotes, setEditNotes] = useState<string>("");
+
   // Fetch lists
-  const { data: stockItems } = useGetInventory();
+  const { data: stockItemsData } = useGetInventory();
+  const stockItems = stockItemsData || [];
 
   // Handle body scroll locking
   useEffect(() => {
-    if (showCreate) {
+    if (showCreate || showEdit) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -78,32 +91,42 @@ export const DeliveriesPage = () => {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [showCreate]);
+  }, [showCreate, showEdit]);
 
-  // Load from localStorage
-  useEffect(() => {
+  // Fetch deliveries from backend
+  const fetchDeliveries = async () => {
     setLoading(true);
+    setFetchError(null);
     try {
-      const stored = localStorage.getItem("apni_deliveries");
-      if (stored) {
-        const parsed: LocalDelivery[] = JSON.parse(stored);
-        const normalized = parsed.map(d => ({
-          ...d,
-          status: (d.status as string === "ASSIGNED" || d.status as string === "CANCELLED" || !statusMeta[d.status]) ? "PENDING" as const : d.status,
-          paymentStatus: d.paymentStatus || "PENDING",
+      const res = await deliveryApi.getDeliveries();
+      if (res.success && res.data) {
+        const mapped: LocalDelivery[] = res.data.map(d => ({
+          id: d.id,
+          deliveryNumber: d.deliveryNumber,
+          customerName: d.customerName,
+          customerPhone: d.customerPhone,
+          deliveryAddress: d.deliveryAddress,
+          materialName: d.materialName,
+          quantity: d.quantity,
+          unit: d.unit,
+          scheduledDate: d.scheduledDate,
+          notes: d.notes,
+          status: d.status,
+          paymentStatus: d.paymentStatus,
+          createdAt: d.createdAt,
         }));
-        setDeliveries(normalized);
-        if (normalized.length > 0) {
-          setSelectedId(normalized[0].id);
-        }
-      } else {
-        setDeliveries([]);
+        setDeliveries(mapped);
       }
-    } catch (err) {
-      console.error("Failed to load local deliveries", err);
+    } catch (err: any) {
+      console.error("Failed to load deliveries", err);
+      setFetchError(err.message || "Failed to load deliveries");
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchDeliveries();
   }, []);
 
   // Check for trigger queries from Dashboard quick actions
@@ -122,11 +145,6 @@ export const DeliveriesPage = () => {
     return d.status === activeStatus;
   });
 
-  const saveDeliveries = (newDeliveries: LocalDelivery[]) => {
-    setDeliveries(newDeliveries);
-    localStorage.setItem("apni_deliveries", JSON.stringify(newDeliveries));
-  };
-
   // Submit handlers
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,105 +157,265 @@ export const DeliveriesPage = () => {
       return;
     }
 
-    const newDelivery: LocalDelivery = {
-      id: Math.random().toString(36).substring(2, 9),
-      deliveryNumber: `DEL-${Date.now().toString().slice(-5)}`,
-      customerName,
-      customerPhone: customerPhone || null,
-      deliveryAddress,
-      materialName,
-      quantity: Number(quantity),
-      unit,
-      scheduledDate: scheduledDate || null,
-      notes: notes || null,
-      status: "PENDING",
-      paymentStatus: "PENDING",
-      createdAt: new Date().toISOString(),
-    };
-
-    const updated = [newDelivery, ...deliveries];
-    saveDeliveries(updated);
-    setSelectedId(newDelivery.id);
-    toast.success("Delivery scheduled successfully!");
-    setShowCreate(false);
-
-    // Create Notification on Backend
+    setIsSubmitting(true);
     try {
-      await notificationApi.createNotification(
-        "Delivery Scheduled",
-        `New shipment ${newDelivery.deliveryNumber} scheduled for ${newDelivery.customerName} (${newDelivery.quantity} ${newDelivery.unit} of ${newDelivery.materialName}).`
-      );
-    } catch (err) {
-      console.error("Failed to generate delivery creation notification:", err);
+      const res = await deliveryApi.createDelivery({
+        customerName: customerName.trim(),
+        customerPhone: customerPhone ? customerPhone.trim() : null,
+        deliveryAddress: deliveryAddress.trim(),
+        materialName: materialName.trim(),
+        quantity: Number(quantity),
+        unit: unit.trim(),
+        scheduledDate: scheduledDate || null,
+        notes: notes || null,
+      });
+
+      if (res.success && res.data) {
+        toast.success("Delivery scheduled successfully!");
+        setShowCreate(false);
+        // Reset Form
+        setCustomerName("");
+        setCustomerPhone("");
+        setDeliveryAddress("");
+        setMaterialName("");
+        setQuantity("");
+        setUnit("Bags");
+        setScheduledDate("");
+        setNotes("");
+
+        // Refresh List and select new item
+        const updatedRes = await deliveryApi.getDeliveries();
+        if (updatedRes.success && updatedRes.data) {
+          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
+            id: d.id,
+            deliveryNumber: d.deliveryNumber,
+            customerName: d.customerName,
+            customerPhone: d.customerPhone,
+            deliveryAddress: d.deliveryAddress,
+            materialName: d.materialName,
+            quantity: d.quantity,
+            unit: d.unit,
+            scheduledDate: d.scheduledDate,
+            notes: d.notes,
+            status: d.status,
+            paymentStatus: d.paymentStatus,
+            createdAt: d.createdAt,
+          }));
+          setDeliveries(mapped);
+          setSelectedId(res.data.id);
+        }
+
+        // Create Notification on Backend
+        try {
+          await notificationApi.createNotification(
+            "Delivery Scheduled",
+            `New shipment ${res.data.deliveryNumber} scheduled for ${res.data.customerName} (${res.data.quantity} ${res.data.unit} of ${res.data.materialName}).`
+          );
+        } catch (err) {
+          console.error("Failed to generate delivery creation notification:", err);
+        }
+      }
+    } catch (err: any) {
+      console.error("Failed to create delivery", err);
+      toast.error(err.message || "Failed to schedule delivery.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!active) return;
+    if (!editMaterialName) {
+      toast.error("Please select a material.");
+      return;
+    }
+    if (Number(editQuantity) <= 0) {
+      toast.error("Quantity must be greater than zero.");
+      return;
     }
 
-    // Reset Form
-    setCustomerName("");
-    setCustomerPhone("");
-    setDeliveryAddress("");
-    setMaterialName("");
-    setQuantity("");
-    setUnit("Bags");
-    setScheduledDate("");
-    setNotes("");
+    setIsSubmitting(true);
+    try {
+      const res = await deliveryApi.updateDelivery(active.id, {
+        customerName: editCustomerName.trim(),
+        customerPhone: editCustomerPhone ? editCustomerPhone.trim() : null,
+        deliveryAddress: editDeliveryAddress.trim(),
+        materialName: editMaterialName.trim(),
+        quantity: Number(editQuantity),
+        unit: editUnit.trim(),
+        scheduledDate: editScheduledDate || null,
+        notes: editNotes || null,
+      });
+
+      if (res.success && res.data) {
+        toast.success("Delivery updated successfully!");
+        setShowEdit(false);
+        // Refresh list
+        const updatedRes = await deliveryApi.getDeliveries();
+        if (updatedRes.success && updatedRes.data) {
+          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
+            id: d.id,
+            deliveryNumber: d.deliveryNumber,
+            customerName: d.customerName,
+            customerPhone: d.customerPhone,
+            deliveryAddress: d.deliveryAddress,
+            materialName: d.materialName,
+            quantity: d.quantity,
+            unit: d.unit,
+            scheduledDate: d.scheduledDate,
+            notes: d.notes,
+            status: d.status,
+            paymentStatus: d.paymentStatus,
+            createdAt: d.createdAt,
+          }));
+          setDeliveries(mapped);
+        }
+      }
+    } catch (err: any) {
+      console.error("Failed to update delivery", err);
+      toast.error(err.message || "Failed to update delivery.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleStatusUpdate = async (id: string, nextStatus: LocalDelivery["status"]) => {
-    const updated = deliveries.map(d => {
-      if (d.id === id) {
-        return { ...d, status: nextStatus };
-      }
-      return d;
-    });
-    saveDeliveries(updated);
-    toast.success(`Delivery status updated to ${statusMeta[nextStatus]?.label || nextStatus}`);
+    try {
+      const res = await deliveryApi.updateDelivery(id, { status: nextStatus });
+      if (res.success && res.data) {
+        toast.success(`Delivery status updated to ${statusMeta[nextStatus]?.label || nextStatus}`);
+        
+        // Refresh list
+        const updatedRes = await deliveryApi.getDeliveries();
+        if (updatedRes.success && updatedRes.data) {
+          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
+            id: d.id,
+            deliveryNumber: d.deliveryNumber,
+            customerName: d.customerName,
+            customerPhone: d.customerPhone,
+            deliveryAddress: d.deliveryAddress,
+            materialName: d.materialName,
+            quantity: d.quantity,
+            unit: d.unit,
+            scheduledDate: d.scheduledDate,
+            notes: d.notes,
+            status: d.status,
+            paymentStatus: d.paymentStatus,
+            createdAt: d.createdAt,
+          }));
+          setDeliveries(mapped);
+        }
 
-    const activeDel = deliveries.find(d => d.id === id);
-    if (activeDel) {
-      try {
-        const title = nextStatus === "OUT_FOR_DELIVERY" ? "Out for Delivery" : "Delivery Completed";
-        const desc = nextStatus === "OUT_FOR_DELIVERY" 
-          ? `Shipment ${activeDel.deliveryNumber} to ${activeDel.customerName} is now out for delivery.`
-          : `Shipment ${activeDel.deliveryNumber} has been delivered successfully to ${activeDel.customerName}.`;
-        await notificationApi.createNotification(title, desc);
-      } catch (err) {
-        console.error("Failed to log status notification:", err);
+        try {
+          const title = nextStatus === "OUT_FOR_DELIVERY" ? "Out for Delivery" : "Delivery Completed";
+          const desc = nextStatus === "OUT_FOR_DELIVERY" 
+            ? `Shipment ${res.data.deliveryNumber} to ${res.data.customerName} is now out for delivery.`
+            : `Shipment ${res.data.deliveryNumber} has been delivered successfully to ${res.data.customerName}.`;
+          await notificationApi.createNotification(title, desc);
+        } catch (err) {
+          console.error("Failed to log status notification:", err);
+        }
       }
+    } catch (err: any) {
+      console.error("Failed to update delivery status", err);
+      toast.error(err.message || "Failed to update delivery status.");
     }
   };
 
   const handlePaymentUpdate = async (id: string, nextPayStatus: LocalDelivery["paymentStatus"]) => {
-    const updated = deliveries.map(d => {
-      if (d.id === id) {
-        return { ...d, paymentStatus: nextPayStatus };
-      }
-      return d;
-    });
-    saveDeliveries(updated);
-    toast.success(`Payment status updated to ${payStatusMeta[nextPayStatus]?.label || nextPayStatus}`);
+    try {
+      const res = await deliveryApi.updateDelivery(id, { paymentStatus: nextPayStatus });
+      if (res.success && res.data) {
+        toast.success(`Payment status updated to ${payStatusMeta[nextPayStatus]?.label || nextPayStatus}`);
+        
+        // Refresh list
+        const updatedRes = await deliveryApi.getDeliveries();
+        if (updatedRes.success && updatedRes.data) {
+          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
+            id: d.id,
+            deliveryNumber: d.deliveryNumber,
+            customerName: d.customerName,
+            customerPhone: d.customerPhone,
+            deliveryAddress: d.deliveryAddress,
+            materialName: d.materialName,
+            quantity: d.quantity,
+            unit: d.unit,
+            scheduledDate: d.scheduledDate,
+            notes: d.notes,
+            status: d.status,
+            paymentStatus: d.paymentStatus,
+            createdAt: d.createdAt,
+          }));
+          setDeliveries(mapped);
+        }
 
-    const activeDel = deliveries.find(d => d.id === id);
-    if (activeDel && nextPayStatus === "RECEIVED") {
-      try {
-        await notificationApi.createNotification(
-          "Payment Received",
-          `Payment for shipment ${activeDel.deliveryNumber} (${activeDel.customerName}) has been marked as RECEIVED.`
-        );
-      } catch (err) {
-        console.error("Failed to log payment status notification:", err);
+        if (nextPayStatus === "RECEIVED") {
+          try {
+            await notificationApi.createNotification(
+              "Payment Received",
+              `Payment for shipment ${res.data.deliveryNumber} (${res.data.customerName}) has been marked as RECEIVED.`
+            );
+          } catch (err) {
+            console.error("Failed to log payment status notification:", err);
+          }
+        }
       }
+    } catch (err: any) {
+      console.error("Failed to update payment status", err);
+      toast.error(err.message || "Failed to update payment status.");
     }
   };
 
-  const handleDeleteDelivery = (id: string) => {
+  const handleDeleteDelivery = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this delivery? This action is permanent.")) return;
-    const updated = deliveries.filter(d => d.id !== id);
-    saveDeliveries(updated);
-    toast.success("Delivery deleted successfully.");
-    setSelectedId(updated.length > 0 ? updated[0].id : null);
+    try {
+      const res = await deliveryApi.deleteDelivery(id);
+      if (res.success) {
+        toast.success("Delivery deleted successfully.");
+        
+        const updatedRes = await deliveryApi.getDeliveries();
+        if (updatedRes.success && updatedRes.data) {
+          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
+            id: d.id,
+            deliveryNumber: d.deliveryNumber,
+            customerName: d.customerName,
+            customerPhone: d.customerPhone,
+            deliveryAddress: d.deliveryAddress,
+            materialName: d.materialName,
+            quantity: d.quantity,
+            unit: d.unit,
+            scheduledDate: d.scheduledDate,
+            notes: d.notes,
+            status: d.status,
+            paymentStatus: d.paymentStatus,
+            createdAt: d.createdAt,
+          }));
+          setDeliveries(mapped);
+          
+          const remaining = mapped.filter(d => d.id !== id);
+          setSelectedId(remaining.length > 0 ? remaining[0].id : null);
+        }
+      }
+    } catch (err: any) {
+      console.error("Failed to delete delivery", err);
+      toast.error(err.message || "Failed to delete delivery.");
+    }
   };
 
-  const active = filteredDeliveries.find(d => d.id === selectedId) || filteredDeliveries[0];
+  const openEditModal = (d: LocalDelivery) => {
+    setEditCustomerName(d.customerName);
+    setEditCustomerPhone(d.customerPhone || "");
+    setEditDeliveryAddress(d.deliveryAddress);
+    setEditMaterialName(d.materialName);
+    setEditQuantity(String(d.quantity));
+    setEditUnit(d.unit);
+    setEditScheduledDate(d.scheduledDate ? d.scheduledDate.substring(0, 10) : "");
+    setEditNotes(d.notes || "");
+    setShowEdit(true);
+  };
+
+  const active = filteredDeliveries.find(d => d.id === selectedId) || (filteredDeliveries.length > 0 ? filteredDeliveries[0] : null);
 
   return (
     <div className="flex flex-col gap-0 pb-4 h-full">
@@ -319,6 +497,21 @@ export const DeliveriesPage = () => {
             <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
             <span style={{ color: C.muted }} className="text-xs font-semibold">Loading deliveries...</span>
           </div>
+        ) : fetchError ? (
+          <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-[rgba(20,18,14,0.1)] rounded-xl h-64 border-dashed">
+            <div style={{ background: "rgba(239,68,68,0.05)" }} className="w-12 h-12 rounded-full flex items-center justify-center mb-3">
+              <ClipboardList size={22} color={C.error} />
+            </div>
+            <div style={{ color: C.error }} className="text-sm font-semibold mb-1">Failed to load deliveries</div>
+            <div style={{ color: C.muted }} className="text-xs max-w-xs mb-4">{fetchError}</div>
+            <button
+              onClick={fetchDeliveries}
+              style={{ background: C.blue }}
+              className="px-4 py-2 rounded-lg text-white font-semibold text-xs cursor-pointer"
+            >
+              Retry
+            </button>
+          </div>
         ) : filteredDeliveries.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-[rgba(20,18,14,0.1)] rounded-xl h-64 border-dashed">
             <div style={{ background: "rgba(42,76,214,0.05)" }} className="w-12 h-12 rounded-full flex items-center justify-center mb-3">
@@ -375,7 +568,7 @@ export const DeliveriesPage = () => {
                           </span>
                         </div>
                         <div style={{ color: C.ink }} className="text-[13px] font-bold">{d.customerName}</div>
-                        <div style={{ color: C.muted }} className="text-[11px] mt-0.5">{d.materialName} · {d.quantity} {d.unit}</div>
+                        <div style={{ color: C.muted }} className="text-[11px] mt-0.5">{d.materialName} · {d.quantity.toLocaleString("en-IN")} {d.unit}</div>
                         <div style={{ color: C.muted }} className="text-[11px] truncate">{d.deliveryAddress}</div>
                       </div>
                     </div>
@@ -398,15 +591,27 @@ export const DeliveriesPage = () => {
                       </div>
                       <p style={{ color: C.muted }} className="text-[10px] mt-1">Created on {new Date(active.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
                     </div>
-                    {canManageDeliveries && active.status === "PENDING" && (
-                      <button
-                        onClick={() => handleDeleteDelivery(active.id)}
-                        style={{ border: `1.5px solid ${C.error}30`, color: C.error }}
-                        className="px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer hover:bg-red-50"
-                      >
-                        Delete Delivery
-                      </button>
-                    )}
+                    <div className="flex gap-2">
+                      {canManageDeliveries && (
+                        <button
+                          onClick={() => openEditModal(active)}
+                          style={{ border: `1.5px solid ${C.blue}30`, color: C.blue }}
+                          className="px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer hover:bg-blue-50 flex items-center gap-1"
+                        >
+                          <Edit2 size={10} />
+                          <span>Edit Details</span>
+                        </button>
+                      )}
+                      {user?.role?.toUpperCase() === "OWNER" && active.status === "PENDING" && (
+                        <button
+                          onClick={() => handleDeleteDelivery(active.id)}
+                          style={{ border: `1.5px solid ${C.error}30`, color: C.error }}
+                          className="px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer hover:bg-red-50"
+                        >
+                          Delete Delivery
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <Divider />
@@ -543,7 +748,7 @@ export const DeliveriesPage = () => {
               </div>
               <div>
                 <span style={{ color: C.muted }} className="block text-[10px] uppercase font-bold tracking-wider mb-0.5">Quantity</span>
-                <span style={{ color: C.ink }} className="font-semibold">{active.quantity} {active.unit}</span>
+                <span style={{ color: C.ink }} className="font-semibold">{active.quantity.toLocaleString("en-IN")} {active.unit}</span>
               </div>
               <div>
                 <span style={{ color: C.muted }} className="block text-[10px] uppercase font-bold tracking-wider mb-0.5">Schedule</span>
@@ -596,7 +801,21 @@ export const DeliveriesPage = () => {
               </>
             )}
 
-            {canManageDeliveries && active.status === "PENDING" && (
+            {canManageDeliveries && (
+              <button
+                onClick={() => {
+                  setSelectedId(null);
+                  openEditModal(active);
+                }}
+                style={{ background: "#EFF6FF", color: C.blue }}
+                className="w-full py-3 rounded-xl font-bold text-xs cursor-pointer mt-2 flex items-center justify-center gap-1.5"
+              >
+                <Edit2 size={12} />
+                <span>Edit Delivery</span>
+              </button>
+            )}
+
+            {user?.role?.toUpperCase() === "OWNER" && active.status === "PENDING" && (
               <button
                 onClick={() => handleDeleteDelivery(active.id)}
                 style={{ background: "#FEF2F2", color: C.error }}
@@ -724,10 +943,137 @@ export const DeliveriesPage = () => {
 
               <button
                 type="submit"
-                style={{ background: C.blue }}
-                className="w-full mt-2 py-3 rounded-xl text-white font-bold cursor-pointer hover:opacity-95"
+                disabled={isSubmitting}
+                style={{ background: C.blue, opacity: isSubmitting ? 0.7 : 1 }}
+                className="w-full mt-2 py-3 rounded-xl text-white font-bold cursor-pointer hover:opacity-95 disabled:cursor-not-allowed"
               >
-                Schedule Delivery
+                {isSubmitting ? "Scheduling..." : "Schedule Delivery"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG: EDIT DELIVERY FORM */}
+      {showEdit && active && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm" style={{ zIndex: 100 }}>
+          <div style={{ background: C.white, borderRadius: 16 }} className="w-full max-w-sm p-5 flex flex-col gap-4 overflow-y-auto max-h-[90%]">
+            <div className="flex items-center justify-between">
+              <span style={{ color: C.ink }} className="text-base font-bold">Edit Delivery Details</span>
+              <button onClick={() => setShowEdit(false)} className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer">×</button>
+            </div>
+            <form onSubmit={handleEditSubmit} className="flex flex-col gap-3.5 text-xs font-medium">
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-500 text-[10px] uppercase">Customer Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Suresh Infra Pvt Ltd"
+                  value={editCustomerName}
+                  onChange={(e) => setEditCustomerName(e.target.value)}
+                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                  className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Customer Phone (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. +91 98765 00002"
+                    value={editCustomerPhone}
+                    onChange={(e) => setEditCustomerPhone(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Scheduled Date (Optional)</label>
+                  <input
+                    type="date"
+                    value={editScheduledDate}
+                    onChange={(e) => setEditScheduledDate(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-500 text-[10px] uppercase">Delivery Address</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Plot 43, Sector 5, Pimpri, Pune"
+                  value={editDeliveryAddress}
+                  onChange={(e) => setEditDeliveryAddress(e.target.value)}
+                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                  className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-500 text-[10px] uppercase">Select Material</label>
+                <select
+                  required
+                  value={editMaterialName}
+                  onChange={(e) => setEditMaterialName(e.target.value)}
+                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                  className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                >
+                  <option value="">-- Choose Material --</option>
+                  {stockItems.map(item => (
+                    <option key={item.id} value={item.materialName}>{item.materialName} ({item.unit})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Quantity</label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="e.g. 50"
+                    value={editQuantity}
+                    onChange={(e) => setEditQuantity(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Unit</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Bags"
+                    value={editUnit}
+                    onChange={(e) => setEditUnit(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-gray-500 text-[10px] uppercase">Dispatch Note (Optional)</label>
+                <textarea
+                  placeholder="e.g. Gate clearance needed, ask for Vikram at warehouse"
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                  className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 resize-none h-16"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{ background: C.blue, opacity: isSubmitting ? 0.7 : 1 }}
+                className="w-full mt-2 py-3 rounded-xl text-white font-bold cursor-pointer hover:opacity-95 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </button>
             </form>
           </div>

@@ -35,7 +35,10 @@ export const restrictTo = (...roles: string[]) => {
       return next(new ApiError(401, "Authentication required."));
     }
 
-    if (!roles.includes(req.user.role)) {
+    const userRole = (req.user.role || "").toUpperCase();
+    const upperRoles = roles.map((r) => r.toUpperCase());
+
+    if (!upperRoles.includes(userRole)) {
       return next(new ApiError(403, "You do not have permission to perform this action."));
     }
 
@@ -53,7 +56,7 @@ export const requirePermission = (permission: string) => {
       return next(new ApiError(401, "Authentication required."));
     }
 
-    const role = req.user.role as UserRole;
+    const role = (req.user.role || "").toUpperCase() as UserRole;
     const permissions = ROLE_PERMISSIONS[role] || [];
 
     if (!permissions.includes(permission)) {
@@ -62,6 +65,22 @@ export const requirePermission = (permission: string) => {
 
     next();
   };
+};
+
+export const authorizeDeliveryAccess = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return next(new ApiError(401, "Authentication required."));
+  }
+
+  const role = (req.user.role || "").toUpperCase();
+  if (role !== "OWNER" && role !== "MANAGER") {
+    return res.status(403).json({
+      success: false,
+      message: "You do not have permission to access Delivery Management."
+    });
+  }
+
+  next();
 };
 
 export const requireBusinessAccess = (req: Request, res: Response, next: NextFunction) => {

@@ -6,7 +6,8 @@ import { User } from "../context/AuthContext";
  */
 export const hasPermission = (user: User | null, permission: string): boolean => {
   if (!user) return false;
-  if (user.role === "OWNER") return true;
+  const role = user.role.toUpperCase();
+  if (role === "OWNER") return true;
   return user.permissions.includes(permission);
 };
 
@@ -15,14 +16,16 @@ export const hasPermission = (user: User | null, permission: string): boolean =>
  */
 export const hasRole = (user: User | null, roles: string[]): boolean => {
   if (!user) return false;
-  return roles.includes(user.role);
+  const upperRoles = roles.map(r => r.toUpperCase());
+  return upperRoles.includes(user.role.toUpperCase());
 };
 
 /**
  * Returns the default entry home path for a user based on their role.
  */
 export const getHomePathForRole = (role?: string): string => {
-  switch (role) {
+  if (!role) return "/login";
+  switch (role.toUpperCase()) {
     case "OWNER":
     case "MANAGER":
       return "/dashboard";

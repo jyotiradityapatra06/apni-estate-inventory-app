@@ -10,6 +10,7 @@ import LoginPage from "../../pages/auth/LoginPage";
 import ProtectedRoute from "./ProtectedRoute";
 import RoleGuard from "./RoleGuard";
 import PermissionGuard from "./PermissionGuard";
+import DeliveryRouteGuard from "./DeliveryRouteGuard";
 import AccessDeniedPage from "../../pages/not-found/AccessDeniedPage";
 import { AuthProvider } from "../../context/AuthContext";
 import { useAuth } from "../../hooks/useAuth";
@@ -48,7 +49,7 @@ export const AppRouter = () => {
                 <Route path="/inventory" element={<InventoryPage />} />
               </Route>
               
-              <Route element={<PermissionGuard permission="deliveries:view" />}>
+              <Route element={<DeliveryRouteGuard />}>
                 <Route path="/deliveries" element={<DeliveriesPage />} />
               </Route>
               

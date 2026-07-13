@@ -230,37 +230,7 @@ export const LoginPage = () => {
           </button>
         </form>
 
-        {/* Demo credentials helper */}
-        {!isRegister && (
-          <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12 }} className="p-3 text-[11px] text-gray-500 flex flex-col gap-2">
-            <div className="flex justify-between items-center mb-1">
-              <span className="font-semibold text-gray-700">Quick Demo Log In:</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: "OWNER", email: "owner@apniestate.com" },
-                { label: "MANAGER", email: "manager@apniestate.com" },
-                { label: "STAFF", email: "staff@apniestate.com" },
-                { label: "DRIVER", email: "driver@apniestate.com" },
-              ].map((role) => (
-                <button
-                  key={role.label}
-                  type="button"
-                  onClick={() => {
-                    setEmail(role.email);
-                    setPassword("Admin@123");
-                  }}
-                  className="px-2 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded text-[10px] font-semibold cursor-pointer transition-all active:scale-[0.97]"
-                >
-                  {role.label}
-                </button>
-              ))}
-            </div>
-            <div className="text-[9px] text-gray-400 text-center mt-1">
-              Password for all accounts is <span className="text-gray-700 font-semibold select-all">Admin@123</span>
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   );
