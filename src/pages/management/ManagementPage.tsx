@@ -18,7 +18,7 @@ export const ManagementPage = () => {
   const { user, business, logout, refreshSession } = useAuth();
   
   const canManageTeam = hasPermission(user, "team:manage");
-  const canEditBusiness = hasPermission(user, "business:manage") || user?.role === "OWNER" || user?.role === "MANAGER";
+  const canEditBusiness = hasPermission(user, "business:manage");
 
   // Tab State
   const [activeTab, setActiveTab] = useState<"profile" | "team">("profile");

@@ -8,8 +8,15 @@ import { Card } from "../../app/components/common/Card";
 import { SectionLabel } from "../../app/components/common/SectionLabel";
 import { Divider } from "../../app/components/common/Divider";
 import { useGetInventory, useInventoryMutations } from "../../hooks/useInventory";
+import { useAuth } from "../../hooks/useAuth";
+import { hasPermission } from "../../utils/permissions";
 
 export const InventoryPage = () => {
+  const { user } = useAuth();
+  const canCreate = hasPermission(user, "inventory:create");
+  const canUpdate = hasPermission(user, "inventory:update");
+  const canDelete = hasPermission(user, "inventory:delete");
+
   const [showReconcile, setShowReconcile] = useState(false);
   const [reconcileItemId, setReconcileItemId] = useState("");
   const [reconcileQty, setReconcileQty] = useState("");
@@ -387,13 +394,15 @@ export const InventoryPage = () => {
             <div className="text-white text-lg font-bold">Stock Overview</div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleOpenAdd}
-              style={{ background: "rgba(255,255,255,0.2)" }}
-              className="p-2 rounded-lg flex items-center justify-center cursor-pointer text-white"
-            >
-              <Plus size={16} />
-            </button>
+            {canCreate && (
+              <button
+                onClick={handleOpenAdd}
+                style={{ background: "rgba(255,255,255,0.2)" }}
+                className="p-2 rounded-lg flex items-center justify-center cursor-pointer text-white"
+              >
+                <Plus size={16} />
+              </button>
+            )}
             <button
               onClick={() => setShowReconcile(true)}
               style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.25)" }}
@@ -461,14 +470,16 @@ export const InventoryPage = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleOpenAdd}
-              style={{ background: C.blue }}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg cursor-pointer text-white text-xs font-semibold"
-            >
-              <Plus size={14} color="white" />
-              <span>Add Material</span>
-            </button>
+            {canCreate && (
+              <button
+                onClick={handleOpenAdd}
+                style={{ background: C.blue }}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg cursor-pointer text-white text-xs font-semibold"
+              >
+                <Plus size={14} color="white" />
+                <span>Add Material</span>
+              </button>
+            )}
             <button
               onClick={() => setShowReconcile(true)}
               style={{ background: C.white, border: `1px solid ${C.border}` }}
@@ -620,18 +631,22 @@ export const InventoryPage = () => {
                         >
                           - Stock-Out
                         </button>
-                        <button
-                          onClick={() => handleOpenEdit(item)}
-                          className="px-2.5 py-1 rounded bg-blue-50 text-[10px] font-semibold text-blue-700 cursor-pointer"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleOpenDelete(item)}
-                          className="px-2.5 py-1 rounded bg-red-50 text-[10px] font-semibold text-red-700 cursor-pointer"
-                        >
-                          Delete
-                        </button>
+                        {canUpdate && (
+                          <button
+                            onClick={() => handleOpenEdit(item)}
+                            className="px-2.5 py-1 rounded bg-blue-50 text-[10px] font-semibold text-blue-700 cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            onClick={() => handleOpenDelete(item)}
+                            className="px-2.5 py-1 rounded bg-red-50 text-[10px] font-semibold text-red-700 cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -687,20 +702,24 @@ export const InventoryPage = () => {
                           >
                             - Stock
                           </button>
-                          <button
-                            onClick={() => handleOpenEdit(item)}
-                            style={{ color: C.blue }}
-                            className="px-2.5 py-1 rounded hover:bg-blue-50 text-[10px] font-bold cursor-pointer"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleOpenDelete(item)}
-                            style={{ color: C.error }}
-                            className="px-2.5 py-1 rounded hover:bg-red-50 text-[10px] font-bold cursor-pointer"
-                          >
-                            Delete
-                          </button>
+                          {canUpdate && (
+                            <button
+                              onClick={() => handleOpenEdit(item)}
+                              style={{ color: C.blue }}
+                              className="px-2.5 py-1 rounded hover:bg-blue-50 text-[10px] font-bold cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                          )}
+                          {canDelete && (
+                            <button
+                              onClick={() => handleOpenDelete(item)}
+                              style={{ color: C.error }}
+                              className="px-2.5 py-1 rounded hover:bg-red-50 text-[10px] font-bold cursor-pointer"
+                            >
+                              Delete
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );

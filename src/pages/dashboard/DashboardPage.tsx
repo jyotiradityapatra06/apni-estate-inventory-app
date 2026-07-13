@@ -17,6 +17,7 @@ import { useGetInventory } from "../../hooks/useInventory";
 import { inventoryApi } from "../../api/inventory.api";
 import { notificationApi, NotificationData } from "../../api/notification.api";
 import { LocalDelivery } from "../deliveries/DeliveriesPage";
+import { deliveryApi } from "../../api/delivery.api";
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
@@ -69,30 +70,33 @@ export const DashboardPage = () => {
     }
   };
 
-  const loadLocalDeliveries = () => {
+  const fetchDeliveries = async () => {
+    const role = user?.role?.toUpperCase();
+    if (role !== "OWNER" && role !== "MANAGER") {
+      setDeliveries([]);
+      return;
+    }
     try {
-      const stored = localStorage.getItem("apni_deliveries");
-      if (stored) {
-        setDeliveries(JSON.parse(stored));
-      } else {
-        setDeliveries([]);
+      const res = await deliveryApi.getDeliveries();
+      if (res.success && res.data) {
+        setDeliveries(res.data as any);
       }
     } catch (err) {
-      console.error("Failed to load local deliveries:", err);
+      console.error("Failed to load deliveries for dashboard:", err);
     }
   };
 
   useEffect(() => {
     fetchTransactions();
     fetchBackendNotifications();
-    loadLocalDeliveries();
+    fetchDeliveries();
   }, [user]);
 
   const handleRefresh = () => {
     refreshInv();
     fetchTransactions();
     fetchBackendNotifications();
-    loadLocalDeliveries();
+    fetchDeliveries();
     toast.success("Dashboard metrics updated");
   };
 

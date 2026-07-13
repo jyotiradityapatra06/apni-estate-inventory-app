@@ -18,6 +18,7 @@ export const LoginPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [demoLoadingRole, setDemoLoadingRole] = useState<"OWNER" | "MANAGER" | "STAFF" | null>(null);
 
   useEffect(() => {
     if (sessionStorage.getItem("session_expired_toast") === "true") {
@@ -57,6 +58,35 @@ export const LoginPage = () => {
       toast.error(msg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async (role: "OWNER" | "MANAGER" | "STAFF") => {
+    if (loading || demoLoadingRole) return;
+    setDemoLoadingRole(role);
+    setLoading(true);
+    setError(null);
+
+    const demoCredentials = {
+      OWNER: { email: "owner@apniestate.com", password: "Admin@123" },
+      MANAGER: { email: "manager@apniestate.com", password: "Admin@123" },
+      STAFF: { email: "staff@apniestate.com", password: "Admin@123" },
+    };
+
+    try {
+      const creds = demoCredentials[role];
+      const data = await login({ email: creds.email, password: creds.password });
+      toast.success("Login successful");
+      const userRole = data?.user?.role;
+      navigate(getHomePathForRole(userRole));
+    } catch (err: any) {
+      console.error("Demo login error:", err);
+      const msg = err?.message || "An unexpected validation or network error occurred.";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+      setDemoLoadingRole(null);
     }
   };
 
@@ -229,6 +259,46 @@ export const LoginPage = () => {
             )}
           </button>
         </form>
+
+        {/* Demo Access Section */}
+        {!isRegister && (
+          <div
+            style={{
+              background: C.surface,
+              border: `1px solid ${C.border}`,
+              borderRadius: 12,
+            }}
+            className="p-4 text-center flex flex-col gap-2.5"
+          >
+            <div className="flex flex-col gap-0.5">
+              <span style={{ color: C.ink }} className="text-xs font-bold">
+                Demo Access
+              </span>
+              <span style={{ color: C.muted }} className="text-[10px]">
+                Choose a role to explore the application.
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {(["OWNER", "MANAGER", "STAFF"] as const).map((role) => {
+                const isSelectedLoading = demoLoadingRole === role;
+                return (
+                  <button
+                    key={role}
+                    type="button"
+                    disabled={loading}
+                    onClick={() => handleDemoLogin(role)}
+                    className="px-2.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-lg text-[10px] font-bold cursor-pointer transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSelectedLoading && (
+                      <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    )}
+                    <span>{role.charAt(0) + role.slice(1).toLowerCase()}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
 
       </div>
