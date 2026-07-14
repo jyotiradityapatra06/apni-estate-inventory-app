@@ -90,18 +90,17 @@ export const ManagementPage = () => {
   return (
     <div className="flex flex-col gap-0 pb-4 min-h-screen">
       {/* Mobile Page Header */}
-      <div style={{ background: C.blue }} className="px-4 pt-12 pb-5 md:hidden">
+      <div style={{ background: C.blue }} className="mx-4 mt-3 rounded-xl px-5 py-5 md:hidden text-white shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-white/60 text-[11px] uppercase tracking-wider font-semibold">Management</div>
-            <div className="text-white text-lg font-bold">Business Settings</div>
+            <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold">Management</div>
+            <div className="text-xl font-bold leading-tight mt-1 text-white">Business Settings</div>
           </div>
           <button 
             onClick={handleLogout}
-            style={{ background: "rgba(255,255,255,0.2)" }}
-            className="p-2 rounded-lg text-white"
+            className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
           >
-            <LogOut size={16} />
+            <LogOut size={18} className="text-white" />
           </button>
         </div>
       </div>
@@ -199,16 +198,16 @@ export const ManagementPage = () => {
 
                 <div className="grid grid-cols-2 gap-4 text-xs font-medium">
                   <div>
-                    <span style={{ color: C.muted }} className="block text-[10px] uppercase font-semibold mb-0.5">GST Registration</span>
-                    <span style={{ color: C.ink }} className="font-bold">{business?.gstNumber || "Not Provided"}</span>
+                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">GST Registration</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{business?.gstNumber || "Not Provided"}</span>
                   </div>
                   <div>
-                    <span style={{ color: C.muted }} className="block text-[10px] uppercase font-semibold mb-0.5">Business Contact</span>
-                    <span style={{ color: C.ink }} className="font-bold">{business?.phone || "Not Provided"}</span>
+                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">Business Contact</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{business?.phone || "Not Provided"}</span>
                   </div>
                   <div className="col-span-2">
-                    <span style={{ color: C.muted }} className="block text-[10px] uppercase font-semibold mb-0.5">Operating Address</span>
-                    <span style={{ color: C.ink }} className="font-bold">{business?.address || "Not Provided"}</span>
+                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">Operating Address</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{business?.address || "Not Provided"}</span>
                   </div>
                 </div>
               </Card>
@@ -217,25 +216,25 @@ export const ManagementPage = () => {
             {/* Account Details */}
             <div>
               <SectionLabel>Account Settings</SectionLabel>
-              <Card className="p-5 flex flex-col gap-3 text-xs font-medium">
+              <Card className="p-5 flex flex-col gap-3 text-sm font-medium">
                 <div className="flex justify-between py-1">
                   <span style={{ color: C.muted }}>User Identifier</span>
-                  <span style={{ color: C.ink }} className="font-bold">{user?.id}</span>
+                  <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{user?.id}</span>
                 </div>
                 <Divider />
                 <div className="flex justify-between py-1">
                   <span style={{ color: C.muted }}>Staff Name</span>
-                  <span style={{ color: C.ink }} className="font-bold">{user?.name}</span>
+                  <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{user?.name}</span>
                 </div>
                 <Divider />
                 <div className="flex justify-between py-1">
                   <span style={{ color: C.muted }}>Email Address</span>
-                  <span style={{ color: C.ink }} className="font-bold">{user?.email}</span>
+                  <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{user?.email}</span>
                 </div>
                 <Divider />
                 <div className="flex justify-between py-1">
                   <span style={{ color: C.muted }}>System Permissions</span>
-                  <span style={{ color: C.blue }} className="font-bold uppercase tracking-wider text-[10px] bg-blue-50 px-2 py-0.5 rounded">
+                  <span style={{ color: C.blue }} className="font-bold uppercase tracking-wider text-xs bg-blue-50 px-2.5 py-1 rounded font-bold">
                     {user?.role}
                   </span>
                 </div>
@@ -325,7 +324,7 @@ export const ManagementPage = () => {
                 type="submit"
                 disabled={editLoading}
                 style={{ background: C.blue }}
-                className="w-full mt-2 py-3 rounded-xl text-white font-bold cursor-pointer hover:opacity-95 disabled:opacity-50"
+                className="w-full mt-2 h-11 rounded-lg text-white font-bold cursor-pointer hover:opacity-95 disabled:opacity-50"
               >
                 {editLoading ? "Saving Changes..." : "Save Business Profile"}
               </button>

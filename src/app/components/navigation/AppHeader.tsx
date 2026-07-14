@@ -168,7 +168,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
         background: isDark ? C.darkCard : C.white,
         borderBottom: `1px solid ${borderColor}`,
       }}
-      className="z-30 hidden h-16 flex-shrink-0 select-none items-center justify-between px-6 md:flex"
+      className="fixed top-0 left-0 right-0 md:left-20 lg:left-60 h-16 z-30 flex select-none items-center justify-between px-6"
     >
       {/* Page title */}
       <div>

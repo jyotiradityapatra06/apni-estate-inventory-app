@@ -53,14 +53,14 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
   return (
     <aside
       style={{
-        background: "#0B132B", // Deep dark navy
-        borderRight: "1px solid #1E293B",
+        background: C.dark,
+        borderRight: `1px solid ${C.darkBorder}`,
       }}
       className="hidden md:flex flex-col h-full transition-all duration-300 w-20 lg:w-60 flex-shrink-0"
     >
       {/* Branding Section */}
       <div
-        style={{ borderBottom: "1px solid #1E293B" }}
+        style={{ borderBottom: `1px solid ${C.darkBorder}` }}
         className="h-16 flex items-center justify-center lg:justify-start px-4 gap-3 flex-shrink-0"
       >
         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden bg-white">
@@ -132,7 +132,7 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
 
       {/* Profile Footer Section */}
       <div
-        style={{ borderTop: "1px solid #1E293B" }}
+        style={{ borderTop: `1px solid ${C.darkBorder}` }}
         className="p-3 lg:p-4 flex items-center justify-center lg:justify-start gap-3 flex-shrink-0"
       >
         <div style={{ background: "rgba(38,72,231,0.2)", borderRadius: 999 }} className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center flex-shrink-0">

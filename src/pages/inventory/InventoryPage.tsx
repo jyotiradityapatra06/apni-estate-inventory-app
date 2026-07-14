@@ -56,6 +56,9 @@ export const InventoryPage = () => {
   // Creation callback tracking
   const [createSource, setCreateSource] = useState<"reconcile" | "adjust" | null>(null);
 
+  const [stockInError, setStockInError] = useState<string | null>(null);
+  const [stockOutError, setStockOutError] = useState<string | null>(null);
+
   // Fetch Inventory
   const { data: stockItems, loading, error, refresh } = useGetInventory({
     search: searchQuery,
@@ -130,11 +133,26 @@ export const InventoryPage = () => {
         setShowReconcile(false);
         setIsReconcileDropdownOpen(false);
         setIsAdjustDropdownOpen(false);
+        setStockInError(null);
+        setStockOutError(null);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (!showReconcile) {
+      setStockInError(null);
+    }
+  }, [showReconcile]);
+
+  useEffect(() => {
+    if (!showAdjust) {
+      setStockInError(null);
+      setStockOutError(null);
+    }
+  }, [showAdjust]);
 
   // Outside click handler to close suggestions
   useEffect(() => {
@@ -155,12 +173,22 @@ export const InventoryPage = () => {
     if (showReconcile) {
       if (reconcileItemId) {
         const item = stockItems.find(s => s.id === reconcileItemId);
-        setReconcileSearch(item ? item.materialName : "");
-      } else {
-        setReconcileSearch("");
+        if (item) {
+          setReconcileSearch(item.materialName);
+        }
       }
     }
   }, [showReconcile, reconcileItemId, stockItems]);
+
+  // Clean reconcile fields on open if no preselected item
+  useEffect(() => {
+    if (showReconcile && !reconcileItemId) {
+      setReconcileSearch("");
+      setReconcileQty("");
+      setReconcileSupplier("");
+      setReconcileNote("");
+    }
+  }, [showReconcile]);
 
   // Sync adjustSearch with adjustingItem
   useEffect(() => {
@@ -240,26 +268,32 @@ export const InventoryPage = () => {
   const handleAdjustSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mutationLoading) return;
-    setFeedback(null);
 
     if (!adjustingItem || adjustingItem.materialName !== adjustSearch) {
-      const errMsg = "Please select a valid material from suggestions.";
-      setFeedback({ type: "error", msg: errMsg });
-      toast.error(errMsg);
+      const errMsg = adjustType === "IN" 
+        ? "Select a material or add it as a new material." 
+        : "Please select a valid material from suggestions.";
+      if (adjustType === "IN") {
+        setStockInError(errMsg);
+      } else {
+        setStockOutError(errMsg);
+      }
       return;
     }
 
     if (!adjustQty || Number(adjustQty) <= 0) {
       const errMsg = "Please enter a valid adjustment quantity greater than zero.";
-      setFeedback({ type: "error", msg: errMsg });
-      toast.error(errMsg);
+      if (adjustType === "IN") {
+        setStockInError(errMsg);
+      } else {
+        setStockOutError(errMsg);
+      }
       return;
     }
 
     if (adjustType === "OUT" && Number(adjustQty) > adjustingItem.quantity) {
       const errMsg = "Stock cannot be reduced below zero.";
-      setFeedback({ type: "error", msg: errMsg });
-      toast.error(errMsg);
+      setStockOutError(errMsg);
       return;
     }
 
@@ -269,6 +303,8 @@ export const InventoryPage = () => {
         quantity: Number(adjustQty),
         note: adjustNote,
       });
+      setStockInError(null);
+      setStockOutError(null);
       setFeedback({
         type: "success",
         msg: `Recorded stock ${adjustType === "IN" ? "addition" : "deduction"} for ${adjustingItem.materialName}.`,
@@ -278,8 +314,11 @@ export const InventoryPage = () => {
       refresh();
     } catch (err: any) {
       const msg = err?.message || "Failed to adjust stock.";
-      setFeedback({ type: "error", msg });
-      toast.error(msg);
+      if (adjustType === "IN") {
+        setStockInError(msg);
+      } else {
+        setStockOutError(msg);
+      }
     }
   };
 
@@ -302,22 +341,19 @@ export const InventoryPage = () => {
   const lowStock = stockItems.filter((s) => s.quantity < s.reorderLevel);
 
   if (showReconcile) {
-    const handleReconcileSubmit = async (e: React.FormEvent) => {
+     const handleReconcileSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if (mutationLoading) return;
-      setFeedback(null);
 
       if (!reconcileItemId) {
-        const errMsg = "Please select a material.";
-        setFeedback({ type: "error", msg: errMsg });
-        toast.error(errMsg);
+        const errMsg = "Select a material or add it as a new material.";
+        setStockInError(errMsg);
         return;
       }
 
       if (!reconcileQty || Number(reconcileQty) <= 0) {
         const errMsg = "Please enter a valid received quantity greater than zero.";
-        setFeedback({ type: "error", msg: errMsg });
-        toast.error(errMsg);
+        setStockInError(errMsg);
         return;
       }
 
@@ -330,6 +366,7 @@ export const InventoryPage = () => {
           note: combinedNote,
         });
 
+        setStockInError(null);
         toast.success(`Successfully stocked in ${reconcileQty} ${selectedItem?.unit || "units"} of ${selectedItem?.materialName}`);
         
         // Reset fields
@@ -342,20 +379,19 @@ export const InventoryPage = () => {
         refresh();
       } catch (err: any) {
         const msg = err?.message || "Failed to confirm stock in.";
-        setFeedback({ type: "error", msg });
-        toast.error(msg);
+        setStockInError(msg);
       }
     };
     return (
       <div className="flex flex-col h-full">
-        <div style={{ background: C.blue }} className="px-4 pt-12 pb-5">
-          <div className="flex items-center gap-3 mb-1">
+        <div style={{ background: C.blue }} className="mx-4 mt-3 rounded-xl px-5 py-5 text-white shadow-sm flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <button onClick={() => { setShowReconcile(false); }} className="cursor-pointer">
               <ArrowLeft size={20} color="white" />
             </button>
             <div>
-              <div className="text-white/60 text-[11px] uppercase tracking-wider font-semibold">Incoming Stock</div>
-              <div className="text-white text-base font-bold">Stock In</div>
+              <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold">Stock In</div>
+              <div className="text-xl font-bold leading-tight mt-1 text-white">Stock In Form</div>
             </div>
           </div>
         </div>
@@ -363,6 +399,11 @@ export const InventoryPage = () => {
         <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
           <Card className="p-4 border-slate-300 shadow-sm rounded-xl">
             <h3 style={{ color: C.ink }} className="text-base font-bold mb-4">Stock In</h3>
+            {stockInError && (
+              <div className="bg-red-50 border border-red-150 text-red-700 px-3 py-2 rounded-lg text-xs mb-3 font-semibold">
+                {stockInError}
+              </div>
+            )}
             {stockItems.length === 0 ? (
               <div className="text-center py-6">
                 <AlertTriangle size={32} color={C.error} className="mx-auto mb-2" />
@@ -379,8 +420,7 @@ export const InventoryPage = () => {
                   Create Material
                 </button>
               </div>
-            ) : (
-              <form onSubmit={handleReconcileSubmit} className="flex flex-col gap-4 text-xs font-medium">
+            ) : (              <form onSubmit={handleReconcileSubmit} className="flex flex-col gap-4 text-xs font-medium">
                 <div className="flex flex-col gap-1 relative" ref={reconcileComboboxRef}>
                   <label className="text-slate-700 text-sm font-bold mb-1">Select Material</label>
                   <div className="relative">
@@ -393,8 +433,16 @@ export const InventoryPage = () => {
                       placeholder="Search material by name..."
                       value={reconcileSearch}
                       onChange={(e) => {
-                        setReconcileSearch(e.target.value);
+                        const val = e.target.value;
+                        setReconcileSearch(val);
                         setIsReconcileDropdownOpen(true);
+                        setStockInError(null);
+                        const exactMatch = stockItems.find(s => s.materialName.toLowerCase() === val.toLowerCase().trim());
+                        if (exactMatch && exactMatch.materialName === val) {
+                          setReconcileItemId(exactMatch.id);
+                        } else {
+                          setReconcileItemId("");
+                        }
                       }}
                       onFocus={() => setIsReconcileDropdownOpen(true)}
                       style={{ background: C.surface, border: `1.5px solid ${C.border}`, color: C.ink }}
@@ -407,6 +455,7 @@ export const InventoryPage = () => {
                           setReconcileSearch("");
                           setReconcileItemId("");
                           setIsReconcileDropdownOpen(true);
+                          setStockInError(null);
                         }}
                         className="absolute right-3 top-3.5 text-slate-400 font-bold hover:text-slate-650 text-sm cursor-pointer"
                       >
@@ -430,16 +479,23 @@ export const InventoryPage = () => {
                               onClick={() => {
                                 setCreateSource("reconcile");
                                 setMaterialName(reconcileSearch);
-                                setQuantity("0");
+                                setEditingItem(null);
                                 setCategory("Cement");
+                                setSku("");
                                 setUnit("Bags");
+                                setQuantity("0");
+                                setReorderLevel("100");
                                 setLocationInput("Godown A");
+                                setCostPrice("");
+                                setSellingPrice("");
+                                setFeedback(null);
                                 setShowAddEdit(true);
                                 setIsReconcileDropdownOpen(false);
+                                setStockInError(null);
                               }}
                               className="w-full text-left px-4 py-3 text-xs font-bold text-amber-600 hover:bg-slate-50 cursor-pointer border-b border-slate-100"
                             >
-                              + Add &quot;{reconcileSearch}&quot; as new material
+                              + Add &quot;{reconcileSearch}&quot; as a new material
                             </button>
                           ) : (
                             <div className="px-4 py-3 text-xs text-slate-500 font-semibold text-center">
@@ -457,11 +513,12 @@ export const InventoryPage = () => {
                                   setReconcileItemId(item.id);
                                   setReconcileSearch(item.materialName);
                                   setIsReconcileDropdownOpen(false);
+                                  setStockInError(null);
                                 }}
                                 className="w-full text-left px-4 py-2.5 hover:bg-slate-50 border-b border-slate-100 flex flex-col justify-start cursor-pointer"
                               >
                                 <span className="font-bold text-slate-800 text-sm">{item.materialName}</span>
-                                <span className="text-xs text-slate-505 mt-0.5 text-slate-500">
+                                <span className="text-xs text-slate-550 mt-0.5 text-slate-500">
                                   Stock: {item.quantity.toLocaleString("en-IN")} {item.unit} · {item.location}
                                 </span>
                               </button>
@@ -472,16 +529,23 @@ export const InventoryPage = () => {
                                 onClick={() => {
                                   setCreateSource("reconcile");
                                   setMaterialName(reconcileSearch);
-                                  setQuantity("0");
+                                  setEditingItem(null);
                                   setCategory("Cement");
+                                  setSku("");
                                   setUnit("Bags");
+                                  setQuantity("0");
+                                  setReorderLevel("100");
                                   setLocationInput("Godown A");
+                                  setCostPrice("");
+                                  setSellingPrice("");
+                                  setFeedback(null);
                                   setShowAddEdit(true);
                                   setIsReconcileDropdownOpen(false);
+                                  setStockInError(null);
                                 }}
                                 className="w-full text-left px-4 py-3 text-xs font-bold text-[#EAB308] hover:bg-slate-50 cursor-pointer border-t border-slate-100"
                               >
-                                + Add &quot;{reconcileSearch}&quot; as new material
+                                + Add &quot;{reconcileSearch}&quot; as a new material
                               </button>
                             )}
                           </>
@@ -489,10 +553,31 @@ export const InventoryPage = () => {
                       })()}
                     </div>
                   )}
+                  {reconcileItemId && (
+                    (() => {
+                      const selectedItem = stockItems.find(s => s.id === reconcileItemId);
+                      if (selectedItem && selectedItem.materialName === reconcileSearch) {
+                        return (
+                          <div className="text-xs font-bold mt-1 text-slate-600">
+                            Current Stock: <span className="font-bold text-slate-800 font-mono">{selectedItem.quantity} {selectedItem.unit}</span>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-slate-700 text-sm font-bold mb-1">Quantity to Add</label>
+                  <label className="text-slate-700 text-sm font-bold mb-1">
+                    {(() => {
+                      const selectedItem = stockItems.find(s => s.id === reconcileItemId);
+                      if (selectedItem && selectedItem.materialName === reconcileSearch) {
+                        return `Quantity to Add (${selectedItem.unit})`;
+                      }
+                      return "Quantity to Add";
+                    })()}
+                  </label>
                   <input
                     type="number"
                     required
@@ -546,29 +631,27 @@ export const InventoryPage = () => {
   return (
     <div className="flex flex-col gap-0 pb-4">
       {/* Mobile Header */}
-      <div style={{ background: C.blue }} className="px-4 pt-12 pb-5 md:hidden">
-        <div className="flex items-center justify-between mb-3">
+      <div style={{ background: C.blue }} className="mx-4 mt-3 rounded-xl px-5 py-5 md:hidden text-white shadow-sm">
+        <div className="flex items-center justify-between">
           <div>
-            <div className="text-white/60 text-[11px] uppercase tracking-wider font-semibold">Stock</div>
-            <div className="text-white text-lg font-bold">Stock Overview</div>
+            <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold">Stock</div>
+            <div className="text-xl font-bold leading-tight mt-1 text-white">Stock Overview</div>
           </div>
           <div className="flex items-center gap-2">
             {canCreate && (
               <button
                 onClick={handleOpenAdd}
-                style={{ background: "rgba(255,255,255,0.2)" }}
-                className="p-2 rounded-lg flex items-center justify-center cursor-pointer text-white"
+                className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
               >
-                <Plus size={16} />
+                <Plus size={18} className="text-white" />
               </button>
             )}
             <button
               onClick={() => setShowReconcile(true)}
-              style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.25)" }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg cursor-pointer"
+              className="h-10 px-4 rounded-lg flex items-center gap-2 bg-white/10 active:scale-95 transition-all border border-white/20 cursor-pointer text-white text-xs font-bold"
             >
-              <ClipboardList size={14} color="white" />
-              <span className="text-white text-xs font-semibold">Stock In</span>
+              <ClipboardList size={16} />
+              <span>Stock In</span>
             </button>
           </div>
         </div>
@@ -645,7 +728,7 @@ export const InventoryPage = () => {
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg cursor-pointer text-gray-700 text-xs font-semibold hover:bg-black/5"
             >
               <ClipboardList size={14} color={C.muted} />
-              <span>Incoming Stock</span>
+              <span>Stock In</span>
             </button>
           </div>
         </div>
@@ -682,12 +765,14 @@ export const InventoryPage = () => {
 
         {/* Low Stock Alert banner */}
         {!loading && lowStock.length > 0 && (
-          <div style={{ background: "#FEF2F2", border: `1px solid ${C.error}30` }} className="rounded-xl px-4 py-3 flex items-start gap-3">
-            <AlertTriangle size={16} color={C.error} className="flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <div style={{ color: "#991B1B" }} className="text-[12px] font-semibold">{lowStock.length} Low Stock</div>
-              <div style={{ color: "#B91C1C" }} className="text-[11px]">
-                {lowStock.map(s => s.materialName).slice(0, 3).join(", ")} {lowStock.length > 3 ? "and more " : ""}needs more stock.
+          <div style={{ background: "#FEF2F2", border: `1px solid ${C.error}30` }} className="rounded-xl px-4 py-2 flex items-start gap-2.5">
+            <AlertTriangle size={15} color={C.error} className="flex-shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <div style={{ color: "#991B1B" }} className="text-[11px] font-bold leading-tight">
+                {lowStock.length === 1 ? "1 material is low on stock" : `${lowStock.length} materials are low on stock`}
+              </div>
+              <div style={{ color: "#B91C1C" }} className="text-[10px] mt-0.5 truncate font-medium">
+                {lowStock.map(s => s.materialName).join(", ")}
               </div>
             </div>
           </div>
@@ -749,63 +834,70 @@ export const InventoryPage = () => {
                 return (
                   <div key={item.id}>
                     {i > 0 && <Divider />}
-                    <div className="px-4 py-3">
-                      <div className="flex items-start justify-between mb-2">
+                    <div className="px-4 py-3.5">
+                      <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span style={{ color: C.ink }} className="text-[13px] font-semibold">{item.materialName}</span>
+                          <div className="flex items-start gap-2 flex-col sm:flex-row sm:items-center">
+                            <span style={{ color: C.ink }} className="text-sm font-bold leading-snug whitespace-normal break-words">{item.materialName}</span>
                             {isCritical && <Badge label="LOW" variant="danger" />}
                           </div>
-                          <div style={{ color: C.muted }} className="text-[11px]">{item.category} · {item.sku} · {item.location}</div>
+                          <div style={{ color: C.muted }} className="text-xs mt-1 font-medium">{item.category} · {item.sku} · {item.location}</div>
                         </div>
                         <div className="text-right flex-shrink-0 ml-2">
-                          <div style={{ color: isCritical ? C.error : C.ink, fontFamily: "'Space Grotesk'" }} className="text-base font-bold">{available.toLocaleString("en-IN")}</div>
-                          <div style={{ color: C.muted }} className="text-[10px]">{item.unit} avail.</div>
+                          <div style={{ color: isCritical ? C.error : C.ink, fontFamily: "'Space Grotesk'" }} className="text-lg font-bold leading-tight">{available.toLocaleString("en-IN")}</div>
+                          <div style={{ color: C.muted }} className="text-[11px] font-semibold block text-right mt-0.5 whitespace-nowrap">{item.unit} avail.</div>
                         </div>
                       </div>
-                      <div className="flex gap-3 text-[10px] mb-2">
-                        {item.costPrice && <span style={{ color: C.muted }}>Cost: <span style={{ color: C.ink }} className="font-semibold">₹{item.costPrice}</span></span>}
-                        <span style={{ color: C.muted }}>Reorder Level: <span style={{ color: C.ink }} className="font-semibold">{item.reorderLevel.toLocaleString("en-IN")}</span></span>
+                      <div className="flex gap-4 text-xs font-medium mb-2.5">
+                        {item.costPrice && <span style={{ color: C.muted }}>Cost: <span style={{ color: C.ink }} className="font-bold">₹{item.costPrice}</span></span>}
+                        <span style={{ color: C.muted }}>Reorder Level: <span style={{ color: C.ink }} className="font-bold">{item.reorderLevel.toLocaleString("en-IN")}</span></span>
                       </div>
-                      <div style={{ background: "#F0EEE6", borderRadius: 99, height: 5 }} className="mb-2">
+                      <div style={{ background: "#F0EEE6", borderRadius: 99, height: 6 }} className="mb-2.5">
                         <div style={{ background: isCritical ? C.error : pct > 60 ? C.success : C.warning, borderRadius: 99, width: `${pct}%`, height: "100%", transition: "width 0.3s" }} />
                       </div>
                       <div style={{ background: isCritical ? "#FEF2F2" : "#F0FDF4", borderRadius: 8 }} className="px-3 py-2">
-                        <p style={{ color: isCritical ? "#991B1B" : "#065F46" }} className="text-[11px]">
-                          ~{estDays} days remaining at average rates
+                        <p style={{ color: isCritical ? "#991B1B" : "#065F46" }} className="text-xs font-semibold">
+                          {isCritical ? "Low stock: " : ""}~{estDays} days remaining at average rates
                         </p>
                       </div>
 
                       {/* Mobile Card Actions row */}
-                      <div className="flex gap-1.5 mt-3 pt-3 border-t border-[rgba(20,18,14,0.06)] justify-end">
-                        <button
-                          onClick={() => handleOpenAdjustment(item, "IN")}
-                          className="px-2.5 py-1 rounded bg-green-50 text-[10px] font-semibold text-green-700 cursor-pointer"
-                        >
-                          + Stock-In
-                        </button>
-                        <button
-                          onClick={() => handleOpenAdjustment(item, "OUT")}
-                          className="px-2.5 py-1 rounded bg-red-50 text-[10px] font-semibold text-red-700 cursor-pointer"
-                        >
-                          - Stock-Out
-                        </button>
-                        {canUpdate && (
+                      <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-[rgba(20,18,14,0.06)]">
+                        {/* Primary adjustments */}
+                        <div className="flex-1 flex gap-2">
                           <button
-                            onClick={() => handleOpenEdit(item)}
-                            className="px-2.5 py-1 rounded bg-blue-50 text-[10px] font-semibold text-blue-700 cursor-pointer"
+                            onClick={() => handleOpenAdjustment(item, "IN")}
+                            className="flex-1 h-10 flex items-center justify-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100 hover:bg-emerald-100 active:scale-98 transition-all cursor-pointer"
                           >
-                            Edit
+                            Stock In
                           </button>
-                        )}
-                        {canDelete && (
                           <button
-                            onClick={() => handleOpenDelete(item)}
-                            className="px-2.5 py-1 rounded bg-red-50 text-[10px] font-semibold text-red-700 cursor-pointer"
+                            onClick={() => handleOpenAdjustment(item, "OUT")}
+                            className="flex-1 h-10 flex items-center justify-center gap-1 bg-rose-50 text-rose-700 text-xs font-bold rounded-lg border border-rose-100 hover:bg-rose-100 active:scale-98 transition-all cursor-pointer"
                           >
-                            Delete
+                            Stock Out
                           </button>
-                        )}
+                        </div>
+
+                        {/* Secondary edits */}
+                        <div className="flex gap-2">
+                          {canUpdate && (
+                            <button
+                              onClick={() => handleOpenEdit(item)}
+                              className="h-10 px-3 flex items-center justify-center bg-slate-100 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-200 active:scale-95 transition-all cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                          )}
+                          {canDelete && (
+                            <button
+                              onClick={() => handleOpenDelete(item)}
+                              className="h-10 px-3 flex items-center justify-center bg-red-50 text-red-600 text-xs font-bold rounded-lg hover:bg-red-100 active:scale-95 transition-all cursor-pointer"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -852,14 +944,14 @@ export const InventoryPage = () => {
                             style={{ color: C.success }}
                             className="px-2.5 py-1 rounded hover:bg-green-50 text-[10px] font-bold cursor-pointer"
                           >
-                            + Stock
+                            Stock In
                           </button>
                           <button
                             onClick={() => handleOpenAdjustment(item, "OUT")}
                             style={{ color: C.error }}
                             className="px-2.5 py-1 rounded hover:bg-red-50 text-[10px] font-bold cursor-pointer"
                           >
-                            - Stock
+                            Stock Out
                           </button>
                           {canUpdate && (
                             <button
@@ -892,7 +984,7 @@ export const InventoryPage = () => {
 
       {/* MODAL: ADD / EDIT MATERIAL */}
       {showAddEdit && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(14,24,35,0.4)", backdropFilter: "blur(4px)" }}>
+        <div className="absolute inset-0 z-[100] flex items-center justify-center px-4" style={{ background: "rgba(14,24,35,0.4)", backdropFilter: "blur(4px)" }}>
           <div style={{ background: C.white, borderRadius: 16, boxShadow: "0 20px 25px -5px rgba(20, 18, 14, 0.1), 0 10px 10px -5px rgba(20, 18, 14, 0.04)" }} className="w-full max-w-md p-5 flex flex-col gap-4 max-h-[85%] overflow-y-auto">
             <div className="flex items-center justify-between">
               <span style={{ color: C.ink }} className="text-sm font-bold">{editingItem ? "Edit Material" : "Add New Material"}</span>
@@ -1022,7 +1114,7 @@ export const InventoryPage = () => {
                 type="submit"
                 disabled={mutationLoading}
                 style={{ background: C.blue }}
-                className="w-full mt-2 py-3 rounded-xl text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="w-full mt-2 h-11 rounded-lg text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               >
                 {mutationLoading ? (
                   editingItem ? "Saving..." : "Adding..."
@@ -1038,7 +1130,7 @@ export const InventoryPage = () => {
       {/* MODAL: STOCK ADJUSTMENT (STOCK-IN / STOCK-OUT) */}
       {showAdjust && (
         <div className="absolute inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(14,24,35,0.4)", backdropFilter: "blur(4px)" }}>
-          <div style={{ background: C.white, borderRadius: 16, boxShadow: "0 20px 25px -5px rgba(20, 18, 14, 0.1), 0 10px 10px -5px rgba(20, 18, 14, 0.04)" }} className="w-full max-w-sm p-5 flex flex-col gap-4">
+          <div style={{ background: C.white, borderRadius: 16, position: "relative", zIndex: 50, boxShadow: "0 20px 25px -5px rgba(20, 18, 14, 0.1), 0 10px 10px -5px rgba(20, 18, 14, 0.04)" }} className="w-full max-w-sm p-5 flex flex-col gap-4 relative z-50">
             <div className="flex items-center justify-between">
               <span style={{ color: C.ink }} className="text-sm font-bold">
                 {adjustType === "IN" ? "Stock In" : "Stock Out"}
@@ -1046,9 +1138,20 @@ export const InventoryPage = () => {
               <button onClick={() => setShowAdjust(false)} className="text-gray-500 font-bold cursor-pointer text-sm">×</button>
             </div>
 
-            <div className="flex flex-col gap-1 relative" ref={adjustComboboxRef}>
+            {adjustType === "IN" && stockInError && (
+              <div className="bg-red-50 border border-red-150 text-red-700 px-3 py-2 rounded-lg text-xs font-semibold">
+                {stockInError}
+              </div>
+            )}
+            {adjustType === "OUT" && stockOutError && (
+              <div className="bg-red-50 border border-red-150 text-red-700 px-3 py-2 rounded-lg text-xs font-semibold">
+                {stockOutError}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1" ref={adjustComboboxRef}>
               <label className="text-slate-700 text-xs font-bold mb-1">Select Material</label>
-              <div className="relative text-xs">
+              <div className="relative">
                 <div className="absolute left-3 top-3.5 text-slate-400">
                   <Search size={16} />
                 </div>
@@ -1058,8 +1161,17 @@ export const InventoryPage = () => {
                   placeholder="Search material..."
                   value={adjustSearch}
                   onChange={(e) => {
-                    setAdjustSearch(e.target.value);
+                    const val = e.target.value;
+                    setAdjustSearch(val);
                     setIsAdjustDropdownOpen(true);
+                    setStockInError(null);
+                    setStockOutError(null);
+                    const exactMatch = stockItems.find(s => s.materialName.toLowerCase() === val.toLowerCase().trim());
+                    if (exactMatch && exactMatch.materialName === val) {
+                      setAdjustingItem(exactMatch);
+                    } else {
+                      setAdjustingItem(null);
+                    }
                   }}
                   onFocus={() => setIsAdjustDropdownOpen(true)}
                   style={{ background: C.surface, border: `1.5px solid ${C.border}`, color: C.ink }}
@@ -1072,98 +1184,118 @@ export const InventoryPage = () => {
                       setAdjustSearch("");
                       setAdjustingItem(null);
                       setIsAdjustDropdownOpen(true);
+                      setStockInError(null);
+                      setStockOutError(null);
                     }}
                     className="absolute right-3 top-3.5 text-slate-400 font-bold hover:text-slate-655 text-sm cursor-pointer"
                   >
                     ×
                   </button>
                 )}
-              </div>
-              {isAdjustDropdownOpen && (
-                <div
-                  style={{ border: `1px solid ${C.border}` }}
-                  className="absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
-                >
-                  {(() => {
-                    const filteredAdjust = stockItems.filter(item =>
-                      item.materialName.toLowerCase().includes(adjustSearch.toLowerCase())
-                    );
-                    if (filteredAdjust.length === 0) {
-                      if (adjustType === "IN") {
-                        return canCreate && adjustSearch.trim() !== "" ? (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCreateSource("adjust");
-                              setMaterialName(adjustSearch);
-                              setQuantity("0");
-                              setCategory("Cement");
-                              setUnit("Bags");
-                              setLocationInput("Godown A");
-                              setShowAddEdit(true);
-                              setIsAdjustDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-3 text-xs font-bold text-amber-600 hover:bg-slate-50 cursor-pointer border-b border-slate-100"
-                          >
-                            + Add &quot;{adjustSearch}&quot; as new material
-                          </button>
-                        ) : (
-                          <div className="px-4 py-3 text-xs text-slate-500 font-semibold text-center">
-                            No matching materials.
-                          </div>
-                        );
-                      } else {
-                        // Stock out
-                        return (
-                          <div className="px-4 py-3 text-xs text-red-600 font-bold text-center">
-                            Material not found. Add it through Stock In first.
-                          </div>
-                        );
+                {isAdjustDropdownOpen && (
+                  <div
+                    style={{ border: `1px solid ${C.border}` }}
+                    className="absolute left-0 right-0 top-full mt-2 z-[70] bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                  >
+                    {(() => {
+                      const filteredAdjust = stockItems.filter(item =>
+                        item.materialName.toLowerCase().includes(adjustSearch.toLowerCase())
+                      );
+                      if (filteredAdjust.length === 0) {
+                        if (adjustType === "IN") {
+                          return canCreate && adjustSearch.trim() !== "" ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCreateSource("adjust");
+                                setMaterialName(adjustSearch);
+                                setEditingItem(null);
+                                setCategory("Cement");
+                                setSku("");
+                                setUnit("Bags");
+                                setQuantity("0");
+                                setReorderLevel("100");
+                                setLocationInput("Godown A");
+                                setCostPrice("");
+                                setSellingPrice("");
+                                setFeedback(null);
+                                setShowAddEdit(true);
+                                setIsAdjustDropdownOpen(false);
+                                setStockInError(null);
+                                setStockOutError(null);
+                              }}
+                              className="w-full text-left px-4 py-3 text-xs font-bold text-amber-600 hover:bg-slate-50 cursor-pointer border-b border-slate-100"
+                            >
+                              + Add &quot;{adjustSearch}&quot; as a new material
+                            </button>
+                          ) : (
+                            <div className="px-4 py-3 text-xs text-slate-500 font-semibold text-center">
+                              No matching materials.
+                            </div>
+                          );
+                        } else {
+                          // Stock out
+                          return (
+                            <div className="px-4 py-3 text-xs text-red-650 font-bold text-center">
+                              Material not found. Add it through Stock In first.
+                            </div>
+                          );
+                        }
                       }
-                    }
-                    return (
-                      <>
-                        {filteredAdjust.map(item => (
-                          <button
-                            key={item.id}
-                            type="button"
-                            onClick={() => {
-                              setAdjustingItem(item);
-                              setAdjustSearch(item.materialName);
-                              setIsAdjustDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-2.5 hover:bg-slate-50 border-b border-slate-100 flex flex-col justify-start cursor-pointer"
-                          >
-                            <span className="font-bold text-slate-800 text-sm">{item.materialName}</span>
-                            <span className="text-xs text-slate-500 mt-0.5">
-                              Stock: {item.quantity.toLocaleString("en-IN")} {item.unit} · {item.location}
-                            </span>
-                          </button>
-                        ))}
-                        {adjustType === "IN" && canCreate && adjustSearch.trim() !== "" && !filteredAdjust.some(f => f.materialName.toLowerCase() === adjustSearch.toLowerCase().trim()) && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCreateSource("adjust");
-                              setMaterialName(adjustSearch);
-                              setQuantity("0");
-                              setCategory("Cement");
-                              setUnit("Bags");
-                              setLocationInput("Godown A");
-                              setShowAddEdit(true);
-                              setIsAdjustDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-3 text-xs font-bold text-[#EAB308] hover:bg-slate-50 cursor-pointer border-t border-slate-100"
-                          >
-                            + Add &quot;{adjustSearch}&quot; as new material
-                          </button>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              )}
-              {adjustingItem && (
+                      return (
+                        <>
+                          {filteredAdjust.map(item => (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() => {
+                                setAdjustingItem(item);
+                                setAdjustSearch(item.materialName);
+                                setIsAdjustDropdownOpen(false);
+                                setStockInError(null);
+                                setStockOutError(null);
+                              }}
+                              className="w-full text-left px-4 py-2.5 hover:bg-slate-50 border-b border-slate-100 flex flex-col justify-start cursor-pointer"
+                            >
+                              <span className="font-bold text-slate-800 text-sm">{item.materialName}</span>
+                              <span className="text-xs text-slate-500 mt-0.5">
+                                Stock: {item.quantity.toLocaleString("en-IN")} {item.unit} · {item.location}
+                              </span>
+                            </button>
+                          ))}
+                          {adjustType === "IN" && canCreate && adjustSearch.trim() !== "" && !filteredAdjust.some(f => f.materialName.toLowerCase() === adjustSearch.toLowerCase().trim()) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCreateSource("adjust");
+                                setMaterialName(adjustSearch);
+                                setEditingItem(null);
+                                setCategory("Cement");
+                                setSku("");
+                                setUnit("Bags");
+                                setQuantity("0");
+                                setReorderLevel("100");
+                                setLocationInput("Godown A");
+                                setCostPrice("");
+                                setSellingPrice("");
+                                setFeedback(null);
+                                setShowAddEdit(true);
+                                setIsAdjustDropdownOpen(false);
+                                setStockInError(null);
+                                setStockOutError(null);
+                              }}
+                              className="w-full text-left px-4 py-3 text-xs font-bold text-[#EAB308] hover:bg-slate-50 cursor-pointer border-t border-slate-100"
+                            >
+                              + Add &quot;{adjustSearch}&quot; as a new material
+                            </button>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+              {adjustingItem && adjustingItem.materialName === adjustSearch && (
                 <div className="text-xs font-bold mt-1 text-slate-600">
                   Current Stock: <span className="font-bold text-slate-800 font-mono">{adjustingItem.quantity} {adjustingItem.unit}</span>
                 </div>
@@ -1173,7 +1305,8 @@ export const InventoryPage = () => {
             <form onSubmit={handleAdjustSubmit} className="flex flex-col gap-3 text-xs">
               <div className="flex flex-col gap-1">
                 <label className="text-slate-700 text-[11px] font-bold mb-0.5">
-                  {adjustType === "IN" ? "Quantity to Add" : "Quantity to Remove"}{adjustingItem ? ` (${adjustingItem.unit})` : ""}
+                  {adjustType === "IN" ? "Quantity to Add" : "Quantity to Remove"}
+                  {adjustingItem && adjustingItem.materialName === adjustSearch ? ` (${adjustingItem.unit})` : ""}
                 </label>
                 <input
                   type="number"

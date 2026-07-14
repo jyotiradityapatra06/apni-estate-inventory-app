@@ -64,7 +64,7 @@ export const MobileBottomNavigation = ({ isDark }: MobileBottomNavigationProps) 
               </div>
               <span
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? activeColor : inactiveColor,
                 }}

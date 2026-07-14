@@ -141,37 +141,37 @@ export const DashboardPage = () => {
   const paymentPendingDelCount = deliveries.filter(d => d.paymentStatus === "PENDING").length;
 
   return (
-    <div className="flex flex-col gap-6 pb-8 max-w-7xl mx-auto px-4 md:px-6">
+    <div className="flex flex-col gap-6 pb-8 max-w-7xl mx-auto px-0 md:px-6">
       {/* Mobile Header Banner */}
-      <div className="bg-[#0F172A] px-5 pt-8 pb-6 rounded-xl md:hidden border border-slate-700 text-white mt-2">
-        <div className="flex items-center justify-between mb-4">
+      <div style={{ background: C.blue }} className="mx-4 mt-3 rounded-xl px-5 py-5 md:hidden text-white shadow-sm flex flex-col gap-3">
+        <div className="flex items-center justify-between">
           <div>
-            <div className="text-white/70 text-xs font-semibold uppercase tracking-wider">Dashboard</div>
-            <div className="text-xl font-bold leading-tight mt-1">{business?.name || "APNI ESTATE"}</div>
+            <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold">Dashboard</div>
+            <div className="text-xl font-bold leading-tight mt-1 text-white">{business?.name || "APNI ESTATE"}</div>
           </div>
           <button
             onClick={handleRefresh}
-            className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10 active:scale-95 transition-all focus:outline-none border border-white/20 cursor-pointer"
+            className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
           >
-            <RefreshCw size={16} className="text-white" />
+            <RefreshCw size={18} className="text-white" />
           </button>
         </div>
-        <div className="flex items-center gap-2 bg-white/5 px-2.5 py-1 rounded border border-white/10 w-max">
+        <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1 rounded border border-white/15 w-max">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-white/80 text-xs font-bold">Real-time Connected</span>
+          <span className="text-white/85 text-[11px] font-bold">Real-time Connected</span>
         </div>
       </div>
 
       {/* Desktop Header */}
       <div className="hidden md:flex items-center justify-between mb-2 mt-2">
         <div>
-          <h1 className="text-2xl font-bold text-[#0F172A]">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
           <p className="text-sm text-slate-500 mt-1">Your stock and delivery status at a glance.</p>
         </div>
         <button
           onClick={handleRefresh}
           style={{ border: `1.5px solid ${C.border}` }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg cursor-pointer text-sm font-bold bg-white text-[#0F172A] hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg cursor-pointer text-sm font-bold bg-white text-slate-900 hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
         >
           <RefreshCw size={14} />
           <span>Refresh</span>
@@ -182,7 +182,7 @@ export const DashboardPage = () => {
         {/* Today's Summary section */}
         <div>
           <div className="mb-3">
-            <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+            <span className="text-sm font-bold uppercase tracking-wider block text-slate-900">
               Today&apos;s Summary
             </span>
           </div>
@@ -212,7 +212,7 @@ export const DashboardPage = () => {
                   <div className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">
                     Total Materials
                   </div>
-                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-[#0F172A]">
+                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-slate-900">
                     {totalItems}
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export const DashboardPage = () => {
                   <div className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">
                     Low Stock
                   </div>
-                  <div style={{ color: lowStockItemsCount > 0 ? C.error : "#0F172A" }} className="text-2xl font-bold font-mono leading-none mt-1.5">
+                  <div style={{ color: lowStockItemsCount > 0 ? C.error : C.ink }} className="text-2xl font-bold font-mono leading-none mt-1.5">
                     {lowStockItemsCount}
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export const DashboardPage = () => {
                   <div className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">
                     Stock In Today
                   </div>
-                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-[#0F172A]">
+                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-slate-900">
                     {stockInTodayCount}
                   </div>
                 </div>
@@ -284,7 +284,7 @@ export const DashboardPage = () => {
                   <div className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">
                     Stock Out Today
                   </div>
-                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-[#0F172A]">
+                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-slate-900">
                     {stockOutTodayCount}
                   </div>
                 </div>
@@ -300,7 +300,7 @@ export const DashboardPage = () => {
         {canUpdate && (
           <div>
             <div className="mb-3">
-              <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+              <span className="text-sm font-bold uppercase tracking-wider block text-slate-900">
                 Quick Actions
               </span>
             </div>
@@ -315,7 +315,7 @@ export const DashboardPage = () => {
                 className="flex items-center justify-center gap-3 h-12 rounded-lg hover:bg-slate-50 active:scale-98 transition-all focus:outline-none cursor-pointer border-slate-300 px-4"
               >
                 <ArrowDownToLine size={18} className="text-[#16A34A]" />
-                <span className="text-sm font-bold text-[#0F172A]">Stock In</span>
+                <span className="text-sm font-bold text-slate-900">Stock In</span>
               </button>
 
               <button
@@ -328,7 +328,7 @@ export const DashboardPage = () => {
                 className="flex items-center justify-center gap-3 h-12 rounded-lg hover:bg-slate-50 active:scale-98 transition-all focus:outline-none cursor-pointer px-4"
               >
                 <ArrowUpFromLine size={18} className="text-[#DC2626]" />
-                <span className="text-sm font-bold text-[#0F172A]">Stock Out</span>
+                <span className="text-sm font-bold text-slate-900">Stock Out</span>
               </button>
             </div>
           </div>
@@ -341,7 +341,7 @@ export const DashboardPage = () => {
           {isOwnerOrManager && (
             <div className="lg:col-span-4 flex flex-col gap-3">
               <div>
-                <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+                <span className="text-sm font-bold uppercase tracking-wider block text-slate-900">
                   Delivery Status
                 </span>
               </div>
@@ -354,11 +354,11 @@ export const DashboardPage = () => {
                 className="p-6 flex flex-col gap-5 h-[350px] border-slate-300 rounded-xl"
               >
                 <div className="flex items-center gap-3">
-                  <div style={{ background: "rgba(15,23,42,0.06)" }} className="p-2.5 rounded-lg text-[#0F172A]">
+                  <div style={{ background: C.blueSoft, color: C.blue }} className="p-2.5 rounded-lg">
                     <ClipboardList size={20} />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-[#0F172A]">Delivery Summary</h3>
+                    <h3 className="text-sm font-bold text-slate-900">Delivery Summary</h3>
                     <p className="text-xs text-slate-500 mt-0.5">Current delivery counts</p>
                   </div>
                 </div>
@@ -368,7 +368,7 @@ export const DashboardPage = () => {
                 <div className="grid grid-cols-2 gap-4 flex-1 text-xs">
                   <div className="bg-slate-50 border border-slate-300 p-4 rounded-lg flex flex-col justify-between shadow-sm">
                     <span className="font-bold text-[10px] uppercase tracking-wider block text-slate-500">Pending</span>
-                    <span className="text-2xl font-bold font-mono mt-2 text-[#0F172A]">{pendingDelCount}</span>
+                    <span className="text-2xl font-bold font-mono mt-2 text-slate-900">{pendingDelCount}</span>
                   </div>
                   <div className="bg-sky-50/50 border border-slate-300 p-4 rounded-lg flex flex-col justify-between shadow-sm">
                     <span className="font-bold text-[10px] uppercase tracking-wider block text-[#0284C7]">Out for Delivery</span>
@@ -390,7 +390,7 @@ export const DashboardPage = () => {
           {/* Real Transactions Ledger */}
           <div className={`${isOwnerOrManager ? "lg:col-span-4" : "w-full max-w-3xl"} flex flex-col gap-3`}>
             <div>
-              <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+              <span className="text-sm font-bold uppercase tracking-wider block text-slate-900">
                 Recent Stock Activity
               </span>
             </div>
@@ -418,7 +418,7 @@ export const DashboardPage = () => {
                         {idx > 0 && <Divider className="my-2.5" />}
                         <div className="flex items-center justify-between text-xs">
                           <div className="min-w-0 flex-1">
-                            <div className="font-bold text-sm text-[#0F172A] truncate">{tx.inventoryItem?.materialName || "Material Item"}</div>
+                            <div className="font-bold text-sm text-slate-900 truncate">{tx.inventoryItem?.materialName || "Material Item"}</div>
                             <div className="text-xs text-slate-500 mt-1 font-medium">
                               {new Date(tx.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                               {tx.note && ` · ${tx.note}`}
@@ -448,7 +448,7 @@ export const DashboardPage = () => {
           {isOwnerOrManager && (
             <div className="lg:col-span-4 flex flex-col gap-3">
               <div>
-                <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+                <span className="text-sm font-bold uppercase tracking-wider block text-slate-900">
                   Recent Activity
                 </span>
               </div>
@@ -469,7 +469,7 @@ export const DashboardPage = () => {
                     <div className="w-12 h-12 rounded-full flex items-center justify-center bg-slate-100 text-slate-500">
                       <CheckCircle2 size={24} />
                     </div>
-                    <span className="text-sm font-semibold text-[#0F172A]">
+                    <span className="text-sm font-semibold text-slate-900">
                       No recent activity
                     </span>
                     <span className="text-xs text-slate-500 max-w-[210px]">
@@ -494,7 +494,7 @@ export const DashboardPage = () => {
                                 : isStockOut
                                   ? "bg-rose-50 text-[#DC2626]"
                                   : isDelivered
-                                    ? "bg-blue-50 text-[#0F172A]"
+                                    ? "bg-blue-50 text-[#2446D8]"
                                     : "bg-amber-50 text-[#CA8A04]"
                                 }`}
                             >
@@ -510,7 +510,7 @@ export const DashboardPage = () => {
                             </div>
 
                             <div className="min-w-0 flex-1">
-                              <div className="text-sm font-bold text-[#0F172A]">
+                              <div className="text-sm font-bold text-slate-900">
                                 {activity.title}
                               </div>
 

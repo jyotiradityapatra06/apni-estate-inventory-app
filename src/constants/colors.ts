@@ -1,33 +1,54 @@
 export const C = {
-  // Primary brand color (Navy)
-  blue: "#0F172A",
-  blueHover: "#020617",
-  blueSoft: "rgba(15, 23, 42, 0.06)",
+  // =====================================================
+  // PRIMARY BRAND COLORS
+  // =====================================================
 
-  // Accent and warning colors (Yellow)
+  // Premium Royal Blue
+  blue: "#2446D8",
+  blueHover: "#1E3FC4",
+  blueDark: "#18369E",
+  blueSoft: "rgba(36, 70, 216, 0.08)",
+
+  // =====================================================
+  // ACCENT COLORS
+  // =====================================================
+
   yellow: "#EAB308",
   yellowSoft: "rgba(234, 179, 8, 0.12)",
+
   amber: "#CA8A04",
   amberSoft: "rgba(202, 138, 4, 0.12)",
 
-  // Status colors
+  // =====================================================
+  // STATUS COLORS
+  // =====================================================
+
   success: "#16A34A",
   successSoft: "rgba(22, 163, 74, 0.08)",
+
   error: "#DC2626",
   errorSoft: "rgba(220, 38, 38, 0.08)",
 
-  // Neutrals system
+  // =====================================================
+  // LIGHT THEME
+  // =====================================================
+
   bg: "#F8FAFC",
   white: "#FFFFFF",
-  border: "#CBD5E1",
-  ink: "#0F172A",
-  muted: "#475569",
   surface: "#F1F5F9",
 
-  // Legacy/Dark sidebar config
-  dark: "#0F172A",
-  darkCard: "#1E293B",
-  darkBorder: "#334155",
+  border: "#CBD5E1",
+
+  ink: "#0F172A",
+  muted: "#475569",
+
+  // =====================================================
+  // NAVIGATION / SIDEBAR
+  // =====================================================
+
+  dark: "#0B1F3A",
+  darkCard: "#112A4E",
+  darkBorder: "#1C3C6E",
 };
 
 export default C;

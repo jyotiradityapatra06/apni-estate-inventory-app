@@ -472,19 +472,18 @@ export const DeliveriesPage = () => {
   return (
     <div className="flex flex-col gap-0 pb-4 h-full">
       {/* Mobile Top Header */}
-      <div style={{ background: C.blue }} className="px-4 pt-12 pb-5 md:hidden">
+      <div style={{ background: C.blue }} className="mx-4 mt-3 rounded-xl px-5 py-5 md:hidden text-white shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-white/60 text-[11px] uppercase tracking-wider font-semibold">Logistics</div>
-            <div className="text-white text-lg font-bold">Deliveries</div>
+            <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold">Logistics</div>
+            <div className="text-xl font-bold leading-tight mt-1 text-white">Deliveries</div>
           </div>
           {canManageDeliveries && (
             <button
               onClick={() => setShowCreate(true)}
-              style={{ background: "rgba(255,255,255,0.2)" }}
-              className="p-2 rounded-lg flex items-center justify-center cursor-pointer text-white"
+              className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
             >
-              <Plus size={16} />
+              <Plus size={18} className="text-white" />
             </button>
           )}
         </div>
@@ -526,7 +525,7 @@ export const DeliveriesPage = () => {
         </div>
 
         {/* Mobile Filter Tabs */}
-        <div className="flex gap-2 overflow-x-auto whitespace-nowrap py-1 md:hidden scrollbar-none">
+        <div className="flex gap-2 overflow-x-auto whitespace-nowrap py-1.5 px-4 -mx-4 md:hidden scrollbar-none">
           {["ALL", "PENDING", "OUT_FOR_DELIVERY", "DELIVERED", "PAYMENT_PENDING"].map((st) => (
             <button
               key={st}
@@ -536,11 +535,12 @@ export const DeliveriesPage = () => {
                 color: activeStatus === st ? "white" : C.muted,
                 border: `1px solid ${activeStatus === st ? C.blue : C.border}`,
               }}
-              className="px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap cursor-pointer transition-all"
+              className="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap cursor-pointer transition-all shadow-sm"
             >
               {st === "ALL" ? "All" : st === "PAYMENT_PENDING" ? "Payment Pending" : statusMeta[st]?.label || st}
             </button>
           ))}
+          <div className="w-4 flex-shrink-0" />
         </div>
 
         {/* Main Content Layout */}
@@ -588,7 +588,7 @@ export const DeliveriesPage = () => {
             {/* Left Column: Delivery pipeline */}
             <div className="lg:col-span-5 flex flex-col gap-3">
               <SectionLabel>{filteredDeliveries.length} deliveries</SectionLabel>
-              <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-4 overflow-y-auto pr-1">
                 {filteredDeliveries.map(d => {
                   const meta = statusMeta[d.status] || statusMeta.PENDING;
                   const isSel = selectedId === d.id;
@@ -605,23 +605,27 @@ export const DeliveriesPage = () => {
                       className="overflow-hidden cursor-pointer hover:bg-black/[0.01] transition-colors"
                       onClick={() => setSelectedId(d.id)}
                     >
-                      <div className="px-4 py-3">
-                        <div className="flex items-start justify-between gap-2 mb-1.5">
-                          <div className="flex gap-1.5 flex-wrap">
-                            <span style={{ background: meta.bg, color: meta.color }} className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-semibold">
-                              {meta.label}
-                            </span>
-                            <span style={{ background: payMeta.bg, color: payMeta.color }} className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-semibold">
-                              {payMeta.label}
-                            </span>
-                          </div>
-                          <span style={{ color: C.muted, fontFamily: "'Space Grotesk'" }} className="text-[10px] font-bold">
+                      <div className="px-4 py-3.5 flex flex-col">
+                        <div className="flex items-center justify-between gap-3 mb-1">
+                          <div style={{ color: C.ink }} className="text-sm font-bold truncate flex-1">{d.customerName}</div>
+                          <span style={{ color: C.muted, fontFamily: "'Space Grotesk'" }} className="text-xs font-semibold flex-shrink-0">
                             {d.deliveryNumber}
                           </span>
                         </div>
-                        <div style={{ color: C.ink }} className="text-[13px] font-bold">{d.customerName}</div>
-                        <div style={{ color: C.muted }} className="text-[11px] mt-0.5">{d.materialName} · {d.quantity.toLocaleString("en-IN")} {d.unit}</div>
-                        <div style={{ color: C.muted }} className="text-[11px] truncate">{d.deliveryAddress}</div>
+                        <div className="flex gap-1.5 flex-wrap my-1.5">
+                          <span style={{ background: meta.bg, color: meta.color }} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                            {meta.label}
+                          </span>
+                          <span style={{ background: payMeta.bg, color: payMeta.color }} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                            {payMeta.label}
+                          </span>
+                        </div>
+                        <div style={{ color: C.muted }} className="text-xs mt-1 font-medium leading-relaxed whitespace-normal break-words">
+                          <span className="font-semibold text-slate-700">Items:</span> {d.materialName} · {d.quantity.toLocaleString("en-IN")} {d.unit}
+                        </div>
+                        <div style={{ color: C.muted }} className="text-xs mt-1 leading-relaxed whitespace-normal break-words">
+                          <span className="font-semibold text-slate-700">Address:</span> {d.deliveryAddress}
+                        </div>
                       </div>
                     </div>
                   );
@@ -757,7 +761,7 @@ export const DeliveriesPage = () => {
 
       {/* MOBILE ONLY DETAIL SHEET (Overlay) */}
       {!loading && active && selectedId && (
-        <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setSelectedId(null)}>
+        <div className="fixed inset-0 z-[80] bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setSelectedId(null)}>
           <div
             style={{ background: C.white }}
             className="absolute bottom-0 left-0 right-0 rounded-t-2xl p-5 max-h-[85%] overflow-y-auto flex flex-col gap-4"
@@ -860,7 +864,7 @@ export const DeliveriesPage = () => {
                   openEditModal(active);
                 }}
                 style={{ background: "#EFF6FF", color: C.blue }}
-                className="w-full py-3 rounded-xl font-bold text-xs cursor-pointer mt-2 flex items-center justify-center gap-1.5"
+                className="w-full h-11 rounded-lg font-bold text-xs cursor-pointer mt-2 flex items-center justify-center gap-1.5"
               >
                 <Edit2 size={12} />
                 <span>Edit Delivery</span>
@@ -871,7 +875,7 @@ export const DeliveriesPage = () => {
               <button
                 onClick={() => handleDeleteDelivery(active.id)}
                 style={{ background: "#FEF2F2", color: C.error }}
-                className="w-full py-3 rounded-xl font-bold text-xs cursor-pointer mt-1"
+                className="w-full h-11 rounded-lg font-bold text-xs cursor-pointer mt-1"
               >
                 Delete Delivery (Permanent)
               </button>
@@ -997,7 +1001,7 @@ export const DeliveriesPage = () => {
                 type="submit"
                 disabled={isSubmitting}
                 style={{ background: C.blue, opacity: isSubmitting ? 0.7 : 1 }}
-                className="w-full mt-2 py-3 rounded-xl text-white font-bold cursor-pointer hover:opacity-95 disabled:cursor-not-allowed"
+                className="w-full mt-2 h-11 rounded-lg text-white font-bold cursor-pointer hover:opacity-95 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Scheduling..." : "Schedule Delivery"}
               </button>
@@ -1123,7 +1127,7 @@ export const DeliveriesPage = () => {
                 type="submit"
                 disabled={isSubmitting}
                 style={{ background: C.blue, opacity: isSubmitting ? 0.7 : 1 }}
-                className="w-full mt-2 py-3 rounded-xl text-white font-bold cursor-pointer hover:opacity-95 disabled:cursor-not-allowed"
+                className="w-full mt-2 h-11 rounded-lg text-white font-bold cursor-pointer hover:opacity-95 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Saving..." : "Save Changes"}
               </button>

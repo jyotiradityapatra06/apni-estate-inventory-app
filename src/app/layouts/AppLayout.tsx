@@ -33,7 +33,7 @@ export const AppLayout = () => {
         {/* Scrollable Page Body */}
         <main
           ref={mainScrollRef}
-          className="flex-1 overflow-y-auto overflow-x-hidden w-full pb-16 md:pb-0"
+          className="flex-1 overflow-y-auto overflow-x-hidden w-full pt-16 pb-28 md:pb-6"
           style={{ scrollbarWidth: "none" }}
         >
           {/* Centered Desktop Content Container */}
