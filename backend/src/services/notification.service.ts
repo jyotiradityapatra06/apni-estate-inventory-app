@@ -8,12 +8,22 @@ export const getAll = async (businessId: string) => {
   });
 };
 
-export const create = async (businessId: string, title: string, message: string) => {
+export const create = async (
+  businessId: string,
+  title: string,
+  message: string
+) => {
   return await prisma.notification.create({
     data: {
       title,
       message,
       businessId,
     },
+  });
+};
+
+export const clearAll = async (businessId: string) => {
+  return await prisma.notification.deleteMany({
+    where: { businessId },
   });
 };

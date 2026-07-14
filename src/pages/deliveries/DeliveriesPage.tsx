@@ -148,16 +148,19 @@ export const DeliveriesPage = () => {
   // Submit handlers
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!materialName) {
       toast.error("Please select a material.");
       return;
     }
+
     if (Number(quantity) <= 0) {
       toast.error("Quantity must be greater than zero.");
       return;
     }
 
     setIsSubmitting(true);
+
     try {
       const res = await deliveryApi.createDelivery({
         customerName: customerName.trim(),
@@ -173,7 +176,7 @@ export const DeliveriesPage = () => {
       if (res.success && res.data) {
         toast.success("Delivery scheduled successfully!");
         setShowCreate(false);
-        // Reset Form
+
         setCustomerName("");
         setCustomerPhone("");
         setDeliveryAddress("");
@@ -183,10 +186,10 @@ export const DeliveriesPage = () => {
         setScheduledDate("");
         setNotes("");
 
-        // Refresh List and select new item
         const updatedRes = await deliveryApi.getDeliveries();
+
         if (updatedRes.success && updatedRes.data) {
-          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
+          const mapped: LocalDelivery[] = updatedRes.data.map((d) => ({
             id: d.id,
             deliveryNumber: d.deliveryNumber,
             customerName: d.customerName,
@@ -201,18 +204,23 @@ export const DeliveriesPage = () => {
             paymentStatus: d.paymentStatus,
             createdAt: d.createdAt,
           }));
+
           setDeliveries(mapped);
           setSelectedId(res.data.id);
         }
 
-        // Create Notification on Backend
         try {
           await notificationApi.createNotification(
             "Delivery Scheduled",
             `New shipment ${res.data.deliveryNumber} scheduled for ${res.data.customerName} (${res.data.quantity} ${res.data.unit} of ${res.data.materialName}).`
           );
+
+          window.dispatchEvent(new Event("notifications:refresh"));
         } catch (err) {
-          console.error("Failed to generate delivery creation notification:", err);
+          console.error(
+            "Failed to generate delivery creation notification:",
+            err
+          );
         }
       }
     } catch (err: any) {
@@ -280,16 +288,25 @@ export const DeliveriesPage = () => {
     }
   };
 
-  const handleStatusUpdate = async (id: string, nextStatus: LocalDelivery["status"]) => {
+  const handleStatusUpdate = async (
+    id: string,
+    nextStatus: LocalDelivery["status"]
+  ) => {
     try {
-      const res = await deliveryApi.updateDelivery(id, { status: nextStatus });
+      const res = await deliveryApi.updateDelivery(id, {
+        status: nextStatus,
+      });
+
       if (res.success && res.data) {
-        toast.success(`Delivery status updated to ${statusMeta[nextStatus]?.label || nextStatus}`);
-        
-        // Refresh list
+        toast.success(
+          `Delivery status updated to ${statusMeta[nextStatus]?.label || nextStatus
+          }`
+        );
+
         const updatedRes = await deliveryApi.getDeliveries();
+
         if (updatedRes.success && updatedRes.data) {
-          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
+          const mapped: LocalDelivery[] = updatedRes.data.map((d) => ({
             id: d.id,
             deliveryNumber: d.deliveryNumber,
             customerName: d.customerName,
@@ -304,15 +321,33 @@ export const DeliveriesPage = () => {
             paymentStatus: d.paymentStatus,
             createdAt: d.createdAt,
           }));
+
           setDeliveries(mapped);
         }
 
         try {
-          const title = nextStatus === "OUT_FOR_DELIVERY" ? "Out for Delivery" : "Delivery Completed";
-          const desc = nextStatus === "OUT_FOR_DELIVERY" 
-            ? `Shipment ${res.data.deliveryNumber} to ${res.data.customerName} is now out for delivery.`
-            : `Shipment ${res.data.deliveryNumber} has been delivered successfully to ${res.data.customerName}.`;
-          await notificationApi.createNotification(title, desc);
+          let title = "Delivery Status Updated";
+          let description = `Shipment ${res.data.deliveryNumber} status changed to ${statusMeta[nextStatus]?.label || nextStatus
+            }.`;
+
+          if (nextStatus === "PENDING") {
+            title = "Delivery Pending";
+            description = `Shipment ${res.data.deliveryNumber} for ${res.data.customerName} has been marked as pending.`;
+          }
+
+          if (nextStatus === "OUT_FOR_DELIVERY") {
+            title = "Out for Delivery";
+            description = `Shipment ${res.data.deliveryNumber} to ${res.data.customerName} is now out for delivery.`;
+          }
+
+          if (nextStatus === "DELIVERED") {
+            title = "Delivery Completed";
+            description = `Shipment ${res.data.deliveryNumber} has been delivered successfully to ${res.data.customerName}.`;
+          }
+
+          await notificationApi.createNotification(title, description);
+
+          window.dispatchEvent(new Event("notifications:refresh"));
         } catch (err) {
           console.error("Failed to log status notification:", err);
         }
@@ -323,16 +358,25 @@ export const DeliveriesPage = () => {
     }
   };
 
-  const handlePaymentUpdate = async (id: string, nextPayStatus: LocalDelivery["paymentStatus"]) => {
+  const handlePaymentUpdate = async (
+    id: string,
+    nextPayStatus: LocalDelivery["paymentStatus"]
+  ) => {
     try {
-      const res = await deliveryApi.updateDelivery(id, { paymentStatus: nextPayStatus });
+      const res = await deliveryApi.updateDelivery(id, {
+        paymentStatus: nextPayStatus,
+      });
+
       if (res.success && res.data) {
-        toast.success(`Payment status updated to ${payStatusMeta[nextPayStatus]?.label || nextPayStatus}`);
-        
-        // Refresh list
+        toast.success(
+          `Payment status updated to ${payStatusMeta[nextPayStatus]?.label || nextPayStatus
+          }`
+        );
+
         const updatedRes = await deliveryApi.getDeliveries();
+
         if (updatedRes.success && updatedRes.data) {
-          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
+          const mapped: LocalDelivery[] = updatedRes.data.map((d) => ({
             id: d.id,
             deliveryNumber: d.deliveryNumber,
             customerName: d.customerName,
@@ -347,18 +391,26 @@ export const DeliveriesPage = () => {
             paymentStatus: d.paymentStatus,
             createdAt: d.createdAt,
           }));
+
           setDeliveries(mapped);
         }
 
-        if (nextPayStatus === "RECEIVED") {
-          try {
+        try {
+          if (nextPayStatus === "RECEIVED") {
             await notificationApi.createNotification(
               "Payment Received",
-              `Payment for shipment ${res.data.deliveryNumber} (${res.data.customerName}) has been marked as RECEIVED.`
+              `Payment for shipment ${res.data.deliveryNumber} (${res.data.customerName}) has been marked as received.`
             );
-          } catch (err) {
-            console.error("Failed to log payment status notification:", err);
+          } else {
+            await notificationApi.createNotification(
+              "Payment Pending",
+              `Payment for shipment ${res.data.deliveryNumber} (${res.data.customerName}) is pending.`
+            );
           }
+
+          window.dispatchEvent(new Event("notifications:refresh"));
+        } catch (err) {
+          console.error("Failed to log payment status notification:", err);
         }
       }
     } catch (err: any) {
@@ -373,7 +425,7 @@ export const DeliveriesPage = () => {
       const res = await deliveryApi.deleteDelivery(id);
       if (res.success) {
         toast.success("Delivery deleted successfully.");
-        
+
         const updatedRes = await deliveryApi.getDeliveries();
         if (updatedRes.success && updatedRes.data) {
           const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
@@ -392,7 +444,7 @@ export const DeliveriesPage = () => {
             createdAt: d.createdAt,
           }));
           setDeliveries(mapped);
-          
+
           const remaining = mapped.filter(d => d.id !== id);
           setSelectedId(remaining.length > 0 ? remaining[0].id : null);
         }

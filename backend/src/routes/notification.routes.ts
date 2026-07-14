@@ -1,13 +1,24 @@
 import { Router } from "express";
 import * as notificationController from "../controllers/notification.controller";
-import { protect } from "../middleware/auth.middleware";
+import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
-// Protect all notification routes
-router.use(protect);
+router.use(authenticate);
 
-router.get("/", notificationController.getAllNotifications);
-router.post("/", notificationController.createNotification);
+router.get(
+    "/",
+    notificationController.getAllNotifications
+);
+
+router.post(
+    "/",
+    notificationController.createNotification
+);
+
+router.delete(
+    "/",
+    notificationController.clearAllNotifications
+);
 
 export default router;
