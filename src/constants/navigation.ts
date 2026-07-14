@@ -10,9 +10,9 @@ export interface TabItem {
 }
 
 export const tabs: TabItem[] = [
-  { id: "home", label: "Home", icon: Home, path: "/dashboard", requiredPermission: "dashboard:view" },
+  { id: "home", label: "Dashboard", icon: Home, path: "/dashboard", requiredPermission: "dashboard:view" },
   { id: "stock", label: "Stock", icon: Package, path: "/inventory", requiredPermission: "inventory:view" },
-  { id: "delivery", label: "Delivery", icon: Truck, path: "/deliveries", requiredPermission: "deliveries:view" },
+  { id: "delivery", label: "Deliveries", icon: Truck, path: "/deliveries", requiredPermission: "deliveries:view" },
   { id: "management", label: "Management", icon: User, path: "/management" },
 ];
 

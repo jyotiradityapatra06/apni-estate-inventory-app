@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, AlertTriangle, CheckCircle, ClipboardList, Search, Plus, Trash2, Edit3 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -42,6 +42,19 @@ export const InventoryPage = () => {
 
   // Alert message banner states
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+
+  // Combobox States for Reconcile (Stock In overlay)
+  const [reconcileSearch, setReconcileSearch] = useState("");
+  const [isReconcileDropdownOpen, setIsReconcileDropdownOpen] = useState(false);
+  const reconcileComboboxRef = useRef<HTMLDivElement | null>(null);
+
+  // Combobox States for Adjust Modal
+  const [adjustSearch, setAdjustSearch] = useState("");
+  const [isAdjustDropdownOpen, setIsAdjustDropdownOpen] = useState(false);
+  const adjustComboboxRef = useRef<HTMLDivElement | null>(null);
+
+  // Creation callback tracking
+  const [createSource, setCreateSource] = useState<"reconcile" | "adjust" | null>(null);
 
   // Fetch Inventory
   const { data: stockItems, loading, error, refresh } = useGetInventory({
@@ -107,7 +120,7 @@ export const InventoryPage = () => {
     setShowDeleteConfirm(true);
   };
 
-  // Escape key handler to close dialogs
+  // Escape key handler to close dialogs & suggestions
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -115,19 +128,55 @@ export const InventoryPage = () => {
         setShowAdjust(false);
         setShowDeleteConfirm(false);
         setShowReconcile(false);
+        setIsReconcileDropdownOpen(false);
+        setIsAdjustDropdownOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Trigger stock-in quick adjustment on mount if action parameter is present
+  // Outside click handler to close suggestions
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (reconcileComboboxRef.current && !reconcileComboboxRef.current.contains(e.target as Node)) {
+        setIsReconcileDropdownOpen(false);
+      }
+      if (adjustComboboxRef.current && !adjustComboboxRef.current.contains(e.target as Node)) {
+        setIsAdjustDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  // Sync reconcileSearch with reconcileItemId
+  useEffect(() => {
+    if (showReconcile) {
+      if (reconcileItemId) {
+        const item = stockItems.find(s => s.id === reconcileItemId);
+        setReconcileSearch(item ? item.materialName : "");
+      } else {
+        setReconcileSearch("");
+      }
+    }
+  }, [showReconcile, reconcileItemId, stockItems]);
+
+  // Sync adjustSearch with adjustingItem
+  useEffect(() => {
+    if (showAdjust && adjustingItem) {
+      setAdjustSearch(adjustingItem.materialName);
+    }
+  }, [showAdjust, adjustingItem]);
+
+  // Trigger stock-in / stock-out quick adjustment on mount if action parameter is present
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("action") === "stock-in") {
+    const action = urlParams.get("action");
+    if (action === "stock-in" || action === "stock-out") {
       if (stockItems && stockItems.length > 0) {
         setAdjustingItem(stockItems[0]);
-        setAdjustType("IN");
+        setAdjustType(action === "stock-in" ? "IN" : "OUT");
         setAdjustQty("");
         setAdjustNote("");
         setFeedback(null);
@@ -163,9 +212,21 @@ export const InventoryPage = () => {
         setFeedback({ type: "success", msg: "Inventory material updated successfully." });
         toast.success("Material updated");
       } else {
-        await createItem(inputData);
+        const newItem = await createItem(inputData);
         setFeedback({ type: "success", msg: "Inventory material created successfully." });
         toast.success("Material added");
+
+        // Autoselect and redirect focus back to stock-in/reconcile or adjust form
+        if (createSource === "reconcile") {
+          setReconcileItemId(newItem.id);
+          setReconcileSearch(newItem.materialName);
+          setShowReconcile(true);
+        } else if (createSource === "adjust") {
+          setAdjustingItem(newItem);
+          setAdjustSearch(newItem.materialName);
+          setShowAdjust(true);
+        }
+        setCreateSource(null);
       }
       setShowAddEdit(false);
       refresh();
@@ -180,6 +241,13 @@ export const InventoryPage = () => {
     e.preventDefault();
     if (mutationLoading) return;
     setFeedback(null);
+
+    if (!adjustingItem || adjustingItem.materialName !== adjustSearch) {
+      const errMsg = "Please select a valid material from suggestions.";
+      setFeedback({ type: "error", msg: errMsg });
+      toast.error(errMsg);
+      return;
+    }
 
     if (!adjustQty || Number(adjustQty) <= 0) {
       const errMsg = "Please enter a valid adjustment quantity greater than zero.";
@@ -278,7 +346,6 @@ export const InventoryPage = () => {
         toast.error(msg);
       }
     };
-
     return (
       <div className="flex flex-col h-full">
         <div style={{ background: C.blue }} className="px-4 pt-12 pb-5">
@@ -287,15 +354,15 @@ export const InventoryPage = () => {
               <ArrowLeft size={20} color="white" />
             </button>
             <div>
-              <div className="text-white/60 text-[11px] uppercase tracking-wider">Inventory Entry</div>
-              <div className="text-white text-base font-bold">Incoming Stock</div>
+              <div className="text-white/60 text-[11px] uppercase tracking-wider font-semibold">Incoming Stock</div>
+              <div className="text-white text-base font-bold">Stock In</div>
             </div>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
-          <Card className="p-4">
-            <h3 style={{ color: C.ink }} className="text-sm font-bold mb-4">Stock-In Form</h3>
+          <Card className="p-4 border-slate-300 shadow-sm rounded-xl">
+            <h3 style={{ color: C.ink }} className="text-base font-bold mb-4">Stock In</h3>
             {stockItems.length === 0 ? (
               <div className="text-center py-6">
                 <AlertTriangle size={32} color={C.error} className="mx-auto mb-2" />
@@ -307,33 +374,125 @@ export const InventoryPage = () => {
                     handleOpenAdd();
                   }}
                   style={{ background: C.blue }}
-                  className="px-4 py-2 rounded-xl text-white font-bold text-xs cursor-pointer"
+                  className="px-4 py-2 rounded-lg text-white font-bold text-xs cursor-pointer h-12"
                 >
                   Create Material
                 </button>
               </div>
             ) : (
               <form onSubmit={handleReconcileSubmit} className="flex flex-col gap-4 text-xs font-medium">
-                <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Select Material</label>
-                  <select
-                    required
-                    value={reconcileItemId}
-                    onChange={(e) => setReconcileItemId(e.target.value)}
-                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                  >
-                    <option value="">-- Choose Material --</option>
-                    {stockItems.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.materialName} ({item.location} · Current: {item.quantity} {item.unit})
-                      </option>
-                    ))}
-                  </select>
+                <div className="flex flex-col gap-1 relative" ref={reconcileComboboxRef}>
+                  <label className="text-slate-700 text-sm font-bold mb-1">Select Material</label>
+                  <div className="relative">
+                    <div className="absolute left-3 top-3.5 text-slate-400">
+                      <Search size={16} />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Search material by name..."
+                      value={reconcileSearch}
+                      onChange={(e) => {
+                        setReconcileSearch(e.target.value);
+                        setIsReconcileDropdownOpen(true);
+                      }}
+                      onFocus={() => setIsReconcileDropdownOpen(true)}
+                      style={{ background: C.surface, border: `1.5px solid ${C.border}`, color: C.ink }}
+                      className="w-full pl-10 pr-8 py-2.5 h-12 rounded-lg outline-none text-sm font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                    />
+                    {reconcileSearch && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReconcileSearch("");
+                          setReconcileItemId("");
+                          setIsReconcileDropdownOpen(true);
+                        }}
+                        className="absolute right-3 top-3.5 text-slate-400 font-bold hover:text-slate-650 text-sm cursor-pointer"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                  {isReconcileDropdownOpen && (
+                    <div
+                      style={{ border: `1px solid ${C.border}` }}
+                      className="absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+                    >
+                      {(() => {
+                        const filtered = stockItems.filter(item =>
+                          item.materialName.toLowerCase().includes(reconcileSearch.toLowerCase())
+                        );
+                        if (filtered.length === 0) {
+                          return canCreate && reconcileSearch.trim() !== "" ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCreateSource("reconcile");
+                                setMaterialName(reconcileSearch);
+                                setQuantity("0");
+                                setCategory("Cement");
+                                setUnit("Bags");
+                                setLocationInput("Godown A");
+                                setShowAddEdit(true);
+                                setIsReconcileDropdownOpen(false);
+                              }}
+                              className="w-full text-left px-4 py-3 text-xs font-bold text-amber-600 hover:bg-slate-50 cursor-pointer border-b border-slate-100"
+                            >
+                              + Add &quot;{reconcileSearch}&quot; as new material
+                            </button>
+                          ) : (
+                            <div className="px-4 py-3 text-xs text-slate-500 font-semibold text-center">
+                              No matching materials.
+                            </div>
+                          );
+                        }
+                        return (
+                          <>
+                            {filtered.map(item => (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => {
+                                  setReconcileItemId(item.id);
+                                  setReconcileSearch(item.materialName);
+                                  setIsReconcileDropdownOpen(false);
+                                }}
+                                className="w-full text-left px-4 py-2.5 hover:bg-slate-50 border-b border-slate-100 flex flex-col justify-start cursor-pointer"
+                              >
+                                <span className="font-bold text-slate-800 text-sm">{item.materialName}</span>
+                                <span className="text-xs text-slate-505 mt-0.5 text-slate-500">
+                                  Stock: {item.quantity.toLocaleString("en-IN")} {item.unit} · {item.location}
+                                </span>
+                              </button>
+                            ))}
+                            {canCreate && reconcileSearch.trim() !== "" && !filtered.some(f => f.materialName.toLowerCase() === reconcileSearch.toLowerCase().trim()) && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCreateSource("reconcile");
+                                  setMaterialName(reconcileSearch);
+                                  setQuantity("0");
+                                  setCategory("Cement");
+                                  setUnit("Bags");
+                                  setLocationInput("Godown A");
+                                  setShowAddEdit(true);
+                                  setIsReconcileDropdownOpen(false);
+                                }}
+                                className="w-full text-left px-4 py-3 text-xs font-bold text-[#EAB308] hover:bg-slate-50 cursor-pointer border-t border-slate-100"
+                              >
+                                + Add &quot;{reconcileSearch}&quot; as new material
+                              </button>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Received Quantity</label>
+                  <label className="text-slate-700 text-sm font-bold mb-1">Quantity to Add</label>
                   <input
                     type="number"
                     required
@@ -341,40 +500,40 @@ export const InventoryPage = () => {
                     value={reconcileQty}
                     onChange={(e) => setReconcileQty(e.target.value)}
                     style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                    className="w-full px-3 py-2.5 h-12 text-sm rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Supplier Name (Optional)</label>
+                  <label className="text-slate-700 text-sm font-bold mb-1">Supplier Name (Optional)</label>
                   <input
                     type="text"
                     placeholder="e.g. UltraTech Cement Ltd"
                     value={reconcileSupplier}
                     onChange={(e) => setReconcileSupplier(e.target.value)}
                     style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                    className="w-full px-3 py-2.5 h-12 text-sm rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Add Note (Optional)</label>
+                  <label className="text-slate-700 text-sm font-bold mb-1">Reason / Note</label>
                   <textarea
                     placeholder="e.g. Gate pass no. 5422, received by security"
                     value={reconcileNote}
                     onChange={(e) => setReconcileNote(e.target.value)}
                     style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none h-16"
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none h-16 text-sm"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={mutationLoading}
-                  style={{ background: C.blue }}
-                  className="w-full py-3.5 rounded-xl text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 mt-2"
+                  style={{ background: C.success }}
+                  className="w-full h-12 rounded-lg text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 mt-2"
                 >
-                  {mutationLoading ? "Confirming..." : "Confirm Stock In"}
+                  {mutationLoading ? "Confirming..." : "Add Stock"}
                 </button>
               </form>
             )}
@@ -390,7 +549,7 @@ export const InventoryPage = () => {
       <div style={{ background: C.blue }} className="px-4 pt-12 pb-5 md:hidden">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <div className="text-white/60 text-[11px] uppercase tracking-wider">Inventory</div>
+            <div className="text-white/60 text-[11px] uppercase tracking-wider font-semibold">Stock</div>
             <div className="text-white text-lg font-bold">Stock Overview</div>
           </div>
           <div className="flex items-center gap-2">
@@ -526,9 +685,9 @@ export const InventoryPage = () => {
           <div style={{ background: "#FEF2F2", border: `1px solid ${C.error}30` }} className="rounded-xl px-4 py-3 flex items-start gap-3">
             <AlertTriangle size={16} color={C.error} className="flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <div style={{ color: "#991B1B" }} className="text-[12px] font-semibold">{lowStock.length} items below reorder threshold</div>
+              <div style={{ color: "#991B1B" }} className="text-[12px] font-semibold">{lowStock.length} Low Stock</div>
               <div style={{ color: "#B91C1C" }} className="text-[11px]">
-                {lowStock.map(s => s.materialName).slice(0, 3).join(", ")} {lowStock.length > 3 ? "and more " : ""}require replenishment.
+                {lowStock.map(s => s.materialName).slice(0, 3).join(", ")} {lowStock.length > 3 ? "and more " : ""}needs more stock.
               </div>
             </div>
           </div>
@@ -536,7 +695,7 @@ export const InventoryPage = () => {
 
         {/* Stock items list/table wrapper */}
         <div>
-          <SectionLabel>{loading ? "Loading..." : `${stockItems.length} materials tracked`}</SectionLabel>
+          <SectionLabel>{loading ? "Loading..." : `${stockItems.length} materials available`}</SectionLabel>
 
           {/* Loading state */}
           {loading && (
@@ -877,35 +1036,145 @@ export const InventoryPage = () => {
       )}
 
       {/* MODAL: STOCK ADJUSTMENT (STOCK-IN / STOCK-OUT) */}
-      {showAdjust && adjustingItem && (
+      {showAdjust && (
         <div className="absolute inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(14,24,35,0.4)", backdropFilter: "blur(4px)" }}>
           <div style={{ background: C.white, borderRadius: 16, boxShadow: "0 20px 25px -5px rgba(20, 18, 14, 0.1), 0 10px 10px -5px rgba(20, 18, 14, 0.04)" }} className="w-full max-w-sm p-5 flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <span style={{ color: C.ink }} className="text-sm font-bold">
-                {adjustType === "IN" ? "Stock-In (Add)" : "Stock-Out (Deduct)"}
+                {adjustType === "IN" ? "Stock In" : "Stock Out"}
               </span>
               <button onClick={() => setShowAdjust(false)} className="text-gray-500 font-bold cursor-pointer text-sm">×</button>
             </div>
-            <div style={{ background: C.surface }} className="rounded-lg p-3 text-xs">
-              <div className="text-gray-500 uppercase text-[9px] mb-0.5">Material</div>
-              <select
-                value={adjustingItem.id}
-                onChange={(e) => {
-                  const selected = stockItems.find(s => s.id === e.target.value);
-                  if (selected) setAdjustingItem(selected);
-                }}
-                style={{ background: C.white, border: `1px solid ${C.border}`, color: C.ink }}
-                className="w-full px-2 py-1.5 rounded outline-none font-semibold mt-1 cursor-pointer"
-              >
-                {stockItems.map(s => (
-                  <option key={s.id} value={s.id}>{s.materialName} ({s.quantity} {s.unit})</option>
-                ))}
-              </select>
-              <div className="text-gray-500 mt-2">Current Stock: <span className="font-semibold text-gray-800">{adjustingItem.quantity} {adjustingItem.unit}</span></div>
+
+            <div className="flex flex-col gap-1 relative" ref={adjustComboboxRef}>
+              <label className="text-slate-700 text-xs font-bold mb-1">Select Material</label>
+              <div className="relative text-xs">
+                <div className="absolute left-3 top-3.5 text-slate-400">
+                  <Search size={16} />
+                </div>
+                <input
+                  type="text"
+                  required
+                  placeholder="Search material..."
+                  value={adjustSearch}
+                  onChange={(e) => {
+                    setAdjustSearch(e.target.value);
+                    setIsAdjustDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsAdjustDropdownOpen(true)}
+                  style={{ background: C.surface, border: `1.5px solid ${C.border}`, color: C.ink }}
+                  className="w-full pl-10 pr-8 py-2.5 h-12 rounded-lg outline-none text-sm font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                />
+                {adjustSearch && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAdjustSearch("");
+                      setAdjustingItem(null);
+                      setIsAdjustDropdownOpen(true);
+                    }}
+                    className="absolute right-3 top-3.5 text-slate-400 font-bold hover:text-slate-655 text-sm cursor-pointer"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              {isAdjustDropdownOpen && (
+                <div
+                  style={{ border: `1px solid ${C.border}` }}
+                  className="absolute left-0 right-0 top-full mt-1 bg-white rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+                >
+                  {(() => {
+                    const filteredAdjust = stockItems.filter(item =>
+                      item.materialName.toLowerCase().includes(adjustSearch.toLowerCase())
+                    );
+                    if (filteredAdjust.length === 0) {
+                      if (adjustType === "IN") {
+                        return canCreate && adjustSearch.trim() !== "" ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCreateSource("adjust");
+                              setMaterialName(adjustSearch);
+                              setQuantity("0");
+                              setCategory("Cement");
+                              setUnit("Bags");
+                              setLocationInput("Godown A");
+                              setShowAddEdit(true);
+                              setIsAdjustDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-3 text-xs font-bold text-amber-600 hover:bg-slate-50 cursor-pointer border-b border-slate-100"
+                          >
+                            + Add &quot;{adjustSearch}&quot; as new material
+                          </button>
+                        ) : (
+                          <div className="px-4 py-3 text-xs text-slate-500 font-semibold text-center">
+                            No matching materials.
+                          </div>
+                        );
+                      } else {
+                        // Stock out
+                        return (
+                          <div className="px-4 py-3 text-xs text-red-600 font-bold text-center">
+                            Material not found. Add it through Stock In first.
+                          </div>
+                        );
+                      }
+                    }
+                    return (
+                      <>
+                        {filteredAdjust.map(item => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => {
+                              setAdjustingItem(item);
+                              setAdjustSearch(item.materialName);
+                              setIsAdjustDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2.5 hover:bg-slate-50 border-b border-slate-100 flex flex-col justify-start cursor-pointer"
+                          >
+                            <span className="font-bold text-slate-800 text-sm">{item.materialName}</span>
+                            <span className="text-xs text-slate-500 mt-0.5">
+                              Stock: {item.quantity.toLocaleString("en-IN")} {item.unit} · {item.location}
+                            </span>
+                          </button>
+                        ))}
+                        {adjustType === "IN" && canCreate && adjustSearch.trim() !== "" && !filteredAdjust.some(f => f.materialName.toLowerCase() === adjustSearch.toLowerCase().trim()) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCreateSource("adjust");
+                              setMaterialName(adjustSearch);
+                              setQuantity("0");
+                              setCategory("Cement");
+                              setUnit("Bags");
+                              setLocationInput("Godown A");
+                              setShowAddEdit(true);
+                              setIsAdjustDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-3 text-xs font-bold text-[#EAB308] hover:bg-slate-50 cursor-pointer border-t border-slate-100"
+                          >
+                            + Add &quot;{adjustSearch}&quot; as new material
+                          </button>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+              {adjustingItem && (
+                <div className="text-xs font-bold mt-1 text-slate-600">
+                  Current Stock: <span className="font-bold text-slate-800 font-mono">{adjustingItem.quantity} {adjustingItem.unit}</span>
+                </div>
+              )}
             </div>
+
             <form onSubmit={handleAdjustSubmit} className="flex flex-col gap-3 text-xs">
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase font-bold">Adjustment Qty ({adjustingItem.unit})</label>
+                <label className="text-slate-700 text-[11px] font-bold mb-0.5">
+                  {adjustType === "IN" ? "Quantity to Add" : "Quantity to Remove"}{adjustingItem ? ` (${adjustingItem.unit})` : ""}
+                </label>
                 <input
                   type="number"
                   required
@@ -913,27 +1182,27 @@ export const InventoryPage = () => {
                   value={adjustQty}
                   onChange={(e) => setAdjustQty(e.target.value)}
                   style={{ background: C.surface, border: `1.5px solid ${adjustType === "IN" ? C.success : C.error}`, color: C.ink }}
-                  className="w-full px-3 py-2.5 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                  className="w-full px-3 py-2.5 h-12 text-sm rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 font-semibold"
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Notes</label>
+                <label className="text-slate-700 text-[11px] font-bold mb-0.5">Reason / Note</label>
                 <input
                   type="text"
                   placeholder="e.g. Supplier delivery, Site delivery"
                   value={adjustNote}
                   onChange={(e) => setAdjustNote(e.target.value)}
                   style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                  className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-3 py-2.5 h-12 text-sm rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 font-semibold"
                 />
               </div>
               <button
                 type="submit"
                 disabled={mutationLoading}
                 style={{ background: adjustType === "IN" ? C.success : C.error }}
-                className="w-full py-3.5 rounded-xl text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="w-full h-12 rounded-lg text-white font-bold cursor-pointer disabled:opacity-50 hover:opacity-95 active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 mt-2"
               >
-                {mutationLoading ? "Updating stock..." : `Confirm ${adjustType === "IN" ? "Stock-In" : "Stock-Out"}`}
+                {mutationLoading ? "Updating stock..." : (adjustType === "IN" ? "Add Stock" : "Remove Stock")}
               </button>
             </form>
           </div>

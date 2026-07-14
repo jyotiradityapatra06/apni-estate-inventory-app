@@ -25,7 +25,7 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
     navigate("/login", { replace: true });
   };
 
-  const activeColor = C.blue;
+  const activeColor = C.yellow;
   const inactiveColor = "#94A3B8";
   const textColor = "#F8FAFC";
 
@@ -53,7 +53,7 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
   return (
     <aside
       style={{
-        background: "#0F172A",
+        background: "#0B132B", // Deep dark navy
         borderRight: "1px solid #1E293B",
       }}
       className="hidden md:flex flex-col h-full transition-all duration-300 w-20 lg:w-60 flex-shrink-0"
@@ -88,7 +88,7 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
               key={tab.id}
               onClick={() => handleNavigate(tab.path)}
               style={{
-                background: isActive ? "rgba(38, 72, 231, 0.15)" : "transparent",
+                background: isActive ? "rgba(234, 179, 8, 0.15)" : "transparent",
                 color: isActive ? activeColor : inactiveColor,
               }}
               className="w-full flex flex-col lg:flex-row items-center gap-1.5 lg:gap-3 px-2 lg:px-4 py-3 lg:py-2.5 rounded-lg cursor-pointer transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-blue-500/30 group active:scale-[0.98]"

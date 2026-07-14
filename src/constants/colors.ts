@@ -1,28 +1,28 @@
 export const C = {
-  // Primary brand color
-  blue: "#2648E7",
-  blueHover: "#1A3BCE",
-  blueSoft: "rgba(38, 72, 231, 0.08)",
+  // Primary brand color (Navy)
+  blue: "#0F172A",
+  blueHover: "#020617",
+  blueSoft: "rgba(15, 23, 42, 0.06)",
 
-  // Accent and warning colors
-  yellow: "#FFC300",
-  yellowSoft: "rgba(255, 195, 0, 0.12)",
-  amber: "#FFC107",
-  amberSoft: "rgba(255, 193, 7, 0.12)",
+  // Accent and warning colors (Yellow)
+  yellow: "#EAB308",
+  yellowSoft: "rgba(234, 179, 8, 0.12)",
+  amber: "#CA8A04",
+  amberSoft: "rgba(202, 138, 4, 0.12)",
 
   // Status colors
-  success: "#10B981",
-  successSoft: "rgba(16, 185, 129, 0.1)",
-  error: "#EF4444",
-  errorSoft: "rgba(239, 68, 68, 0.1)",
+  success: "#16A34A",
+  successSoft: "rgba(22, 163, 74, 0.08)",
+  error: "#DC2626",
+  errorSoft: "rgba(220, 38, 38, 0.08)",
 
   // Neutrals system
-  bg: "#F6F7FB",
+  bg: "#F8FAFC",
   white: "#FFFFFF",
-  border: "#E5E7EB",
-  ink: "#111827",
-  muted: "#6B7280",
-  surface: "#F9FAFB",
+  border: "#CBD5E1",
+  ink: "#0F172A",
+  muted: "#475569",
+  surface: "#F1F5F9",
 
   // Legacy/Dark sidebar config
   dark: "#0F172A",

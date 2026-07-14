@@ -93,8 +93,8 @@ export const ManagementPage = () => {
       <div style={{ background: C.blue }} className="px-4 pt-12 pb-5 md:hidden">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-white/60 text-[11px] uppercase tracking-wider font-semibold">Settings</div>
-            <div className="text-white text-lg font-bold">Management</div>
+            <div className="text-white/60 text-[11px] uppercase tracking-wider font-semibold">Management</div>
+            <div className="text-white text-lg font-bold">Business Settings</div>
           </div>
           <button 
             onClick={handleLogout}
@@ -110,7 +110,7 @@ export const ManagementPage = () => {
         {/* Desktop Toolbar */}
         <div className="hidden md:flex items-center justify-between gap-4 mb-2">
           <div>
-            <h1 style={{ color: C.ink }} className="text-lg font-bold">Business Management</h1>
+            <h1 style={{ color: C.ink }} className="text-lg font-bold">Management</h1>
             <p style={{ color: C.muted }} className="text-xs">Configure your business profile, staff members, and personal credentials.</p>
           </div>
           <button

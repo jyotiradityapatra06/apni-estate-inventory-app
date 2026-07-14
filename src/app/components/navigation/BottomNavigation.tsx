@@ -80,7 +80,7 @@ export const BottomNavigation = ({ isDark }: BottomNavigationProps) => {
                     transform: "translateX(-50%)",
                     width: 32,
                     height: 3,
-                    background: activeColor,
+                    background: C.yellow,
                     borderRadius: "0 0 4px 4px",
                   }}
                 />

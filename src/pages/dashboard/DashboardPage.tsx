@@ -12,9 +12,6 @@ import {
 import { toast } from "sonner";
 
 import { C } from "../../constants/colors";
-import { Card } from "../../app/components/common/Card";
-import { SectionLabel } from "../../app/components/common/SectionLabel";
-import { StatChip } from "../../app/components/common/StatChip";
 import { Divider } from "../../app/components/common/Divider";
 
 import { useAuth } from "../../hooks/useAuth";
@@ -22,11 +19,13 @@ import { useGetInventory } from "../../hooks/useInventory";
 import { inventoryApi } from "../../api/inventory.api";
 import { LocalDelivery } from "../deliveries/DeliveriesPage";
 import { deliveryApi } from "../../api/delivery.api";
+import { hasPermission } from "../../utils/permissions";
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { business, user } = useAuth();
-  const isManagement = user?.role === "OWNER" || user?.role === "MANAGER";
+  const isOwnerOrManager = user?.role === "OWNER" || user?.role === "MANAGER";
+  const canUpdate = hasPermission(user, "inventory:update");
 
   // Fetch Inventory (Real Data)
   const { data: stockItems, loading: invLoading, refresh: refreshInv } = useGetInventory();
@@ -53,8 +52,7 @@ export const DashboardPage = () => {
   };
 
   const fetchDeliveries = async () => {
-    const role = user?.role?.toUpperCase();
-    if (role !== "OWNER" && role !== "MANAGER") {
+    if (!isOwnerOrManager) {
       setDeliveries([]);
       return;
     }
@@ -143,184 +141,296 @@ export const DashboardPage = () => {
   const paymentPendingDelCount = deliveries.filter(d => d.paymentStatus === "PENDING").length;
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
-      {/* Mobile Header */}
-      <div style={{ background: C.blue }} className="px-4 pt-12 pb-5 md:hidden">
-        <div className="flex items-center justify-between mb-3">
+    <div className="flex flex-col gap-6 pb-8 max-w-7xl mx-auto px-4 md:px-6">
+      {/* Mobile Header Banner */}
+      <div className="bg-[#0F172A] px-5 pt-8 pb-6 rounded-xl md:hidden border border-slate-700 text-white mt-2">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <div className="text-white/60 text-[11px] font-medium uppercase tracking-wider">Business Dashboard</div>
-            <div className="text-white text-lg font-bold leading-tight">{business?.name || "APNI ESTATE"}</div>
+            <div className="text-white/70 text-xs font-semibold uppercase tracking-wider">Dashboard</div>
+            <div className="text-xl font-bold leading-tight mt-1">{business?.name || "APNI ESTATE"}</div>
           </div>
           <button
             onClick={handleRefresh}
-            style={{ background: "rgba(255,255,255,0.15)" }}
-            className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer"
+            className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10 active:scale-95 transition-all focus:outline-none border border-white/20 cursor-pointer"
           >
-            <RefreshCw size={15} color="white" />
+            <RefreshCw size={16} className="text-white" />
           </button>
         </div>
-        <div className="flex items-center gap-1.5">
-          <div style={{ background: C.success }} className="w-1.5 h-1.5 rounded-full" />
-          <span className="text-white/70 text-[11px] font-medium">Real-time Connected</span>
+        <div className="flex items-center gap-2 bg-white/5 px-2.5 py-1 rounded border border-white/10 w-max">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-white/80 text-xs font-bold">Real-time Connected</span>
         </div>
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden md:flex items-center justify-between mb-2">
+      <div className="hidden md:flex items-center justify-between mb-2 mt-2">
         <div>
-          <h1 style={{ color: C.ink }} className="text-xl font-bold">Business Overview</h1>
-          <p style={{ color: C.muted }} className="text-sm">Your stock and delivery status at a glance.</p>
+          <h1 className="text-2xl font-bold text-[#0F172A]">Dashboard</h1>
+          <p className="text-sm text-slate-500 mt-1">Your stock and delivery status at a glance.</p>
         </div>
         <button
           onClick={handleRefresh}
-          style={{ border: `1.5px solid ${C.border}`, color: C.ink }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer text-xs font-semibold bg-white hover:bg-slate-50 active:scale-95 transition-all"
+          style={{ border: `1.5px solid ${C.border}` }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg cursor-pointer text-sm font-bold bg-white text-[#0F172A] hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
         >
-          <RefreshCw size={13} />
+          <RefreshCw size={14} />
           <span>Refresh</span>
         </button>
       </div>
 
-      <div className="px-1 md:px-0 flex flex-col gap-5">
-        {/* Real Metrics Grid */}
+      <div className="flex flex-col gap-6">
+        {/* Today's Summary section */}
         <div>
-          <SectionLabel>Today&apos;s Business</SectionLabel>
+          <div className="mb-3">
+            <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+              Today&apos;s Summary
+            </span>
+          </div>
+
           {invLoading || txLoading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map(i => (
-                <div key={i} className="bg-white border border-[rgba(20,18,14,0.1)] rounded-xl p-4 h-20 animate-pulse" />
+                <div
+                  key={i}
+                  className="bg-white border border-slate-300 rounded-xl p-5 h-28 animate-pulse"
+                />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
-              <StatChip
-                label="Total Stock Items"
-                value={String(totalItems)}
-                sub="Materials in stock"
-                trend={null}
-              />
-              <StatChip
-                label="Low Stock"
-                value={String(lowStockItemsCount)}
-                sub="Needs restocking"
-                trend={lowStockItemsCount > 0 ? "up" : null}
-              />
-              <StatChip
-                label="Stock Added Today"
-                value={String(stockInTodayCount)}
-                sub="Entries made today"
-                trend={null}
-              />
-              <StatChip
-                label="Stock Removed Today"
-                value={String(stockOutTodayCount)}
-                sub="Entries made today"
-                trend={null}
-              />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Total Materials */}
+              <div
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.border}`,
+                  borderLeft: `4px solid ${C.blue}`,
+                  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                }}
+                className="rounded-xl p-5 flex flex-col justify-between min-h-[110px] border-slate-300"
+              >
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">
+                    Total Materials
+                  </div>
+                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-[#0F172A]">
+                    {totalItems}
+                  </div>
+                </div>
+                <div className="text-xs font-semibold text-slate-500 mt-2">
+                  Materials available
+                </div>
+              </div>
+
+              {/* Low Stock */}
+              <div
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.border}`,
+                  borderLeft: `4px solid ${lowStockItemsCount > 0 ? C.error : C.muted}`,
+                  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                }}
+                className="rounded-xl p-5 flex flex-col justify-between min-h-[110px] border-slate-300"
+              >
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">
+                    Low Stock
+                  </div>
+                  <div style={{ color: lowStockItemsCount > 0 ? C.error : "#0F172A" }} className="text-2xl font-bold font-mono leading-none mt-1.5">
+                    {lowStockItemsCount}
+                  </div>
+                </div>
+                <div className="text-xs font-semibold mt-2 flex items-center gap-1">
+                  {lowStockItemsCount > 0 && <ArrowUpRight size={14} style={{ color: C.error }} />}
+                  <span style={{ color: lowStockItemsCount > 0 ? C.error : C.muted }}>
+                    {lowStockItemsCount > 0 ? "Needs more stock" : "All items ok"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Stock In Today */}
+              <div
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.border}`,
+                  borderLeft: `4px solid ${C.success}`,
+                  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                }}
+                className="rounded-xl p-5 flex flex-col justify-between min-h-[110px] border-slate-300"
+              >
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">
+                    Stock In Today
+                  </div>
+                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-[#0F172A]">
+                    {stockInTodayCount}
+                  </div>
+                </div>
+                <div className="text-xs font-semibold text-slate-500 mt-2">
+                  Entries made today
+                </div>
+              </div>
+
+              {/* Stock Out Today */}
+              <div
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.border}`,
+                  borderLeft: `4px solid ${C.yellow}`, // Accent highlight yellow
+                  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                }}
+                className="rounded-xl p-5 flex flex-col justify-between min-h-[110px] border-slate-300"
+              >
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider mb-1 text-slate-500">
+                    Stock Out Today
+                  </div>
+                  <div className="text-2xl font-bold font-mono leading-none mt-1.5 text-[#0F172A]">
+                    {stockOutTodayCount}
+                  </div>
+                </div>
+                <div className="text-xs font-semibold text-slate-500 mt-2">
+                  Entries made today
+                </div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Primary Actions Grid */}
-        <div>
-          <SectionLabel>Quick Actions</SectionLabel>
-          <div className="grid grid-cols-2 gap-3 max-w-md">
-            <Card
-              className="p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-black/[0.01] active:scale-98 transition-all"
-              onClick={() => navigate("/inventory?action=stock-in")}
-            >
-              <div style={{ background: "rgba(16,185,129,0.08)" }} className="w-10 h-10 rounded-full flex items-center justify-center mb-2">
-                <ArrowUpRight size={18} color={C.success} />
-              </div>
-              <span style={{ color: C.ink }} className="text-xs font-bold">Add Stock</span>
-              <span style={{ color: C.muted }} className="text-[10px] mt-0.5">Update stock quantity</span>
-            </Card>
+        {/* Quick Actions section */}
+        {canUpdate && (
+          <div>
+            <div className="mb-3">
+              <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+                Quick Actions
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 max-w-2xl">
+              <button
+                onClick={() => navigate("/inventory?action=stock-in")}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.border}`,
+                  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                }}
+                className="flex items-center justify-center gap-3 h-12 rounded-lg hover:bg-slate-50 active:scale-98 transition-all focus:outline-none cursor-pointer border-slate-300 px-4"
+              >
+                <ArrowDownToLine size={18} className="text-[#16A34A]" />
+                <span className="text-sm font-bold text-[#0F172A]">Stock In</span>
+              </button>
 
-            <Card
-              className="p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-black/[0.01] active:scale-98 transition-all"
-              onClick={() => navigate("/deliveries?action=new-delivery")}
-            >
-              <div style={{ background: "rgba(42,76,214,0.08)" }} className="w-10 h-10 rounded-full flex items-center justify-center mb-2">
-                <Truck size={18} color={C.blue} />
-              </div>
-              <span style={{ color: C.ink }} className="text-xs font-bold">New Delivery</span>
-              <span style={{ color: C.muted }} className="text-[10px] mt-0.5">Create a delivery</span>
-            </Card>
+              <button
+                onClick={() => navigate("/inventory?action=stock-out")}
+                style={{
+                  background: C.white,
+                  border: `1.5px solid ${C.yellow}`, // Highlight border in yellow
+                  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                }}
+                className="flex items-center justify-center gap-3 h-12 rounded-lg hover:bg-slate-50 active:scale-98 transition-all focus:outline-none cursor-pointer px-4"
+              >
+                <ArrowUpFromLine size={18} className="text-[#DC2626]" />
+                <span className="text-sm font-bold text-[#0F172A]">Stock Out</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Unified Deliveries Summary, Transactions, and Notifications */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-fade-in">
-          {/* Deliveries Stats Card (Real Counts) */}
-          <div className="lg:col-span-4 flex flex-col gap-2">
-            <SectionLabel>Delivery Status</SectionLabel>
-            <Card className="p-5 flex flex-col gap-4 h-[280px]">
-              <div className="flex items-center gap-2">
-                <div style={{ background: "rgba(42,76,214,0.08)" }} className="p-2 rounded-lg text-blue-600">
-                  <ClipboardList size={18} />
+        <div className={`grid grid-cols-1 ${isOwnerOrManager ? "lg:grid-cols-12" : ""} gap-6 animate-fade-in`}>
+          
+          {/* Delivery Status (OWNER/MANAGER only) */}
+          {isOwnerOrManager && (
+            <div className="lg:col-span-4 flex flex-col gap-3">
+              <div>
+                <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+                  Delivery Status
+                </span>
+              </div>
+              <div
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.border}`,
+                  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                }}
+                className="p-6 flex flex-col gap-5 h-[350px] border-slate-300 rounded-xl"
+              >
+                <div className="flex items-center gap-3">
+                  <div style={{ background: "rgba(15,23,42,0.06)" }} className="p-2.5 rounded-lg text-[#0F172A]">
+                    <ClipboardList size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#0F172A]">Delivery Summary</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">Current delivery counts</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ color: C.ink }} className="text-xs font-bold">Delivery Summary</h3>
-                  <p style={{ color: C.muted }} className="text-[9px]">Current delivery counts</p>
+
+                <Divider className="my-0" />
+
+                <div className="grid grid-cols-2 gap-4 flex-1 text-xs">
+                  <div className="bg-slate-50 border border-slate-300 p-4 rounded-lg flex flex-col justify-between shadow-sm">
+                    <span className="font-bold text-[10px] uppercase tracking-wider block text-slate-500">Pending</span>
+                    <span className="text-2xl font-bold font-mono mt-2 text-[#0F172A]">{pendingDelCount}</span>
+                  </div>
+                  <div className="bg-sky-50/50 border border-slate-300 p-4 rounded-lg flex flex-col justify-between shadow-sm">
+                    <span className="font-bold text-[10px] uppercase tracking-wider block text-[#0284C7]">Out for Delivery</span>
+                    <span className="text-2xl font-bold font-mono mt-2 text-[#0284C7]">{outDelCount}</span>
+                  </div>
+                  <div className="bg-emerald-50/50 border border-slate-300 p-4 rounded-lg flex flex-col justify-between shadow-sm">
+                    <span className="font-bold text-[10px] uppercase tracking-wider block text-[#16A34A]">Delivered</span>
+                    <span className="text-2xl font-bold font-mono mt-2 text-[#16A34A]">{deliveredDelCount}</span>
+                  </div>
+                  <div className="bg-rose-50/50 border border-slate-300 p-4 rounded-lg flex flex-col justify-between shadow-sm">
+                    <span className="font-bold text-[10px] uppercase tracking-wider block text-[#DC2626]">Payment Pending</span>
+                    <span className="text-2xl font-bold font-mono mt-2 text-[#DC2626]">{paymentPendingDelCount}</span>
+                  </div>
                 </div>
               </div>
-
-              <Divider className="my-0" />
-
-              <div className="grid grid-cols-2 gap-3 flex-1 text-xs">
-                <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex flex-col justify-between">
-                  <span style={{ color: C.muted }} className="font-semibold text-[9px] uppercase tracking-wider block">Pending</span>
-                  <span style={{ color: C.ink }} className="text-lg font-bold font-mono mt-1">{pendingDelCount}</span>
-                </div>
-                <div className="bg-sky-50/50 border border-sky-100/50 p-3 rounded-xl flex flex-col justify-between">
-                  <span style={{ color: "#0369A1" }} className="font-semibold text-[9px] uppercase tracking-wider block">On the Way</span>
-                  <span style={{ color: "#0369A1" }} className="text-lg font-bold font-mono mt-1">{outDelCount}</span>
-                </div>
-                <div className="bg-emerald-50/50 border border-emerald-100/50 p-3 rounded-xl flex flex-col justify-between">
-                  <span style={{ color: "#047857" }} className="font-semibold text-[9px] uppercase tracking-wider block">Delivered</span>
-                  <span style={{ color: "#047857" }} className="text-lg font-bold font-mono mt-1">{deliveredDelCount}</span>
-                </div>
-                <div className="bg-rose-50/50 border border-rose-100/50 p-3 rounded-xl flex flex-col justify-between">
-                  <span style={{ color: "#BE123C" }} className="font-semibold text-[9px] uppercase tracking-wider block">Payment Due</span>
-                  <span style={{ color: "#BE123C" }} className="text-lg font-bold font-mono mt-1">{paymentPendingDelCount}</span>
-                </div>
-              </div>
-            </Card>
-          </div>
+            </div>
+          )}
 
           {/* Real Transactions Ledger */}
-          <div className="lg:col-span-4 flex flex-col gap-2">
-            <SectionLabel>Recent Stock Activity</SectionLabel>
-            <Card className="p-5 flex flex-col gap-3 h-[280px] overflow-y-auto">
+          <div className={`${isOwnerOrManager ? "lg:col-span-4" : "w-full max-w-3xl"} flex flex-col gap-3`}>
+            <div>
+              <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+                Recent Stock Activity
+              </span>
+            </div>
+            <div
+              style={{
+                background: C.white,
+                border: `1px solid ${C.border}`,
+                boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+              }}
+              className="p-6 flex flex-col gap-4 h-[350px] overflow-y-auto border-slate-300 rounded-xl"
+            >
               {txLoading ? (
-                <div className="flex-1 flex items-center justify-center text-xs text-gray-400">Loading activity...</div>
+                <div className="flex-1 flex items-center justify-center text-sm text-slate-500 font-medium">Loading activity...</div>
               ) : recentTransactions.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center gap-1.5">
-                  <span style={{ color: C.muted }} className="text-xs font-semibold">No recent activity</span>
-                  <span style={{ color: C.muted }} className="text-[10px] max-w-xs">Stock updates will appear here.</span>
+                <div className="flex-1 flex flex-col items-center justify-center text-center gap-2">
+                  <span className="text-sm font-semibold text-slate-500">No recent activity</span>
+                  <span className="text-xs text-slate-500 max-w-xs">Stock updates will appear here.</span>
                 </div>
               ) : (
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-3">
                   {recentTransactions.map((tx, idx) => {
                     const isIn = tx.type === "IN";
                     return (
                       <div key={tx.id}>
-                        {idx > 0 && <Divider className="my-1.5" />}
-                        <div className="flex items-center justify-between text-[11px]">
+                        {idx > 0 && <Divider className="my-2.5" />}
+                        <div className="flex items-center justify-between text-xs">
                           <div className="min-w-0 flex-1">
-                            <div style={{ color: C.ink }} className="font-bold truncate">{tx.inventoryItem?.materialName || "Material Item"}</div>
-                            <div style={{ color: C.muted }} className="text-[9px] mt-0.5">
+                            <div className="font-bold text-sm text-[#0F172A] truncate">{tx.inventoryItem?.materialName || "Material Item"}</div>
+                            <div className="text-xs text-slate-500 mt-1 font-medium">
                               {new Date(tx.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                               {tx.note && ` · ${tx.note}`}
                             </div>
                           </div>
-                          <div className="text-right ml-2">
+                          <div className="text-right ml-3 flex-shrink-0">
                             <span
                               style={{
                                 color: isIn ? C.success : C.error,
                                 background: isIn ? "#ECFDF5" : "#FEF2F2"
                               }}
-                              className="px-1.5 py-0.5 rounded font-bold text-[9px]"
+                              className="px-2.5 py-1 rounded font-bold text-xs inline-block"
                             >
                               {isIn ? "+" : "-"}{tx.quantity.toLocaleString("en-IN")} {tx.inventoryItem?.unit || "Units"}
                             </span>
@@ -331,91 +441,105 @@ export const DashboardPage = () => {
                   })}
                 </div>
               )}
-            </Card>
+            </div>
           </div>
 
-          {/* Recent Activity */}
-          <div className="lg:col-span-4 flex flex-col gap-2">
-            <SectionLabel>Recent Activity</SectionLabel>
-            <Card className="p-5 flex flex-col gap-3 h-[280px] overflow-y-auto bg-white border border-[rgba(20,18,14,0.1)] shadow-sm">
-              {txLoading ? (
-                <div className="flex-1 flex items-center justify-center text-sm text-gray-400">
-                  Loading activity...
-                </div>
-              ) : recentActivity.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center gap-2">
-                  <div className="w-11 h-11 rounded-full flex items-center justify-center bg-blue-50 text-blue-600">
-                    <CheckCircle2 size={20} />
+          {/* Recent Activity (OWNER/MANAGER only) */}
+          {isOwnerOrManager && (
+            <div className="lg:col-span-4 flex flex-col gap-3">
+              <div>
+                <span className="text-sm font-bold uppercase tracking-wider block text-[#0F172A]">
+                  Recent Activity
+                </span>
+              </div>
+              <div
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.border}`,
+                  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                }}
+                className="p-6 flex flex-col gap-4 h-[350px] overflow-y-auto border-slate-300 rounded-xl"
+              >
+                {txLoading ? (
+                  <div className="flex-1 flex items-center justify-center text-sm text-slate-500 font-medium">
+                    Loading activity...
                   </div>
-                  <span style={{ color: C.ink }} className="text-sm font-semibold">
-                    No recent activity
-                  </span>
-                  <span style={{ color: C.muted }} className="text-xs max-w-[210px]">
-                    Stock and delivery updates will appear here.
-                  </span>
-                </div>
-              ) : (
-                <div className="flex flex-col">
-                  {recentActivity.map((activity, index) => {
-                    const isStockIn = activity.type === "stock-in";
-                    const isStockOut = activity.type === "stock-out";
-                    const isDelivered = activity.type === "delivered";
+                ) : recentActivity.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center gap-3">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-slate-100 text-slate-500">
+                      <CheckCircle2 size={24} />
+                    </div>
+                    <span className="text-sm font-semibold text-[#0F172A]">
+                      No recent activity
+                    </span>
+                    <span className="text-xs text-slate-500 max-w-[210px]">
+                      Stock and delivery updates will appear here.
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col">
+                    {recentActivity.map((activity, index) => {
+                      const isStockIn = activity.type === "stock-in";
+                      const isStockOut = activity.type === "stock-out";
+                      const isDelivered = activity.type === "delivered";
 
-                    return (
-                      <div key={activity.id}>
-                        {index > 0 && <Divider className="my-2" />}
+                      return (
+                        <div key={activity.id}>
+                          {index > 0 && <Divider className="my-2.5" />}
 
-                        <div className="flex items-start gap-3 py-1">
-                          <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${isStockIn
-                                ? "bg-emerald-50 text-emerald-600"
+                          <div className="flex items-start gap-4 py-1.5">
+                            <div
+                              className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isStockIn
+                                ? "bg-emerald-50 text-[#16A34A]"
                                 : isStockOut
-                                  ? "bg-rose-50 text-rose-600"
+                                  ? "bg-rose-50 text-[#DC2626]"
                                   : isDelivered
-                                    ? "bg-blue-50 text-blue-600"
-                                    : "bg-amber-50 text-amber-600"
-                              }`}
-                          >
-                            {isStockIn ? (
-                              <ArrowDownToLine size={16} />
-                            ) : isStockOut ? (
-                              <ArrowUpFromLine size={16} />
-                            ) : isDelivered ? (
-                              <CheckCircle2 size={16} />
-                            ) : (
-                              <Truck size={16} />
-                            )}
-                          </div>
-
-                          <div className="min-w-0 flex-1">
-                            <div style={{ color: C.ink }} className="text-sm font-semibold">
-                              {activity.title}
+                                    ? "bg-blue-50 text-[#0F172A]"
+                                    : "bg-amber-50 text-[#CA8A04]"
+                                }`}
+                            >
+                              {isStockIn ? (
+                                <ArrowDownToLine size={18} />
+                              ) : isStockOut ? (
+                                <ArrowUpFromLine size={18} />
+                              ) : isDelivered ? (
+                                <CheckCircle2 size={18} />
+                              ) : (
+                                <Truck size={18} />
+                              )}
                             </div>
 
-                            <div style={{ color: C.muted }} className="text-xs mt-0.5 truncate">
-                              {activity.message}
-                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-sm font-bold text-[#0F172A]">
+                                {activity.title}
+                              </div>
 
-                            <div style={{ color: C.muted }} className="text-[10px] mt-1 opacity-70">
-                              {new Date(activity.createdAt).toLocaleString("en-IN", {
-                                day: "numeric",
-                                month: "short",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
+                              <div className="text-xs text-slate-500 mt-1 truncate font-medium">
+                                {activity.message}
+                              </div>
+
+                              <div className="text-[11px] text-slate-450 mt-1 opacity-80 font-medium">
+                                {new Date(activity.createdAt).toLocaleString("en-IN", {
+                                  day: "numeric",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </Card>
-          </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
 export default DashboardPage;
