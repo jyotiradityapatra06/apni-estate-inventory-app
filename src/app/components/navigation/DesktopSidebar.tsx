@@ -56,7 +56,7 @@ export const DesktopSidebar = ({ isDark }: DesktopSidebarProps) => {
         background: C.dark,
         borderRight: `1px solid ${C.darkBorder}`,
       }}
-      className="hidden md:flex flex-col h-full transition-all duration-300 w-20 lg:w-60 flex-shrink-0"
+      className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-all duration-300 w-20 lg:w-60"
     >
       {/* Branding Section */}
       <div

@@ -383,7 +383,7 @@ export const InventoryPage = () => {
       }
     };
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col">
         <div style={{ background: C.blue }} className="mx-4 mt-3 rounded-xl px-5 py-5 text-white shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => { setShowReconcile(false); }} className="cursor-pointer">
@@ -396,7 +396,7 @@ export const InventoryPage = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
+        <div className="px-4 py-4 flex flex-col gap-4">
           <Card className="p-4 border-slate-300 shadow-sm rounded-xl">
             <h3 style={{ color: C.ink }} className="text-base font-bold mb-4">Stock In</h3>
             {stockInError && (

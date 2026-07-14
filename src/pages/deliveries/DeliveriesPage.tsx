@@ -470,7 +470,7 @@ export const DeliveriesPage = () => {
   const active = filteredDeliveries.find(d => d.id === selectedId) || (filteredDeliveries.length > 0 ? filteredDeliveries[0] : null);
 
   return (
-    <div className="flex flex-col gap-0 pb-4 h-full">
+    <div className="flex flex-col gap-0 pb-4">
       {/* Mobile Top Header */}
       <div style={{ background: C.blue }} className="mx-4 mt-3 rounded-xl px-5 py-5 md:hidden text-white shadow-sm">
         <div className="flex items-center justify-between">
@@ -588,7 +588,7 @@ export const DeliveriesPage = () => {
             {/* Left Column: Delivery pipeline */}
             <div className="lg:col-span-5 flex flex-col gap-3">
               <SectionLabel>{filteredDeliveries.length} deliveries</SectionLabel>
-              <div className="flex flex-col gap-4 overflow-y-auto pr-1">
+              <div className="flex flex-col gap-4 pr-1">
                 {filteredDeliveries.map(d => {
                   const meta = statusMeta[d.status] || statusMeta.PENDING;
                   const isSel = selectedId === d.id;
