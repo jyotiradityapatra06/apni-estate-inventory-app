@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Backend MVP for Construction Material Supplier ERP",
   "main": "dist/server.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "prisma generate && tsc -p tsconfig.build.json",
@@ -22,7 +25,7 @@
     "test:perf": "npx ts-node --files tests/performance-scale.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.11.0",
+    "@prisma/client": "5.22.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -39,8 +42,8 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.30",
-    "prisma": "^5.11.0",
+    "prisma": "5.22.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.4.3"
+    "typescript": "5.4.3"
   }
 }
