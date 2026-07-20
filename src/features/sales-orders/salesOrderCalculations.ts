@@ -1,0 +1,4 @@
+export interface DraftLine{quantity:string;rate:string;discountRate:string;gstRate:string}
+const round=(n:number)=>Math.round((n+Number.EPSILON)*100)/100;
+export const calculateLine=(line:DraftLine,taxMode:"GST"|"NON_GST")=>{const quantity=Number(line.quantity||0),rate=Number(line.rate||0),discountRate=Number(line.discountRate||0),gstRate=taxMode==="GST"?Number(line.gstRate||0):0;const gross=round(quantity*rate),discount=round(gross*discountRate/100),taxable=round(gross-discount),tax=round(taxable*gstRate/100);return{gross,discount,taxable,tax,total:round(taxable+tax)}};
+export const calculateOrder=(lines:DraftLine[],taxMode:"GST"|"NON_GST")=>lines.map(x=>calculateLine(x,taxMode)).reduce((a,x)=>({subtotal:round(a.subtotal+x.gross),discount:round(a.discount+x.discount),taxable:round(a.taxable+x.taxable),tax:round(a.tax+x.tax),total:round(a.total+x.total)}),{subtotal:0,discount:0,taxable:0,tax:0,total:0});

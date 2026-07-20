@@ -1,0 +1,15 @@
+import { Router } from "express";
+import * as controller from "../controllers/report.controller";
+import { protect, requirePermission } from "../middleware/auth.middleware";
+const router=Router();router.use(protect);
+router.get("/sales",requirePermission("reports:operational"),controller.sales);
+router.get("/purchases",requirePermission("reports:operational"),controller.purchases);
+router.get("/inventory",requirePermission("reports:operational"),controller.inventory);
+router.get("/expenses",requirePermission("reports:operational"),controller.expenses);
+router.get("/overview",requirePermission("reports:financial"),controller.overview);
+router.get("/stock-valuation",requirePermission("reports:financial"),controller.valuation);
+router.get("/customer-outstanding",requirePermission("reports:financial"),controller.customers);
+router.get("/supplier-outstanding",requirePermission("reports:financial"),controller.suppliers);
+router.get("/gst-summary",requirePermission("reports:financial"),controller.gst);
+router.get("/profit-loss",requirePermission("reports:financial"),controller.profitLoss);
+export default router;

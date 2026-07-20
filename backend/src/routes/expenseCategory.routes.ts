@@ -1,0 +1,10 @@
+import { Router } from "express";
+import * as controller from "../controllers/expenseCategory.controller";
+import { protect, requirePermission } from "../middleware/auth.middleware";
+const router = Router();
+router.use(protect);
+router.get("/", requirePermission("expenses:view"), controller.list);
+router.post("/", requirePermission("expense-categories:manage"), controller.create);
+router.patch("/:id", requirePermission("expense-categories:manage"), controller.update);
+router.post("/:id/deactivate", requirePermission("expense-categories:manage"), controller.deactivate);
+export default router;

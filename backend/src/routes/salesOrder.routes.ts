@@ -1,0 +1,12 @@
+import { Router } from "express";
+import * as controller from "../controllers/salesOrder.controller";
+import { getDeliverableItems } from "../controllers/linkedDelivery.controller";
+import { protect, requirePermission, restrictTo } from "../middleware/auth.middleware";
+const router = Router();
+router.get("/", protect, requirePermission("sales:view"), controller.getAll);
+router.get("/:id/deliverable-items", protect, restrictTo("OWNER", "MANAGER"), requirePermission("deliveries:view"), getDeliverableItems);
+router.get("/:id", protect, requirePermission("sales:view"), controller.getById);
+router.post("/", protect, requirePermission("sales:manage"), controller.create);
+router.post("/:id/confirm", protect, requirePermission("sales:manage"), controller.confirm);
+router.post("/:id/cancel", protect, requirePermission("sales:manage"), controller.cancel);
+export default router;

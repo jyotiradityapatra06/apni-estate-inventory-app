@@ -1,0 +1,10 @@
+import { Router } from "express";
+import * as controller from "../controllers/godown.controller";
+import { protect, requirePermission } from "../middleware/auth.middleware";
+const router = Router();
+router.get("/", protect, requirePermission("godowns:view"), controller.getAll);
+router.get("/:id", protect, requirePermission("godowns:view"), controller.getById);
+router.post("/", protect, requirePermission("godowns:create"), controller.create);
+router.patch("/:id", protect, requirePermission("godowns:update"), controller.update);
+router.delete("/:id", protect, requirePermission("godowns:update"), controller.remove);
+export default router;

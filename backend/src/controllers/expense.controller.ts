@@ -1,0 +1,10 @@
+import { NextFunction, Request, Response } from "express";
+import * as service from "../services/expense.service";
+const context = (req: Request) => ({ businessId: req.user!.businessId, userId: req.user!.userId });
+export const list = async (req: Request, res: Response, next: NextFunction) => { try { res.json({ success: true, ...await service.list(context(req).businessId, req.query) }); } catch (error) { next(error); } };
+export const summary = async (req: Request, res: Response, next: NextFunction) => { try { res.json({ success: true, data: await service.summary(context(req).businessId) }); } catch (error) { next(error); } };
+export const get = async (req: Request, res: Response, next: NextFunction) => { try { res.json({ success: true, data: await service.get(context(req).businessId, req.params.id) }); } catch (error) { next(error); } };
+export const create = async (req: Request, res: Response, next: NextFunction) => { try { const ctx = context(req); res.status(201).json({ success: true, data: await service.create(ctx.businessId, ctx.userId, req.body) }); } catch (error) { next(error); } };
+export const update = async (req: Request, res: Response, next: NextFunction) => { try { res.json({ success: true, data: await service.update(context(req).businessId, req.params.id, req.body) }); } catch (error) { next(error); } };
+export const markPaid = async (req: Request, res: Response, next: NextFunction) => { try { const ctx = context(req); res.json({ success: true, message: "Expense marked as paid.", data: await service.markPaid(ctx.businessId, ctx.userId, req.params.id, req.body) }); } catch (error) { next(error); } };
+export const cancel = async (req: Request, res: Response, next: NextFunction) => { try { const ctx = context(req); res.json({ success: true, message: "Expense cancelled.", data: await service.cancel(ctx.businessId, ctx.userId, req.params.id, req.body) }); } catch (error) { next(error); } };

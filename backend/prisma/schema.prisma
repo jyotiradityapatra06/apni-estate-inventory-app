@@ -1,0 +1,1023 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Business {
+  id                String             @id @default(uuid())
+  name              String
+  gstNumber         String?
+  phone             String?
+  address           String?
+  workerSeatLimit   Int                @default(5)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  users             User[]
+  inventoryItems    InventoryItem[]
+  stockTransactions StockTransaction[]
+  notifications     Notification[]
+  deliveries        Delivery[]
+  customers         Customer[]
+  suppliers         Supplier[]
+  godowns           Godown[]
+  godownStocks      GodownStock[]
+  stockTransfers    StockTransfer[]
+  numberSequences   NumberSequence[]
+  salesOrders       SalesOrder[]
+  invoices          Invoice[]
+  customerPayments  CustomerPayment[]
+  purchaseOrders    PurchaseOrder[]
+  purchasePayments  PurchasePayment[]
+  purchaseReceipts  PurchaseReceipt[]
+  ledgerEntries     LedgerEntry[]
+  expenseCategories ExpenseCategory[]
+  expenses          Expense[]
+  SalesReturn       SalesReturn[]
+  PurchaseReturn    PurchaseReturn[]
+}
+
+model User {
+  id                       String             @id @default(uuid())
+  name                     String
+  email                    String             @unique
+  phone                    String?
+  passwordHash             String
+  role                     String             @default("STAFF") // "OWNER", "MANAGER", "STAFF", "DRIVER"
+  isActive                 Boolean            @default(true)
+  joiningDate              DateTime           @default(now())
+  lastLogin                DateTime?
+  businessId               String
+  business                 Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
+  stockTransactions        StockTransaction[]
+  createdTransfers         StockTransfer[]    @relation("TransferCreatedBy")
+  completedTransfers       StockTransfer[]    @relation("TransferCompletedBy")
+  cancelledTransfers       StockTransfer[]    @relation("TransferCancelledBy")
+  createdGodowns           Godown[]           @relation("GodownCreatedBy")
+  updatedGodowns           Godown[]           @relation("GodownUpdatedBy")
+  createdSalesOrders       SalesOrder[]       @relation("SalesOrderCreatedBy")
+  createdInvoices          Invoice[]          @relation("InvoiceCreatedBy")
+  receivedPayments         CustomerPayment[]  @relation("PaymentReceivedBy")
+  createdDeliveries        Delivery[]         @relation("DeliveryCreatedBy")
+  dispatchedDeliveries     Delivery[]         @relation("DeliveryDispatchedBy")
+  completedDeliveries      Delivery[]         @relation("DeliveryCompletedBy")
+  cancelledDeliveries      Delivery[]         @relation("DeliveryCancelledBy")
+  reversedDeliveries       Delivery[]         @relation("DeliveryReversedBy")
+  createdPurchaseOrders    PurchaseOrder[]    @relation("PurchaseOrderCreatedBy")
+  recordedPurchasePayments PurchasePayment[]  @relation("PurchasePaymentRecordedBy")
+  reversedPurchasePayments PurchasePayment[]  @relation("PurchasePaymentReversedBy")
+  recordedPurchaseReceipts PurchaseReceipt[]  @relation("PurchaseReceiptRecordedBy")
+  createdLedgerEntries     LedgerEntry[]      @relation("LedgerEntryCreatedBy")
+  createdExpenseCategories ExpenseCategory[]  @relation("ExpenseCategoryCreatedBy")
+  createdExpenses          Expense[]          @relation("ExpenseCreatedBy")
+  createdSalesReturns      SalesReturn[]      @relation("SalesReturnCreatedBy")
+  completedSalesReturns    SalesReturn[]      @relation("SalesReturnCompletedBy")
+  cancelledSalesReturns    SalesReturn[]      @relation("SalesReturnCancelledBy")
+  createdPurchaseReturns   PurchaseReturn[]   @relation("PurchaseReturnCreatedBy")
+  completedPurchaseReturns PurchaseReturn[]   @relation("PurchaseReturnCompletedBy")
+  cancelledPurchaseReturns PurchaseReturn[]   @relation("PurchaseReturnCancelledBy")
+  cancelledExpenses        Expense[]          @relation("ExpenseCancelledBy")
+
+  @@index([businessId])
+}
+
+model InventoryItem {
+  id                  String                @id @default(uuid())
+  materialName        String
+  category            String
+  brand               String?
+  sku                 String
+  unit                String
+  quantity            Float                 @default(0)
+  reorderLevel        Float                 @default(0)
+  location            String
+  openingStock        Float                 @default(0)
+  minimumStockLevel   Float                 @default(0)
+  costPrice           Float?
+  sellingPrice        Float?
+  hsnCode             String?
+  taxRate             Float?
+  isActive            Boolean               @default(true)
+  defaultSupplierId   String?
+  defaultSupplier     Supplier?             @relation("DefaultSupplier", fields: [defaultSupplierId], references: [id], onDelete: SetNull)
+  businessId          String
+  business            Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  stockTransactions   StockTransaction[]
+  supplierMaterials   SupplierMaterial[]
+  godownStocks        GodownStock[]
+  stockTransferItems  StockTransferItem[]
+  salesOrderItems     SalesOrderItem[]
+  invoiceItems        InvoiceItem[]
+  deliveryItems       DeliveryItem[]
+  purchaseOrderItems  PurchaseOrderItem[]
+  PurchaseReceiptItem PurchaseReceiptItem[]
+  SalesReturnItem     SalesReturnItem[]
+  PurchaseReturnItem  PurchaseReturnItem[]
+
+  @@unique([businessId, sku])
+  @@index([businessId])
+  @@index([businessId, category])
+  @@index([businessId, materialName])
+  @@index([defaultSupplierId])
+}
+
+model StockTransaction {
+  id              String        @id @default(uuid())
+  type            String
+  quantity        Float
+  note            String?
+  reason          String?
+  referenceType   String?
+  referenceId     String?
+  idempotencyKey  String?       @unique
+  inventoryItemId String
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  godownId        String?
+  godown          Godown?       @relation(fields: [godownId], references: [id], onDelete: SetNull)
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  businessId      String
+  business        Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+
+  @@index([inventoryItemId])
+  @@index([godownId])
+  @@index([userId])
+  @@index([businessId, createdAt])
+  @@index([referenceType, referenceId])
+}
+
+model Customer {
+  id                 String            @id @default(uuid())
+  customerCode       String
+  name               String
+  phone              String
+  email              String?
+  gstin              String?
+  billingAddress     String?
+  shippingAddress    String?
+  creditLimit        Float             @default(0)
+  openingBalance     Float             @default(0)
+  outstandingBalance Float             @default(0)
+  notes              String?
+  isActive           Boolean           @default(true)
+  businessId         String
+  business           Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  salesOrders        SalesOrder[]
+  invoices           Invoice[]
+  payments           CustomerPayment[]
+  deliveries         Delivery[]
+  SalesReturn        SalesReturn[]
+
+  @@unique([businessId, customerCode])
+  @@index([businessId])
+  @@index([businessId, name])
+  @@index([businessId, phone])
+  @@index([businessId, gstin])
+}
+
+model Supplier {
+  id                String             @id @default(uuid())
+  supplierCode      String
+  name              String
+  contactPerson     String?
+  phone             String
+  alternatePhone    String?
+  email             String?
+  gstin             String?
+  address           String?
+  openingPayable    Float              @default(0)
+  pendingPayments   Float              @default(0)
+  notes             String?
+  isActive          Boolean            @default(true)
+  businessId        String
+  business          Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  suppliedMaterials SupplierMaterial[]
+  defaultForItems   InventoryItem[]    @relation("DefaultSupplier")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  companyName       String?
+  panNumber         String?
+  creditLimit       Decimal            @default(0)
+  paymentTerms      String?
+  totalPurchases    Decimal            @default(0)
+  paidAmount        Decimal            @default(0)
+  purchaseOrders    PurchaseOrder[]
+  purchasePayments  PurchasePayment[]
+  purchaseReceipts  PurchaseReceipt[]
+  PurchaseReturn    PurchaseReturn[]
+
+  @@unique([businessId, supplierCode])
+  @@index([businessId])
+  @@index([businessId, name])
+  @@index([businessId, phone])
+  @@index([businessId, gstin])
+}
+
+model SupplierMaterial {
+  id                String        @id @default(uuid())
+  supplierId        String
+  supplier          Supplier      @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  inventoryItemId   String
+  inventoryItem     InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  supplierItemCode  String?
+  lastPurchasePrice Float?
+  isPreferred       Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@unique([supplierId, inventoryItemId])
+  @@index([inventoryItemId])
+}
+
+model Godown {
+  id                 String               @id @default(uuid())
+  godownCode         String
+  name               String
+  address            String?
+  city               String?
+  state              String?
+  pincode            String?
+  contactPerson      String?
+  phone              String?
+  notes              String?
+  isDefault          Boolean              @default(false)
+  isActive           Boolean              @default(true)
+  createdById        String?
+  createdBy          User?                @relation("GodownCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById        String?
+  updatedBy          User?                @relation("GodownUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  businessId         String
+  business           Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  stockBalances      GodownStock[]
+  stockTransactions  StockTransaction[]
+  outgoingTransfers  StockTransfer[]      @relation("TransferSource")
+  incomingTransfers  StockTransfer[]      @relation("TransferDestination")
+  salesOrderItems    SalesOrderItem[]
+  deliveryItems      DeliveryItem[]
+  deliveries         Delivery[]
+  purchaseOrderItems PurchaseOrderItem[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  SalesReturnItem    SalesReturnItem[]
+  PurchaseReturnItem PurchaseReturnItem[]
+
+  @@unique([businessId, godownCode])
+  @@index([businessId])
+  @@index([businessId, name])
+}
+
+model GodownStock {
+  id               String        @id @default(uuid())
+  quantity         Float         @default(0)
+  reservedQuantity Float         @default(0)
+  reorderLevel     Float?        @default(0)
+  godownId         String
+  godown           Godown        @relation(fields: [godownId], references: [id], onDelete: Cascade)
+  inventoryItemId  String
+  inventoryItem    InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  businessId       String
+  business         Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@unique([businessId, godownId, inventoryItemId])
+  @@index([businessId, inventoryItemId])
+  @@index([godownId])
+}
+
+model StockTransfer {
+  id                  String              @id @default(uuid())
+  transferNumber      String
+  transferDate        DateTime            @default(now())
+  status              String              @default("DRAFT")
+  notes               String?
+  postedAt            DateTime?
+  sourceGodownId      String
+  sourceGodown        Godown              @relation("TransferSource", fields: [sourceGodownId], references: [id], onDelete: Cascade)
+  destinationGodownId String
+  destinationGodown   Godown              @relation("TransferDestination", fields: [destinationGodownId], references: [id], onDelete: Cascade)
+  createdById         String
+  createdBy           User                @relation("TransferCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  completedById       String?
+  completedBy         User?               @relation("TransferCompletedBy", fields: [completedById], references: [id], onDelete: Restrict)
+  cancelledById       String?
+  cancelledBy         User?               @relation("TransferCancelledBy", fields: [cancelledById], references: [id], onDelete: Restrict)
+  completedAt         DateTime?
+  cancelledAt         DateTime?
+  cancellationReason  String?
+  idempotencyKey      String?             @unique
+  businessId          String
+  business            Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  items               StockTransferItem[]
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@unique([businessId, transferNumber])
+  @@index([businessId, transferDate])
+  @@index([sourceGodownId])
+  @@index([destinationGodownId])
+}
+
+model StockTransferItem {
+  id              String        @id @default(uuid())
+  quantity        Float
+  stockTransferId String
+  stockTransfer   StockTransfer @relation(fields: [stockTransferId], references: [id], onDelete: Cascade)
+  inventoryItemId String
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  createdAt       DateTime      @default(now())
+
+  @@unique([stockTransferId, inventoryItemId])
+  @@index([inventoryItemId])
+}
+
+model NumberSequence {
+  id           String   @id @default(uuid())
+  sequenceType String
+  prefix       String
+  nextNumber   Int      @default(1)
+  businessId   String
+  business     Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([businessId, sequenceType])
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  title      String
+  message    String
+  isRead     Boolean  @default(false)
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([businessId])
+}
+
+model PurchaseOrder {
+  id                   String              @id @default(uuid())
+  purchaseOrderNumber  String
+  orderDate            DateTime            @default(now())
+  expectedDeliveryDate DateTime?
+  status               String              @default("DRAFT")
+  paymentStatus        String              @default("UNPAID")
+  supplierId           String
+  supplier             Supplier            @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  supplierName         String
+  supplierPhone        String
+  supplierGstin        String?
+  subtotal             Decimal             @default(0)
+  discountTotal        Decimal             @default(0)
+  taxableTotal         Decimal             @default(0)
+  taxTotal             Decimal             @default(0)
+  totalAmount          Decimal             @default(0)
+  receivedAmount       Decimal             @default(0)
+  amountPaid           Decimal             @default(0)
+  balanceDue           Decimal             @default(0)
+  notes                String?
+  sentAt               DateTime?
+  cancelledAt          DateTime?
+  businessId           String
+  business             Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdById          String
+  createdBy            User                @relation("PurchaseOrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  items                PurchaseOrderItem[]
+  payments             PurchasePayment[]
+  receipts             PurchaseReceipt[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  PurchaseReturn       PurchaseReturn[]
+
+  @@unique([businessId, purchaseOrderNumber])
+  @@index([businessId, orderDate])
+  @@index([businessId, status])
+  @@index([supplierId])
+}
+
+model PurchaseOrderItem {
+  id                 String                @id @default(uuid())
+  purchaseOrderId    String
+  purchaseOrder      PurchaseOrder         @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  inventoryItemId    String
+  inventoryItem      InventoryItem         @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  godownId           String
+  godown             Godown                @relation(fields: [godownId], references: [id], onDelete: Cascade)
+  materialName       String
+  sku                String
+  unit               String
+  quantity           Decimal
+  receivedQuantity   Decimal               @default(0)
+  rate               Decimal
+  grossAmount        Decimal
+  discountRate       Decimal               @default(0)
+  discountAmount     Decimal               @default(0)
+  taxableAmount      Decimal
+  gstRate            Decimal               @default(0)
+  taxAmount          Decimal               @default(0)
+  lineTotal          Decimal
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  receiptItems       PurchaseReceiptItem[]
+  PurchaseReturnItem PurchaseReturnItem[]
+
+  @@index([purchaseOrderId])
+  @@index([inventoryItemId])
+  @@index([godownId])
+}
+
+model PurchasePayment {
+  id              String        @id @default(uuid())
+  paymentNumber   String
+  amount          Decimal
+  paymentMode     String
+  paymentDate     DateTime      @default(now())
+  notes           String?
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+  supplierId      String
+  supplier        Supplier      @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  businessId      String
+  business        Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  recordedById    String
+  recordedBy      User          @relation("PurchasePaymentRecordedBy", fields: [recordedById], references: [id], onDelete: Restrict)
+  status          String        @default("POSTED")
+  reversedAt      DateTime?
+  reversedById    String?
+  reversedBy      User?         @relation("PurchasePaymentReversedBy", fields: [reversedById], references: [id], onDelete: SetNull)
+  reversalReason  String?
+  createdAt       DateTime      @default(now())
+  idempotencyKey  String?
+
+  @@unique([businessId, paymentNumber])
+  @@unique([businessId, idempotencyKey])
+  @@index([businessId, paymentDate])
+  @@index([purchaseOrderId])
+  @@index([supplierId])
+}
+
+model PurchaseReceipt {
+  id              String                @id @default(uuid())
+  receiptNumber   String
+  receiptDate     DateTime              @default(now())
+  notes           String?
+  totalAmount     Decimal               @default(0)
+  idempotencyKey  String
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder         @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+  supplierId      String
+  supplier        Supplier              @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  businessId      String
+  business        Business              @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  recordedById    String
+  recordedBy      User                  @relation("PurchaseReceiptRecordedBy", fields: [recordedById], references: [id], onDelete: Restrict)
+  items           PurchaseReceiptItem[]
+  createdAt       DateTime              @default(now())
+
+  @@unique([businessId, receiptNumber])
+  @@unique([businessId, idempotencyKey])
+  @@index([businessId, receiptDate])
+  @@index([purchaseOrderId])
+  @@index([supplierId])
+}
+
+model PurchaseReceiptItem {
+  id                  String            @id @default(uuid())
+  purchaseReceiptId   String
+  purchaseReceipt     PurchaseReceipt   @relation(fields: [purchaseReceiptId], references: [id], onDelete: Cascade)
+  purchaseOrderItemId String
+  purchaseOrderItem   PurchaseOrderItem @relation(fields: [purchaseOrderItemId], references: [id], onDelete: Restrict)
+  inventoryItemId     String
+  inventoryItem       InventoryItem     @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  quantity            Decimal
+  amount              Decimal
+  createdAt           DateTime          @default(now())
+
+  @@index([purchaseReceiptId])
+  @@index([purchaseOrderItemId])
+  @@index([inventoryItemId])
+}
+
+model Delivery {
+  id                       String         @id @default(uuid())
+  deliveryNumber           String
+  customerName             String
+  customerPhone            String?
+  deliveryAddress          String
+  materialName             String
+  quantity                 Float
+  unit                     String
+  scheduledDate            DateTime?
+  notes                    String?
+  status                   String         @default("PENDING") // "PENDING", "OUT_FOR_DELIVERY", "DELIVERED"
+  paymentStatus            String         @default("PENDING") // "PENDING", "RECEIVED"
+  fulfilmentMode           String         @default("LEGACY")
+  businessId               String
+  business                 Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customerId               String?
+  customer                 Customer?      @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  salesOrderId             String?
+  salesOrder               SalesOrder?    @relation(fields: [salesOrderId], references: [id], onDelete: SetNull)
+  invoiceId                String?
+  invoice                  Invoice?       @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  godownId                 String?
+  godown                   Godown?        @relation(fields: [godownId], references: [id], onDelete: SetNull)
+  stockPostedAt            DateTime?
+  stockReversedAt          DateTime?
+  dispatchedAt             DateTime?
+  deliveredAt              DateTime?
+  readyAt                  DateTime?
+  confirmedAt              DateTime?
+  cancelledAt              DateTime?
+  vehicleNumber            String?
+  vehicleType              String?
+  driverName               String?
+  driverPhone              String?
+  receiverName             String?
+  proofOfDeliveryReference String?
+  deliveryNotes            String?
+  cancellationReason       String?
+  reversalReason           String?
+  createdById              String?
+  createdBy                User?          @relation("DeliveryCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  dispatchedById           String?
+  dispatchedBy             User?          @relation("DeliveryDispatchedBy", fields: [dispatchedById], references: [id], onDelete: SetNull)
+  completedById            String?
+  completedBy              User?          @relation("DeliveryCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  cancelledById            String?
+  cancelledBy              User?          @relation("DeliveryCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  reversedById             String?
+  reversedBy               User?          @relation("DeliveryReversedBy", fields: [reversedById], references: [id], onDelete: SetNull)
+  items                    DeliveryItem[]
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+
+  @@index([businessId])
+  @@index([customerId])
+  @@index([salesOrderId])
+  @@index([invoiceId])
+  @@index([godownId])
+  @@index([businessId, fulfilmentMode])
+  @@index([businessId, status])
+  @@index([businessId, scheduledDate])
+}
+
+model SalesOrder {
+  id                   String           @id @default(uuid())
+  orderNumber          String
+  orderDate            DateTime         @default(now())
+  expectedDeliveryDate DateTime?
+  status               String           @default("DRAFT")
+  taxMode              String           @default("GST")
+  customerId           String
+  customer             Customer         @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  customerName         String
+  customerPhone        String?
+  customerGstin        String?
+  billingAddress       String?
+  deliveryAddress      String?
+  placeOfSupplyCode    String?
+  subtotal             Decimal          @default(0)
+  discountTotal        Decimal          @default(0)
+  taxableTotal         Decimal          @default(0)
+  cgstTotal            Decimal          @default(0)
+  sgstTotal            Decimal          @default(0)
+  igstTotal            Decimal          @default(0)
+  totalAmount          Decimal          @default(0)
+  notes                String?
+  terms                String?
+  businessId           String
+  business             Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdById          String
+  createdBy            User             @relation("SalesOrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  items                SalesOrderItem[]
+  invoices             Invoice[]
+  deliveries           Delivery[]
+  confirmedAt          DateTime?
+  cancelledAt          DateTime?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  @@unique([businessId, orderNumber])
+  @@index([businessId, orderDate])
+  @@index([businessId, status])
+  @@index([customerId])
+}
+
+model SalesOrderItem {
+  id                String         @id @default(uuid())
+  salesOrderId      String
+  salesOrder        SalesOrder     @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  inventoryItemId   String
+  inventoryItem     InventoryItem  @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  godownId          String
+  godown            Godown         @relation(fields: [godownId], references: [id], onDelete: Cascade)
+  materialName      String
+  sku               String
+  hsnCode           String?
+  unit              String
+  quantity          Decimal
+  reservedQuantity  Decimal        @default(0)
+  invoicedQuantity  Decimal        @default(0)
+  deliveredQuantity Decimal        @default(0)
+  rate              Decimal
+  grossAmount       Decimal
+  discountRate      Decimal        @default(0)
+  discountAmount    Decimal        @default(0)
+  taxableAmount     Decimal
+  gstRate           Decimal        @default(0)
+  cgstRate          Decimal        @default(0)
+  sgstRate          Decimal        @default(0)
+  igstRate          Decimal        @default(0)
+  cgstAmount        Decimal        @default(0)
+  sgstAmount        Decimal        @default(0)
+  igstAmount        Decimal        @default(0)
+  lineTotal         Decimal
+  invoiceItems      InvoiceItem[]
+  deliveryItems     DeliveryItem[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([salesOrderId])
+  @@index([inventoryItemId])
+  @@index([godownId])
+}
+
+model Invoice {
+  id                String            @id @default(uuid())
+  invoiceNumber     String
+  invoiceDate       DateTime          @default(now())
+  dueDate           DateTime?
+  invoiceType       String            @default("GST")
+  status            String            @default("DRAFT")
+  salesOrderId      String?
+  salesOrder        SalesOrder?       @relation(fields: [salesOrderId], references: [id], onDelete: SetNull)
+  customerId        String
+  customer          Customer          @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  businessName      String
+  businessGstin     String?
+  businessAddress   String?
+  businessPhone     String?
+  businessLogoUrl   String?
+  customerName      String
+  customerPhone     String?
+  customerGstin     String?
+  billingAddress    String?
+  deliveryAddress   String?
+  sellerStateCode   String?
+  placeOfSupplyCode String?
+  supplyType        String?
+  subtotal          Decimal           @default(0)
+  discountTotal     Decimal           @default(0)
+  taxableTotal      Decimal           @default(0)
+  cgstTotal         Decimal           @default(0)
+  sgstTotal         Decimal           @default(0)
+  igstTotal         Decimal           @default(0)
+  taxTotal          Decimal           @default(0)
+  roundOff          Decimal           @default(0)
+  totalAmount       Decimal           @default(0)
+  amountPaid        Decimal           @default(0)
+  balanceDue        Decimal           @default(0)
+  notes             String?
+  terms             String?
+  businessId        String
+  business          Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdById       String
+  createdBy         User              @relation("InvoiceCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  items             InvoiceItem[]
+  deliveries        Delivery[]
+  payments          CustomerPayment[]
+  issuedAt          DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  SalesReturn       SalesReturn[]
+
+  @@unique([businessId, invoiceNumber])
+  @@index([businessId, invoiceDate])
+  @@index([businessId, status])
+  @@index([customerId])
+  @@index([salesOrderId])
+}
+
+model InvoiceItem {
+  id               String            @id @default(uuid())
+  invoiceId        String
+  invoice          Invoice           @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  salesOrderItemId String?
+  salesOrderItem   SalesOrderItem?   @relation(fields: [salesOrderItemId], references: [id], onDelete: SetNull)
+  inventoryItemId  String
+  inventoryItem    InventoryItem     @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  materialName     String
+  sku              String
+  hsnCode          String?
+  unit             String
+  quantity         Decimal
+  rate             Decimal
+  grossAmount      Decimal
+  discountRate     Decimal           @default(0)
+  discountAmount   Decimal           @default(0)
+  taxableAmount    Decimal
+  gstRate          Decimal           @default(0)
+  cgstRate         Decimal           @default(0)
+  sgstRate         Decimal           @default(0)
+  igstRate         Decimal           @default(0)
+  cgstAmount       Decimal           @default(0)
+  sgstAmount       Decimal           @default(0)
+  igstAmount       Decimal           @default(0)
+  lineTotal        Decimal
+  deliveryItems    DeliveryItem[]
+  createdAt        DateTime          @default(now())
+  SalesReturnItem  SalesReturnItem[]
+
+  @@index([invoiceId])
+  @@index([salesOrderItemId])
+  @@index([inventoryItemId])
+}
+
+model DeliveryItem {
+  id                 String          @id @default(uuid())
+  deliveryId         String
+  delivery           Delivery        @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  salesOrderItemId   String?
+  salesOrderItem     SalesOrderItem? @relation(fields: [salesOrderItemId], references: [id], onDelete: SetNull)
+  invoiceItemId      String?
+  invoiceItem        InvoiceItem?    @relation(fields: [invoiceItemId], references: [id], onDelete: SetNull)
+  inventoryItemId    String
+  inventoryItem      InventoryItem   @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  godownId           String
+  godown             Godown          @relation(fields: [godownId], references: [id], onDelete: Cascade)
+  materialName       String
+  sku                String
+  unit               String
+  plannedQuantity    Decimal
+  dispatchedQuantity Decimal         @default(0)
+  deliveredQuantity  Decimal         @default(0)
+  receivedQuantity   Decimal         @default(0)
+  rejectedQuantity   Decimal         @default(0)
+  reversedQuantity   Decimal         @default(0)
+  completionNotes    String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@unique([deliveryId, salesOrderItemId])
+  @@index([deliveryId])
+  @@index([inventoryItemId])
+  @@index([godownId])
+  @@index([salesOrderItemId])
+  @@index([invoiceItemId])
+}
+
+model CustomerPayment {
+  id              String    @id @default(uuid())
+  paymentNumber   String
+  paymentDate     DateTime  @default(now())
+  customerId      String
+  customer        Customer  @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  invoiceId       String?
+  invoice         Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  amount          Decimal
+  paymentMethod   String
+  referenceNumber String?
+  bankName        String?
+  notes           String?
+  status          String    @default("POSTED")
+  reversedAt      DateTime?
+  businessId      String
+  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  receivedById    String
+  receivedBy      User      @relation("PaymentReceivedBy", fields: [receivedById], references: [id], onDelete: Restrict)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  idempotencyKey  String?
+
+  @@unique([businessId, paymentNumber])
+  @@unique([businessId, idempotencyKey])
+  @@index([businessId, paymentDate])
+  @@index([customerId])
+  @@index([invoiceId])
+}
+
+model LedgerEntry {
+  id              String   @id @default(uuid())
+  businessId      String
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  partyType       String
+  partyId         String
+  transactionType String
+  referenceType   String
+  referenceId     String
+  amount          Decimal
+  debitAmount     Decimal  @default(0)
+  creditAmount    Decimal  @default(0)
+  description     String
+  transactionDate DateTime @default(now())
+  createdById     String
+  createdBy       User     @relation("LedgerEntryCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  idempotencyKey  String
+  createdAt       DateTime @default(now())
+
+  @@unique([businessId, idempotencyKey])
+  @@index([businessId, transactionDate])
+  @@index([businessId, partyType, partyId, transactionDate])
+  @@index([businessId, referenceId])
+}
+
+model ExpenseCategory {
+  id             String    @id @default(uuid())
+  name           String
+  normalizedName String
+  description    String?
+  isActive       Boolean   @default(true)
+  isDefault      Boolean   @default(false)
+  businessId     String
+  business       Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdById    String
+  createdBy      User      @relation("ExpenseCategoryCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  expenses       Expense[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([businessId, normalizedName])
+  @@index([businessId, isActive])
+  @@index([businessId, name])
+}
+
+model Expense {
+  id                 String          @id @default(uuid())
+  expenseNumber      String
+  expenseDate        DateTime        @default(now())
+  categoryId         String
+  category           ExpenseCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  payee              String?
+  amount             Decimal
+  gstApplicable      Boolean         @default(false)
+  gstRate            Decimal         @default(0)
+  gstAmount          Decimal         @default(0)
+  totalAmount        Decimal
+  paymentMode        String?
+  paymentStatus      String          @default("PENDING")
+  notes              String?
+  attachmentUrl      String?
+  paidAt             DateTime?
+  cancelledAt        DateTime?
+  cancelledById      String?
+  cancelledBy        User?           @relation("ExpenseCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  cancellationReason String?
+  createdById        String
+  createdBy          User            @relation("ExpenseCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  businessId         String
+  business           Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  idempotencyKey     String?
+
+  @@unique([businessId, expenseNumber])
+  @@unique([businessId, idempotencyKey])
+  @@index([businessId, expenseDate])
+  @@index([businessId, categoryId])
+  @@index([businessId, paymentStatus])
+  @@index([businessId, createdAt])
+}
+
+model SalesReturn {
+  id                 String            @id @default(uuid())
+  returnNumber       String
+  returnDate         DateTime          @default(now())
+  status             String            @default("DRAFT") // "DRAFT", "COMPLETED", "CANCELLED"
+  notes              String?
+  reason             String
+  invoiceId          String
+  invoice            Invoice           @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  customerId         String
+  customer           Customer          @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  businessId         String
+  business           Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdById        String
+  createdBy          User              @relation("SalesReturnCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  completedById      String?
+  completedBy        User?             @relation("SalesReturnCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  cancelledById      String?
+  cancelledBy        User?             @relation("SalesReturnCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?
+  subtotal           Decimal           @default(0)
+  discountTotal      Decimal           @default(0)
+  taxableTotal       Decimal           @default(0)
+  cgstTotal          Decimal           @default(0)
+  sgstTotal          Decimal           @default(0)
+  igstTotal          Decimal           @default(0)
+  taxTotal           Decimal           @default(0)
+  totalAmount        Decimal           @default(0)
+  idempotencyKey     String?           @unique
+  items              SalesReturnItem[]
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@unique([businessId, returnNumber])
+  @@index([businessId])
+  @@index([invoiceId])
+  @@index([customerId])
+}
+
+model SalesReturnItem {
+  id              String        @id @default(uuid())
+  salesReturnId   String
+  salesReturn     SalesReturn   @relation(fields: [salesReturnId], references: [id], onDelete: Cascade)
+  inventoryItemId String
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  godownId        String
+  godown          Godown        @relation(fields: [godownId], references: [id], onDelete: Cascade)
+  quantity        Decimal
+  rate            Decimal
+  discountRate    Decimal
+  gstRate         Decimal
+  cgstRate        Decimal
+  sgstRate        Decimal
+  igstRate        Decimal
+  lineTotal       Decimal
+  cgstAmount      Decimal
+  sgstAmount      Decimal
+  igstAmount      Decimal
+  taxTotal        Decimal
+  invoiceItemId   String
+  invoiceItem     InvoiceItem   @relation(fields: [invoiceItemId], references: [id], onDelete: Restrict)
+
+  @@index([salesReturnId])
+  @@index([inventoryItemId])
+  @@index([godownId])
+  @@index([invoiceItemId])
+}
+
+model PurchaseReturn {
+  id                 String               @id @default(uuid())
+  returnNumber       String
+  returnDate         DateTime             @default(now())
+  status             String               @default("DRAFT") // "DRAFT", "COMPLETED", "CANCELLED"
+  notes              String?
+  reason             String
+  purchaseOrderId    String
+  purchaseOrder      PurchaseOrder        @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+  supplierId         String
+  supplier           Supplier             @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  businessId         String
+  business           Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdById        String
+  createdBy          User                 @relation("PurchaseReturnCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  completedById      String?
+  completedBy        User?                @relation("PurchaseReturnCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  cancelledById      String?
+  cancelledBy        User?                @relation("PurchaseReturnCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?
+  subtotal           Decimal              @default(0)
+  discountTotal      Decimal              @default(0)
+  taxableTotal       Decimal              @default(0)
+  taxTotal           Decimal              @default(0)
+  totalAmount        Decimal              @default(0)
+  idempotencyKey     String?              @unique
+  items              PurchaseReturnItem[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@unique([businessId, returnNumber])
+  @@index([businessId])
+  @@index([purchaseOrderId])
+  @@index([supplierId])
+}
+
+model PurchaseReturnItem {
+  id                  String            @id @default(uuid())
+  purchaseReturnId    String
+  purchaseReturn      PurchaseReturn    @relation(fields: [purchaseReturnId], references: [id], onDelete: Cascade)
+  inventoryItemId     String
+  inventoryItem       InventoryItem     @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  godownId            String
+  godown              Godown            @relation(fields: [godownId], references: [id], onDelete: Cascade)
+  quantity            Decimal
+  rate                Decimal
+  discountRate        Decimal
+  gstRate             Decimal
+  lineTotal           Decimal
+  taxAmount           Decimal
+  purchaseOrderItemId String
+  purchaseOrderItem   PurchaseOrderItem @relation(fields: [purchaseOrderItemId], references: [id], onDelete: Restrict)
+
+  @@index([purchaseReturnId])
+  @@index([inventoryItemId])
+  @@index([godownId])
+  @@index([purchaseOrderItemId])
+}

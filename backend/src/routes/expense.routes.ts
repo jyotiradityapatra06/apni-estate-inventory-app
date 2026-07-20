@@ -1,0 +1,13 @@
+import { Router } from "express";
+import * as controller from "../controllers/expense.controller";
+import { protect, requirePermission } from "../middleware/auth.middleware";
+const router = Router();
+router.use(protect);
+router.get("/", requirePermission("expenses:view"), controller.list);
+router.get("/summary", requirePermission("expenses:view"), controller.summary);
+router.post("/", requirePermission("expenses:manage"), controller.create);
+router.get("/:id", requirePermission("expenses:view"), controller.get);
+router.patch("/:id", requirePermission("expenses:manage"), controller.update);
+router.post("/:id/mark-paid", requirePermission("expenses:manage"), controller.markPaid);
+router.post("/:id/cancel", requirePermission("expenses:manage"), controller.cancel);
+export default router;

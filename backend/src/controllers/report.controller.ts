@@ -1,0 +1,16 @@
+import { NextFunction, Request, Response } from "express";
+import prisma from "../config/db";
+import * as service from "../services/report.service";
+const safe=(value:unknown)=>{const protect=(v:unknown)=>typeof v==="string"&&/^[=+\-@]/.test(v)?`'${v}`:v,raw=value===null||value===undefined?"":typeof value==="object"?JSON.stringify(value,(_key,nested)=>protect(nested)):String(protect(value));return`"${raw.replace(/"/g,'""')}"`};
+const csv=async(name:string,businessId:string,result:any)=>{const business=await prisma.business.findUnique({where:{id:businessId},select:{name:true}}),keys=result.rows.length?Object.keys(result.rows[0]):[];return`\uFEFF${safe(business?.name||"")},${safe(name)}\r\n${safe(`Date from: ${result.metadata.dateFrom||"Current state"}`)},${safe(`Date to: ${result.metadata.dateTo||"Current state"}`)},${safe(`Generated: ${result.metadata.generatedAt}`)}\r\n\r\n${keys.map(safe).join(",")}\r\n${result.rows.map((row:any)=>keys.map(k=>safe(row[k])).join(",")).join("\r\n")}`};
+const handle=(name:string,fn:(businessId:string,query:unknown)=>Promise<any>)=>async(req:Request,res:Response,next:NextFunction)=>{try{const result=await fn(req.user!.businessId,req.query);if(req.query.format==="csv"){res.setHeader("Content-Type","text/csv; charset=utf-8");res.setHeader("Content-Disposition",`attachment; filename="${name.toLowerCase().replace(/\s+/g,"-")}.csv"`);return res.send(await csv(name,req.user!.businessId,result))}res.json({success:true,...result})}catch(error){next(error)}};
+export const overview=handle("Business Overview",service.overview);
+export const sales=handle("Sales Report",service.sales);
+export const purchases=handle("Purchase Report",service.purchases);
+export const inventory=handle("Inventory Report",service.inventory);
+export const valuation=handle("Stock Valuation Report",service.valuation);
+export const customers=handle("Customer Outstanding Report",service.customerOutstanding);
+export const suppliers=handle("Supplier Outstanding Report",service.supplierOutstanding);
+export const expenses=handle("Expense Report",service.expenses);
+export const gst=handle("GST Summary",service.gst);
+export const profitLoss=handle("Profit and Loss Summary",service.profitLoss);

@@ -1,0 +1,1 @@
+import{Router}from"express";import{protect,requirePermission}from"../middleware/auth.middleware";import*as c from"../controllers/financial.controller";const r=Router();r.use(protect,requirePermission("financials:view"));r.get("/receivables",c.receivables);r.get("/payables",c.payables);r.get("/ledger",c.ledger);r.get("/payments",c.payments);export default r;

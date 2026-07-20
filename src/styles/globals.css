@@ -1,0 +1,15 @@
+@media print {
+  @page { size: A4; margin: 12mm; }
+  body { background: white !important; color: black !important; }
+  body * { visibility: hidden; }
+  .invoice-print-root, .invoice-print-root * { visibility: visible; }
+  .invoice-print-root { position: absolute; inset: 0; width: 100%; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+  .invoice-order-link { color: black !important; text-decoration: none !important; }
+}
+@media print {
+  .report-print-root, .report-print-root * { visibility: visible; }
+  .report-actions, aside, header, nav { display: none !important; }
+  .report-print-root { padding: 0 !important; }
+  .report-print-root table { display: table !important; width: 100%; }
+  body { background: white !important; color: black !important; }
+}

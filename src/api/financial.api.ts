@@ -1,0 +1,1 @@
+import{apiClient}from"./apiClient";export const financialApi={receivables:()=>apiClient<any>("/financials/receivables"),payables:()=>apiClient<any>("/financials/payables"),ledger:(q="")=>apiClient<any>(`/financials/ledger${q?`?${q}`:""}`),payments:(q="")=>apiClient<any>(`/financials/payments${q?`?${q}`:""}`)};

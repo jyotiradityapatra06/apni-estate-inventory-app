@@ -1,0 +1,11 @@
+import { Router } from "express";
+import * as controller from "../controllers/invoice.controller";
+import { protect, requirePermission } from "../middleware/auth.middleware";
+const router = Router();
+router.get("/", protect, requirePermission("sales:view"), controller.getAll);
+router.post("/calculate", protect, requirePermission("sales:manage"), controller.calculate);
+router.get("/:id", protect, requirePermission("sales:view"), controller.getById);
+router.post("/", protect, requirePermission("sales:manage"), controller.create);
+router.post("/:id/issue", protect, requirePermission("sales:manage"), controller.issue);
+router.post("/:id/cancel", protect, requirePermission("sales:manage"), controller.cancel);
+export default router;

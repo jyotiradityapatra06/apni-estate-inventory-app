@@ -1,0 +1,10 @@
+import { Router } from "express";
+import * as controller from "../controllers/supplier.controller";
+import { protect, requirePermission } from "../middleware/auth.middleware";
+const router = Router();
+router.get("/", protect, requirePermission("suppliers:view"), controller.getAll);
+router.get("/:id", protect, requirePermission("suppliers:view"), controller.getById);
+router.post("/", protect, requirePermission("suppliers:create"), controller.create);
+router.patch("/:id", protect, requirePermission("suppliers:update"), controller.update);
+router.delete("/:id", protect, requirePermission("suppliers:delete"), controller.remove);
+export default router;

@@ -1,0 +1,11 @@
+import { Request, Response, NextFunction } from "express";
+import * as service from "../services/invoice.service";
+import { calculateInvoice } from "../services/invoiceCalculation.service";
+import { calculateInvoiceSchema } from "../validations/invoice.validation";
+const bid = (req: Request) => req.user!.businessId;
+export const getAll = async (req: Request, res: Response, next: NextFunction) => { try { res.json({ success: true, data: await service.getAll(bid(req), req.query) }); } catch (error) { next(error); } };
+export const getById = async (req: Request, res: Response, next: NextFunction) => { try { res.json({ success: true, data: await service.getById(bid(req), req.params.id) }); } catch (error) { next(error); } };
+export const create = async (req: Request, res: Response, next: NextFunction) => { try { res.status(201).json({ success: true, message: "Invoice created as draft.", data: await service.create(bid(req), req.user!.userId, req.body) }); } catch (error) { next(error); } };
+export const issue = async (req: Request, res: Response, next: NextFunction) => { try { res.json({ success: true, message: "Invoice issued successfully.", data: await service.issue(bid(req), req.params.id) }); } catch (error) { next(error); } };
+export const cancel = async (req: Request, res: Response, next: NextFunction) => { try { res.json({ success: true, message: "Invoice cancelled.", data: await service.cancel(bid(req), req.params.id) }); } catch (error) { next(error); } };
+export const calculate = async (req: Request, res: Response, next: NextFunction) => { try { const data = calculateInvoiceSchema.parse(req.body); const result = calculateInvoice(data.items.map((item) => ({ ...item, invoiceType: data.invoiceType, sellerStateCode: data.sellerStateCode, placeOfSupplyCode: data.placeOfSupplyCode })), data.roundToRupee); res.json({ success: true, data: result }); } catch (error) { next(error); } };

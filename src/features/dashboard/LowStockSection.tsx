@@ -1,0 +1,16 @@
+import { useNavigate } from "react-router";
+import { BusinessStatusBadge } from "../../app/components/common/BusinessStatusBadge";
+import { DesktopDataTable, MobileEntityCard, QuantityDisplay } from "../../app/components/common/BusinessPrimitives";
+import { EmptyState, ErrorState, LoadingSkeleton } from "../../app/components/common/FeedbackStates";
+import { SectionHeader } from "../../app/components/common/PageHeader";
+import type { DashboardData } from "./dashboard.types";
+import { availableStock, lowStockItems, minimumStock, reservedStock } from "./dashboardCalculations";
+
+export function LowStockSection({ dashboard }: { dashboard: DashboardData }) {
+  const navigate = useNavigate(); const items = lowStockItems(dashboard.inventory.data).slice(0, 6);
+  const action = <button onClick={() => navigate("/materials")} className="min-h-11 text-[14px] font-semibold text-blue-700">View all Stock</button>;
+  return <section className="space-y-3"><SectionHeader title="Low Stock" description="Materials that need attention" action={action}/>{dashboard.inventory.loading && !dashboard.inventory.data.length ? <LoadingSkeleton/> : dashboard.inventory.error ? <ErrorState message="Could not load stock information." onRetry={dashboard.refresh}/> : !items.length ? <EmptyState title="Stock levels look good" description="No materials are currently below their minimum stock level."/> : <>
+    <div className="space-y-3 md:hidden">{items.map((item) => <MobileEntityCard key={item.id}><div className="flex items-start justify-between gap-3"><h3 className="min-w-0 break-words text-[15px] font-bold text-slate-950">{item.materialName}</h3><BusinessStatusBadge status={availableStock(item) <= 0 ? "OUT_OF_STOCK" : "LOW_STOCK"}/></div><dl className="mt-4 grid grid-cols-3 gap-2 text-[13px]"><div><dt className="text-slate-500">Available</dt><dd className="mt-1 font-bold"><QuantityDisplay value={availableStock(item)} unit={item.unit}/></dd></div><div><dt className="text-slate-500">Reserved</dt><dd className="mt-1 font-semibold"><QuantityDisplay value={reservedStock(item)} unit={item.unit}/></dd></div><div><dt className="text-slate-500">Minimum</dt><dd className="mt-1 font-semibold"><QuantityDisplay value={minimumStock(item)} unit={item.unit}/></dd></div></dl><button onClick={() => navigate("/materials")} className="mt-4 min-h-11 text-[14px] font-semibold text-blue-700">View Stock</button></MobileEntityCard>)}</div>
+    <DesktopDataTable><table className="w-full text-left text-[14px]"><thead className="bg-slate-50 text-slate-600"><tr><th className="p-4">Material</th><th>Available</th><th>Reserved</th><th>Minimum</th><th>Status</th><th/></tr></thead><tbody>{items.map((item) => <tr key={item.id} className="border-t border-slate-200"><td className="p-4 font-semibold text-slate-900">{item.materialName}</td><td><QuantityDisplay value={availableStock(item)} unit={item.unit}/></td><td><QuantityDisplay value={reservedStock(item)} unit={item.unit}/></td><td><QuantityDisplay value={minimumStock(item)} unit={item.unit}/></td><td><BusinessStatusBadge status={availableStock(item) <= 0 ? "OUT_OF_STOCK" : "LOW_STOCK"}/></td><td><button onClick={() => navigate("/materials")} className="min-h-11 px-3 font-semibold text-blue-700">View</button></td></tr>)}</tbody></table></DesktopDataTable>
+  </>}</section>;
+}
