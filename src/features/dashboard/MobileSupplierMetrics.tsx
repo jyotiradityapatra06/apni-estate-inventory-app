@@ -33,6 +33,10 @@ import { lowStockItems } from "./dashboardCalculations";
 import { fmt } from "../../utils/currency";
 import { hasPermission } from "../../utils/permissions";
 import { BusinessStatusBadge } from "../../app/components/common/BusinessStatusBadge";
+import { InventoryHealthChart } from "./InventoryHealthChart";
+import { StockMovementChart } from "./StockMovementChart";
+import { MaterialAvailabilityChart } from "./MaterialAvailabilityChart";
+import { InventoryValueTrendChart } from "./InventoryValueTrendChart";
 
 export interface MobileSupplierMetricsProps {
   dashboard: DashboardData;
@@ -286,74 +290,17 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
         </div>
       </div>
 
-      {/* 4. Inventory Intelligence Section */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2">
-            <Boxes size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900">Inventory Health</h3>
-          </div>
-          <Link to="/materials" className="text-xs font-bold text-[#F97316] hover:underline flex items-center gap-0.5">
-            <span>View All</span>
-            <ChevronRight size={14} />
-          </Link>
-        </div>
+      {/* 4. Inventory Health Breakdown Chart */}
+      <InventoryHealthChart materials={materials} />
 
-        {totalMaterials === 0 ? (
-          <div className="py-6 text-center space-y-3">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#F97316]">
-              <Package size={24} />
-            </div>
-            <div>
-              <p className="font-extrabold text-sm text-slate-900">No stock available</p>
-              <p className="text-xs text-slate-400 mt-1 max-w-[240px] mx-auto">
-                Add your first material to start tracking physical store inventory.
-              </p>
-            </div>
-            {canAddStock && (
-              <button
-                onClick={() => navigate("/materials/new")}
-                className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl bg-[#0F172A] px-4 text-xs font-bold text-white cursor-pointer hover:bg-slate-800"
-              >
-                <Plus size={14} />
-                <span>Add First Material</span>
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                <span className="text-[9px] uppercase font-bold text-slate-400 block">Total Items</span>
-                <strong className="text-lg font-black text-slate-900 mt-0.5 block">{totalMaterials}</strong>
-              </div>
+      {/* 4b. Stock Movement Trend Chart */}
+      <StockMovementChart movements={dashboard.movements.data || []} />
 
-              <div className={`p-2.5 rounded-xl border ${lowStock.length > 0 ? "bg-amber-50/60 border-amber-200" : "bg-slate-50 border-slate-100"}`}>
-                <span className="text-[9px] uppercase font-bold text-slate-400 block">Low Stock</span>
-                <strong className={`text-lg font-black mt-0.5 block ${lowStock.length > 0 ? "text-amber-600 animate-pulse" : "text-slate-900"}`}>
-                  {lowStock.length}
-                </strong>
-              </div>
+      {/* 4c. Top Material Availability Chart */}
+      <MaterialAvailabilityChart materials={materials} />
 
-              <div className={`p-2.5 rounded-xl border ${outOfStock.length > 0 ? "bg-red-50/60 border-red-200" : "bg-slate-50 border-slate-100"}`}>
-                <span className="text-[9px] uppercase font-bold text-slate-400 block">Out of Stock</span>
-                <strong className={`text-lg font-black mt-0.5 block ${outOfStock.length > 0 ? "text-red-600" : "text-slate-900"}`}>
-                  {outOfStock.length}
-                </strong>
-              </div>
-            </div>
-
-            {lowStock.length > 0 && (
-              <div className="flex items-center gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-900 border border-amber-200/60">
-                <ShieldAlert size={16} className="text-amber-600 shrink-0" />
-                <p className="text-[11px] leading-tight">
-                  <span className="font-bold">{lowStock.length} material(s)</span> are running below safety limits.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {/* 4d. Inventory Value Trend Chart */}
+      <InventoryValueTrendChart materials={materials} movements={dashboard.movements.data || []} />
 
       {/* 5. Sales & Purchase Trends Chart */}
       <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3">

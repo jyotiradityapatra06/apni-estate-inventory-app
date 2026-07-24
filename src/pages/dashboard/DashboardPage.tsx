@@ -7,6 +7,10 @@ import { useDashboardData } from "../../features/dashboard/useDashboardData";
 import { DashboardQuickActions } from "../../features/dashboard/DashboardQuickActions";
 import { DashboardSummaryCards } from "../../features/dashboard/DashboardSummaryCards";
 import { MobileSupplierMetrics } from "../../features/dashboard/MobileSupplierMetrics";
+import { InventoryHealthChart } from "../../features/dashboard/InventoryHealthChart";
+import { StockMovementChart } from "../../features/dashboard/StockMovementChart";
+import { MaterialAvailabilityChart } from "../../features/dashboard/MaterialAvailabilityChart";
+import { InventoryValueTrendChart } from "../../features/dashboard/InventoryValueTrendChart";
 import { salesOrderApi } from "../../api/salesOrder.api";
 import { purchaseApi } from "../../api/purchase.api";
 import { fmt } from "../../utils/currency";
@@ -193,46 +197,17 @@ export default function DashboardPage() {
         {/* Left/Middle Column (Inventory & Operations) */}
         <div className="space-y-6 lg:col-span-2">
           
-          {/* 4. Inventory Intelligence Section */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between border-b pb-3 mb-4">
-              <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Inventory Intelligence</h3>
-              <Link to="/materials" className="text-xs font-semibold text-orange-600 hover:underline">View Stock list</Link>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Items</span>
-                <span className="text-2xl font-black text-slate-800 mt-1 block">{dashboard.inventory.data.length}</span>
-              </div>
-              <div className={`p-3 rounded-xl border ${lowStock.length > 0 ? "bg-amber-50/50 border-amber-100" : "bg-slate-50 border-slate-100"}`}>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Low Stock</span>
-                <span className={`text-2xl font-black mt-1 block ${lowStock.length > 0 ? "text-amber-600 animate-pulse" : "text-slate-800"}`}>
-                  {lowStock.length}
-                </span>
-              </div>
-              <div className={`p-3 rounded-xl border ${outOfStock.length > 0 ? "bg-red-50/50 border-red-100" : "bg-slate-50 border-slate-100"}`}>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Out of Stock</span>
-                <span className={`text-2xl font-black mt-1 block ${outOfStock.length > 0 ? "text-red-600 font-black" : "text-slate-800"}`}>
-                  {outOfStock.length}
-                </span>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Godowns Count</span>
-                <span className="text-2xl font-black text-slate-800 mt-1 block">{godownsCount}</span>
-              </div>
-            </div>
+          {/* 4. Inventory Health Breakdown Chart */}
+          <InventoryHealthChart materials={dashboard.inventory.data} />
 
-            {/* Visual Indicators */}
-            {lowStock.length > 0 && (
-              <div className="mt-4 flex items-center gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-900 border border-amber-100/50">
-                <ShieldAlert size={16} className="text-amber-600 shrink-0" />
-                <p>
-                  <span className="font-bold">{lowStock.length} material(s)</span> are running below safe stock levels. Please check your inventory sheet.
-                </p>
-              </div>
-            )}
-          </div>
+          {/* 4b. Stock Movement Trend Chart */}
+          <StockMovementChart movements={dashboard.movements.data || []} />
+
+          {/* 4c. Top Material Availability Chart */}
+          <MaterialAvailabilityChart materials={dashboard.inventory.data} />
+
+          {/* 4d. Inventory Value Trend Chart */}
+          <InventoryValueTrendChart materials={dashboard.inventory.data} movements={dashboard.movements.data || []} />
 
           {/* 6. Financial Summary (Cash Flow) */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
