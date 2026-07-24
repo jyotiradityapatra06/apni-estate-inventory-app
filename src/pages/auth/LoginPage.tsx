@@ -18,7 +18,7 @@ export const LoginPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [demoLoadingRole, setDemoLoadingRole] = useState<"OWNER" | "MANAGER" | "STAFF" | null>(null);
+  const [demoLoadingRole, setDemoLoadingRole] = useState<"OWNER" | "MANAGER" | "STAFF" | "DRIVER" | null>(null);
 
   useEffect(() => {
     if (sessionStorage.getItem("session_expired_toast") === "true") {
@@ -61,20 +61,23 @@ export const LoginPage = () => {
     }
   };
 
-  const handleDemoLogin = async (role: "OWNER" | "MANAGER" | "STAFF") => {
+  const handleDemoLogin = async (role: "OWNER" | "MANAGER" | "STAFF" | "DRIVER") => {
     if (loading || demoLoadingRole) return;
     setDemoLoadingRole(role);
     setLoading(true);
     setError(null);
 
     const demoCredentials = {
-      OWNER: { email: "owner@apniestate.com", password: "Admin@123" },
-      MANAGER: { email: "manager@apniestate.com", password: "Admin@123" },
-      STAFF: { email: "staff@apniestate.com", password: "Admin@123" },
+      OWNER: { email: "owner@apniestate.com", password: "password" },
+      MANAGER: { email: "manager@apniestate.com", password: "password" },
+      STAFF: { email: "staff@apniestate.com", password: "password" },
+      DRIVER: { email: "driver@apniestate.com", password: "password" },
     };
 
     try {
       const creds = demoCredentials[role];
+      setEmail(creds.email);
+      setPassword(creds.password);
       const data = await login({ email: creds.email, password: creds.password });
       toast.success("Login successful");
       const userRole = data?.user?.role;
@@ -278,8 +281,8 @@ export const LoginPage = () => {
                 Choose a role to explore the application.
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {(["OWNER", "MANAGER", "STAFF"] as const).map((role) => {
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {(["OWNER", "MANAGER", "STAFF", "DRIVER"] as const).map((role) => {
                 const isSelectedLoading = demoLoadingRole === role;
                 return (
                   <button
@@ -287,7 +290,7 @@ export const LoginPage = () => {
                     type="button"
                     disabled={loading}
                     onClick={() => handleDemoLogin(role)}
-                    className="px-2.5 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-lg text-[10px] font-bold cursor-pointer transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-2 py-2 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-lg text-[10px] font-bold cursor-pointer transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSelectedLoading && (
                       <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />

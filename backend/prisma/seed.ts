@@ -27,7 +27,7 @@ async function main() {
 
   // Hash password
   const salt = await bcrypt.genSalt(10);
-  const passwordHash = await bcrypt.hash("Admin@123", salt);
+  const passwordHash = await bcrypt.hash("password", salt);
 
   // Setup Users to seed
   const usersToSeed = [
