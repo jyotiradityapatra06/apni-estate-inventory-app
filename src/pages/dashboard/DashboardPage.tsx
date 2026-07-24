@@ -6,6 +6,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useDashboardData } from "../../features/dashboard/useDashboardData";
 import { DashboardQuickActions } from "../../features/dashboard/DashboardQuickActions";
 import { DashboardSummaryCards } from "../../features/dashboard/DashboardSummaryCards";
+import { MobileSupplierMetrics } from "../../features/dashboard/MobileSupplierMetrics";
 import { salesOrderApi } from "../../api/salesOrder.api";
 import { purchaseApi } from "../../api/purchase.api";
 import { fmt } from "../../utils/currency";
@@ -92,7 +93,12 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <>
+      {/* 1. Mobile-First Supplier Command Center (< 768px) */}
+      <MobileSupplierMetrics dashboard={dashboard} />
+
+      {/* 2. Desktop Command Center (>= 768px) */}
+      <div className="hidden md:block space-y-6 pb-12">
       {/* 1. Top Welcome Section */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b pb-5">
         <div>
@@ -391,6 +397,7 @@ export default function DashboardPage() {
         </div>
 
       </div>
-    </div>
+      </div>
+    </>
   );
 }

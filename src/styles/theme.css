@@ -63,6 +63,32 @@
   --sidebar-accent-foreground: #F8FAFC;
   --sidebar-border: #1E293B;
   --sidebar-ring: #F97316;
+
+  /* Mobile-first Design Tokens */
+  --space-mobile-xs: 0.5rem;
+  --space-mobile-sm: 0.75rem;
+  --space-mobile-md: 1rem;
+  --space-mobile-lg: 1.25rem;
+  --space-mobile-xl: 1.5rem;
+
+  --touch-target-min: 44px;
+  --touch-target-ideal: 48px;
+  --touch-target-lg: 52px;
+
+  --radius-mobile-card: 1rem;
+  --radius-mobile-sheet: 1.25rem;
+  --radius-mobile-pill: 9999px;
+
+  --shadow-mobile-card: 0 2px 8px -2px rgba(15, 23, 42, 0.06), 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+  --shadow-mobile-float: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+  --shadow-mobile-sheet: 0 -10px 30px -5px rgba(15, 23, 42, 0.18);
+
+  --surface-mobile-card: #FFFFFF;
+  --surface-mobile-glass: rgba(255, 255, 255, 0.88);
+  --surface-mobile-subtle: #F1F5F9;
+
+  --safe-area-bottom: max(16px, env(safe-area-inset-bottom));
+  --safe-area-top: env(safe-area-inset-top, 0px);
 }
 
 .dark {
@@ -156,37 +182,55 @@
     text-rendering: optimizeLegibility;
   }
 
-  /**
-  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
-  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
-  */
-
   html {
     font-size: var(--font-size);
   }
 
-  h1 {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  /* Responsive Mobile Typography: Scale headers gracefully on mobile while keeping desktop intact */
+  @media (max-width: 639px) {
+    h1 {
+      font-size: 1.375rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    h2 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+    h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
   }
 
-  h2 {
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  h3 {
-    font-size: var(--text-lg);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
-  }
-
-  h4 {
-    font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
-    line-height: 1.5;
+  @media (min-width: 640px) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
   }
 
   label {
@@ -210,3 +254,83 @@
   input, select, textarea { min-height: 48px; }
   button, a { touch-action: manipulation; }
 }
+
+@layer utilities {
+  .touch-feedback {
+    touch-action: manipulation;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .touch-feedback:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+
+  .press-active {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .press-active:active {
+    transform: scale(0.95);
+  }
+
+  .press-subtle {
+    transition: transform 0.12s ease;
+  }
+  .press-subtle:active {
+    transform: scale(0.985);
+  }
+
+  .mobile-card {
+    background-color: var(--surface-mobile-card);
+    border-radius: var(--radius-mobile-card);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-mobile-card);
+    padding: 1rem;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .mobile-glass-card {
+    background-color: var(--surface-mobile-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-mobile-card);
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    box-shadow: var(--shadow-mobile-card);
+  }
+
+  .sticky-mobile-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-default);
+    padding: 0.75rem 1rem var(--safe-area-bottom) 1rem;
+    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+  }
+
+  .safe-pb {
+    padding-bottom: var(--safe-area-bottom);
+  }
+
+  .safe-pt {
+    padding-top: var(--safe-area-top);
+  }
+
+  .safe-p-bottom-nav {
+    padding-bottom: calc(64px + var(--safe-area-bottom));
+  }
+
+  .scroll-smooth-mobile {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .scroll-smooth-mobile::-webkit-scrollbar {
+    display: none;
+  }
+}
+

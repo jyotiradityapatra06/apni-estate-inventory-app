@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { Plus, Search, ShoppingCart, CheckCircle, Clock, FileText, Landmark, FileCheck } from "lucide-react";
+import { Plus, Search, ShoppingCart, CheckCircle, Clock, FileText, Landmark, FileCheck, Filter } from "lucide-react";
 import salesOrderApi from "../../api/salesOrder.api";
 import invoiceApi from "../../api/invoice.api";
 import { PageHeader } from "../../app/components/common/PageHeader";
 import { BusinessStatusBadge } from "../../app/components/common/BusinessStatusBadge";
 import { StatCard } from "../../app/components/common/Card";
 import { EmptyState, LoadingSkeleton } from "../../app/components/common/FeedbackStates";
+import { MobileDataCard } from "../../app/components/mobile/MobileDataCard";
+import { MobileFilterDrawer } from "../../app/components/mobile/MobileFilterDrawer";
 import { useAuth } from "../../hooks/useAuth";
 import { hasPermission } from "../../utils/permissions";
 import { fmt } from "../../utils/currency";
@@ -21,6 +23,12 @@ export function SalesOrderListPage() {
   const [status, setStatus] = useState("ALL");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [draftStatus, setDraftStatus] = useState("ALL");
+  const [draftFrom, setDraftFrom] = useState("");
+  const [draftTo, setDraftTo] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -53,6 +61,45 @@ export function SalesOrderListPage() {
       );
     });
   }, [data, search, status, from, to]);
+
+  const activeFilterCount = [status, from, to].filter(x => x && x !== "ALL").length;
+
+  const filtersPanel = (
+    <div className="space-y-3">
+      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Order Status
+        <select 
+          aria-label="Order status" 
+          value={draftStatus} 
+          onChange={(e) => setDraftStatus(e.target.value)} 
+          className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+        >
+          <option value="ALL">All statuses</option>
+          {["DRAFT", "CONFIRMED", "PARTIALLY_INVOICED", "INVOICED", "PARTIALLY_DELIVERED", "FULFILLED", "CANCELLED"].map((x) => (
+            <option key={x} value={x}>{x.replaceAll("_", " ")}</option>
+          ))}
+        </select>
+      </label>
+
+      <div className="grid grid-cols-2 gap-2">
+        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">From Date
+          <input 
+            type="date" 
+            value={draftFrom} 
+            onChange={(e) => setDraftFrom(e.target.value)} 
+            className="mt-1.5 h-10 w-full rounded-lg border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          />
+        </label>
+        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">To Date
+          <input 
+            type="date" 
+            value={draftTo} 
+            onChange={(e) => setDraftTo(e.target.value)} 
+            className="mt-1.5 h-10 w-full rounded-lg border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          />
+        </label>
+      </div>
+    </div>
+  );
 
   // Calculations for summary tiles
   const totalSalesVal = invoices.reduce((sum, inv) => sum + (inv.status !== "CANCELLED" ? Number(inv.totalAmount) : 0), 0);
@@ -110,50 +157,74 @@ export function SalesOrderListPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-3 md:grid-cols-[1fr_190px_160px_160px_auto]">
-        <label className="relative">
-          <Search className="absolute left-3 top-3 text-slate-400" size={18}/>
-          <input 
-            aria-label="Search sales orders" 
-            value={search} 
-            onChange={(e) => setSearch(e.target.value)} 
-            placeholder="Order number, customer or phone" 
-            className="h-10 w-full rounded-lg border pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
-          />
-        </label>
-        <select 
-          aria-label="Order status" 
-          value={status} 
-          onChange={(e) => setStatus(e.target.value)} 
-          className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
-        >
-          <option value="ALL">All statuses</option>
-          {["DRAFT", "CONFIRMED", "PARTIALLY_INVOICED", "INVOICED", "PARTIALLY_DELIVERED", "FULFILLED", "CANCELLED"].map((x) => (
-            <option key={x} value={x}>{x.replaceAll("_", " ")}</option>
-          ))}
-        </select>
-        <input 
-          aria-label="From date" 
-          type="date" 
-          value={from} 
-          onChange={(e) => setFrom(e.target.value)} 
-          className="h-10 rounded-lg border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
-        />
-        <input 
-          aria-label="To date" 
-          type="date" 
-          value={to} 
-          onChange={(e) => setTo(e.target.value)} 
-          className="h-10 rounded-lg border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
-        />
-        {(search || status !== "ALL" || from || to) && (
+      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm space-y-3">
+        <div className="flex gap-2">
+          <div className="relative min-w-0 flex-1">
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={18}/>
+            <input 
+              aria-label="Search sales orders" 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              placeholder="Order number, customer or phone" 
+              className="h-10 w-full rounded-lg border border-slate-200 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            />
+          </div>
           <button 
-            onClick={() => { setSearch(""); setStatus("ALL"); setFrom(""); setTo(""); }} 
-            className="font-bold text-xs text-slate-700 hover:bg-slate-50 px-4 h-10 border rounded-lg cursor-pointer"
+            onClick={() => {
+              setDraftStatus(status);
+              setDraftFrom(from);
+              setDraftTo(to);
+              setFilterOpen(true);
+            }} 
+            className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer shrink-0"
           >
-            Clear
+            <Filter size={15}/>
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[10px] text-white">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
-        )}
+        </div>
+
+        {/* Desktop Filter Panel (>=768px) */}
+        <div className="hidden md:grid md:grid-cols-[1fr_190px_160px_160px_auto] gap-3 items-center border-t pt-3">
+          <div />
+          <select 
+            aria-label="Order status" 
+            value={status} 
+            onChange={(e) => setStatus(e.target.value)} 
+            className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          >
+            <option value="ALL">All statuses</option>
+            {["DRAFT", "CONFIRMED", "PARTIALLY_INVOICED", "INVOICED", "PARTIALLY_DELIVERED", "FULFILLED", "CANCELLED"].map((x) => (
+              <option key={x} value={x}>{x.replaceAll("_", " ")}</option>
+            ))}
+          </select>
+          <input 
+            aria-label="From date" 
+            type="date" 
+            value={from} 
+            onChange={(e) => setFrom(e.target.value)} 
+            className="h-10 rounded-lg border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          />
+          <input 
+            aria-label="To date" 
+            type="date" 
+            value={to} 
+            onChange={(e) => setTo(e.target.value)} 
+            className="h-10 rounded-lg border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          />
+          {(search || status !== "ALL" || from || to) && (
+            <button 
+              onClick={() => { setSearch(""); setStatus("ALL"); setFrom(""); setTo(""); }} 
+              className="font-bold text-xs text-slate-700 hover:bg-slate-50 px-4 h-10 border rounded-lg cursor-pointer"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -163,19 +234,19 @@ export function SalesOrderListPage() {
       ) : visible.length === 0 ? (
         <EmptyState 
           title="No Sales Orders Yet" 
-          description={data.length ? "Try clearing your search or filters." : "Create your first customer order."} 
+          description={data.length ? "Try clearing your search or filters." : "Start your first customer order."} 
           icon={ShoppingCart} 
           action={
             hasPermission(user, "sales:manage") && (
               <Link to="/sales-orders/new" className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-5 text-xs font-bold text-white transition-colors cursor-pointer">
-                Create Sale
+                + Create First Sale
               </Link>
             )
           }
         />
       ) : (
         <>
-          {/* Desktop Table View */}
+          {/* Desktop Table View (>=768px) */}
           <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-slate-600 border-b">
@@ -212,41 +283,78 @@ export function SalesOrderListPage() {
             </table>
           </div>
 
-          {/* Mobile Cards View */}
-          <div className="grid gap-4 md:hidden">
+          {/* Mobile Reusable Card Viewport (<768px) */}
+          <div className="space-y-3.5 md:hidden">
             {visible.map((o) => (
-              <Link 
-                key={o.id} 
-                to={`/sales-orders/${o.id}`} 
-                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow transition-shadow block space-y-3"
-              >
-                <div className="flex justify-between items-start gap-3">
-                  <span className="font-bold text-sm text-slate-900">{o.orderNumber}</span>
-                  <BusinessStatusBadge status={o.status}/>
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-900 text-sm leading-tight">{o.customerName}</h4>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{o.items.length} Material{o.items.length === 1 ? "" : "s"}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs border-t pt-3 border-slate-100">
-                  <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Order Total</span>
-                    <strong className="text-slate-950 text-sm mt-0.5 block">{fmt(o.totalAmount)}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Order Date</span>
-                    <span className="text-slate-700 text-xs mt-0.5 block">{new Date(o.orderDate).toLocaleDateString("en-IN")}</span>
-                  </div>
-                </div>
-                <span className="flex min-h-9 items-center justify-center rounded-xl border text-xs font-bold text-slate-700 hover:bg-slate-50">
-                  View Details
-                </span>
-              </Link>
+              <MobileDataCard
+                key={o.id}
+                title={o.orderNumber}
+                subtitle={`${o.customerName} · ${new Date(o.orderDate).toLocaleDateString("en-IN")}`}
+                badge={<BusinessStatusBadge status={o.status} />}
+                onClick={() => navigate(`/sales-orders/${o.id}`)}
+                primaryMetric={{
+                  label: "Order Total",
+                  value: fmt(o.totalAmount),
+                  helper: `${o.items.length} material(s) ordered`
+                }}
+                secondaryMetrics={[
+                  { label: "Order Date", value: new Date(o.orderDate).toLocaleDateString("en-IN") },
+                  { label: "Created By", value: o.createdBy?.name || "—" }
+                ]}
+                metadata={[
+                  { label: "Customer Phone", value: o.customerPhone || "—" }
+                ]}
+                actions={
+                  <>
+                    <button
+                      onClick={() => navigate(`/sales-orders/${o.id}`)}
+                      className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                    >
+                      View Order
+                    </button>
+                    {hasPermission(user, "sales:manage") && o.status !== "CANCELLED" && (
+                      <button
+                        onClick={() => navigate(`/invoices/new?salesOrderId=${o.id}`)}
+                        className="flex-1 min-h-[44px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs font-bold text-white cursor-pointer press-active"
+                      >
+                        Generate Invoice
+                      </button>
+                    )}
+                  </>
+                }
+              />
             ))}
           </div>
         </>
       )}
+
+      {/* Reusable Mobile Filter Drawer */}
+      <MobileFilterDrawer
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        title="Filter Sales Orders"
+        subtitle="Refine orders by status & date range"
+        activeFilterCount={activeFilterCount}
+        onReset={() => {
+          setDraftStatus("ALL");
+          setDraftFrom("");
+          setDraftTo("");
+          setStatus("ALL");
+          setFrom("");
+          setTo("");
+        }}
+        onApply={() => {
+          setStatus(draftStatus);
+          setFrom(draftFrom);
+          setTo(draftTo);
+          setFilterOpen(false);
+        }}
+      >
+        {filtersPanel}
+      </MobileFilterDrawer>
     </div>
   );
 }
+
 export default SalesOrderListPage;
+

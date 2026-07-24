@@ -9,6 +9,8 @@ import { QuantityDisplay } from "../../app/components/common/BusinessPrimitives"
 import { EmptyState, LoadingSkeleton } from "../../app/components/common/FeedbackStates";
 import { PageHeader } from "../../app/components/common/PageHeader";
 import { StatCard } from "../../app/components/common/Card";
+import { MobileDataCard } from "../../app/components/mobile/MobileDataCard";
+import { MobileFilterDrawer } from "../../app/components/mobile/MobileFilterDrawer";
 import { useAuth } from "../../hooks/useAuth";
 import type { Godown } from "../../types/godown.types";
 import { hasPermission } from "../../utils/permissions";
@@ -218,65 +220,73 @@ export function StockListPage() {
       ) : !filtered.length ? (
         <EmptyState 
           title="No materials found" 
-          description={search || activeCount > 0 ? "Try adjusting your filters or search keywords." : "Start adding construction materials to manage your inventory."} 
+          description={search || activeCount > 0 ? "Try adjusting your filters or search keywords." : "Add your first material to start managing your inventory."} 
           icon={Package} 
           action={
             canCreate && !materials.data.length ? (
               <button onClick={() => navigate("/materials/new")} className="min-h-10 rounded-xl bg-orange-600 hover:bg-orange-700 px-5 text-xs font-bold text-white transition-colors cursor-pointer">
-                Add Material
+                Add First Material
               </button>
             ) : undefined
           }
         />
       ) : (
         <>
-          {/* Mobile Card List Viewport */}
-          <div className="space-y-4 md:hidden">
+          {/* Mobile Reusable Card List Viewport (<768px) */}
+          <div className="space-y-3.5 md:hidden">
             {filtered.map((item) => {
               const status = stockStatus(item);
-              const godownsText = item.godownStocks?.map((gs) => gs.godown.name).join(", ") || "No warehouse";
-              return (
-                <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h4 className="font-bold text-sm text-slate-900 leading-tight">{item.materialName}</h4>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{item.sku} &middot; {item.category}</p>
-                    </div>
-                    <BusinessStatusBadge status={status}/>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
-                    <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Available Stock</span>
-                      <strong className="text-slate-900 text-sm mt-0.5 block"><QuantityDisplay value={availableStock(item)} unit={item.unit}/></strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Godown / Warehouse</span>
-                      <span className="text-slate-900 text-xs mt-0.5 block truncate" title={godownsText}>{godownsText}</span>
-                    </div>
-                  </div>
+              const godownsText = item.godownStocks?.map((gs) => gs.godown.name).join(", ") || "Main Godown";
+              const itemStockValue = item.quantity * (item.costPrice || 0);
 
-                  <div className="flex gap-2 pt-2 border-t border-slate-100">
-                    <button onClick={() => navigate(`/materials/${item.id}`)} className="flex-1 min-h-9 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">
-                      View Details
-                    </button>
-                    {canUpdate && (
-                      <button onClick={() => navigate(`/materials/${item.id}/edit`)} className="flex-1 min-h-9 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">
-                        Edit
+              return (
+                <MobileDataCard
+                  key={item.id}
+                  title={item.materialName}
+                  subtitle={`${item.sku} · ${item.category}`}
+                  badge={<BusinessStatusBadge status={status} />}
+                  onClick={() => navigate(`/materials/${item.id}`)}
+                  primaryMetric={{
+                    label: "Available Quantity",
+                    value: <QuantityDisplay value={availableStock(item)} unit={item.unit} />,
+                    helper: `Min limit: ${minimumStock(item)} ${item.unit}`
+                  }}
+                  secondaryMetrics={[
+                    { label: "Stock Value", value: fmt(itemStockValue) },
+                    { label: "Godown / Location", value: godownsText }
+                  ]}
+                  actions={
+                    <>
+                      <button
+                        onClick={() => navigate(`/materials/${item.id}`)}
+                        className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                      >
+                        View Details
                       </button>
-                    )}
-                    {canIn && (
-                      <button onClick={() => openMovement("IN", item)} className="px-3 min-h-9 rounded-xl bg-orange-600 hover:bg-orange-700 text-xs font-bold text-white cursor-pointer">
-                        Stock In
-                      </button>
-                    )}
-                  </div>
-                </div>
+                      {canIn && (
+                        <button
+                          onClick={() => openMovement("IN", item)}
+                          className="flex-1 min-h-[44px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs font-bold text-white cursor-pointer press-active"
+                        >
+                          + Stock In
+                        </button>
+                      )}
+                      {hasPermission(user, "godowns:transfer") && (
+                        <button
+                          onClick={() => navigate(`/transfers/new?materialId=${item.id}`)}
+                          className="min-h-[44px] px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                        >
+                          Transfer
+                        </button>
+                      )}
+                    </>
+                  }
+                />
               );
             })}
           </div>
 
-          {/* Desktop Table Viewport */}
+          {/* Desktop Table Viewport (>=768px) */}
           <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-slate-600 border-b">
@@ -334,30 +344,24 @@ export function StockListPage() {
         </>
       )}
 
-      {/* Mobile Collapsible Filters Drawer */}
-      {filterOpen && (
-        <div className="fixed inset-0 z-[90] flex items-end bg-slate-950/45 md:hidden">
-          <div className="w-full rounded-t-2xl bg-white p-5 space-y-4">
-            <div className="flex items-center justify-between border-b pb-3">
-              <h2 className="text-base font-black text-slate-950 tracking-tight">Filter Materials</h2>
-              <button onClick={() => setFilterOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500 cursor-pointer">
-                <X size={16}/>
-              </button>
-            </div>
-            <div className="space-y-4">
-              {filtersPanel}
-            </div>
-            <div className="mt-6 flex gap-3 pt-4 border-t">
-              <button onClick={() => { setDraft(initialFilters); setFilters(initialFilters); }} className="min-h-10 flex-1 rounded-xl border text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer">
-                Clear All
-              </button>
-              <button onClick={() => { setFilters(draft); setFilterOpen(false); }} className="min-h-10 flex-[2] rounded-xl bg-orange-600 hover:bg-orange-700 text-xs font-bold text-white cursor-pointer">
-                Apply Filters
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Reusable Mobile Filter Drawer */}
+      <MobileFilterDrawer
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        title="Filter Inventory"
+        subtitle="Filter materials by category, warehouse & stock status"
+        activeFilterCount={activeCount}
+        onReset={() => {
+          setDraft(initialFilters);
+          setFilters(initialFilters);
+        }}
+        onApply={() => {
+          setFilters(draft);
+          setFilterOpen(false);
+        }}
+      >
+        {filtersPanel}
+      </MobileFilterDrawer>
 
       <StockMovementDialog 
         open={!!movement} 
@@ -371,3 +375,4 @@ export function StockListPage() {
     </div>
   );
 }
+

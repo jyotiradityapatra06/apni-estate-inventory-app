@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router";
-import { Bell, Search, Trash2, User, X } from "lucide-react";
+import { Bell, Search, Trash2, User, X, ChevronRight } from "lucide-react";
 import { C } from "../../../constants/colors";
 import { notificationApi, type NotificationData } from "../../../api/notification.api";
+import { useAuth } from "../../../hooks/useAuth";
 
 export interface AppHeaderProps {
   isDark: boolean;
@@ -12,8 +13,10 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const notificationRef = useRef<HTMLDivElement | null>(null);
+  const { user, business } = useAuth();
 
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
   const [isClearingNotifications, setIsClearingNotifications] = useState(false);
@@ -250,10 +253,32 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
         background: isDark ? C.darkCard : C.white,
         borderBottom: `1px solid ${borderColor}`,
       }}
-      className="sticky top-0 z-45 flex h-16 flex-shrink-0 items-center justify-between px-4 md:px-6 select-none"
+      className="sticky top-0 z-45 flex h-14 md:h-16 flex-shrink-0 items-center justify-between px-3 md:px-6 select-none"
     >
-      {/* Page title */}
-      <div>
+      {/* Mobile Compact Business Header (md:hidden) */}
+      <div className="flex items-center gap-2 md:hidden min-w-0">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0F172A] text-white shrink-0 shadow-sm">
+          <span className="font-black text-xs tracking-wider text-[#F97316]">AE</span>
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <h1 className="truncate text-xs font-black text-slate-900 leading-tight">
+              {business?.name || "APNI ESTATE"}
+            </h1>
+            {user?.role && (
+              <span className="shrink-0 rounded-full bg-orange-50 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wider text-orange-600 border border-orange-100">
+                {user.role}
+              </span>
+            )}
+          </div>
+          <p className="text-[10px] font-bold text-slate-400 truncate mt-0.5">
+            {title} &middot; Supplier ERP
+          </p>
+        </div>
+      </div>
+
+      {/* Desktop Page Title (hidden md:block) */}
+      <div className="hidden md:block">
         <h1
           style={{ color: textColor }}
           className="max-w-[190px] truncate text-[18px] font-bold md:max-w-none lg:text-xl"
@@ -262,9 +287,116 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
         </h1>
       </div>
 
-      {/* Header controls */}
-      <div className="flex items-center gap-2 md:gap-4">
-        {/* Search */}
+      {/* Mobile Search Overlay Input Bar */}
+      {mobileSearchOpen && (
+        <div className="fixed inset-x-0 top-0 z-50 bg-white p-3 shadow-xl border-b border-slate-200 md:hidden animate-fade-in">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search size={16} className="absolute left-3 top-3 text-slate-400" />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search stock, supplier, invoice, customer..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  void performSearch(e.target.value);
+                }}
+                className="w-full rounded-xl bg-slate-100 py-2 pl-9 pr-3 text-xs font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-orange-500/20"
+              />
+            </div>
+            <button
+              onClick={() => {
+                setMobileSearchOpen(false);
+                setSearchQuery("");
+                setSearchResults({ materials: [], customers: [], suppliers: [], invoices: [], orders: [] });
+              }}
+              className="px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
+
+          {searchQuery.length >= 2 && (
+            <div className="mt-3 max-h-[60dvh] overflow-y-auto space-y-3 pt-2 border-t border-slate-100 text-xs">
+              {!hasSearchResults && (
+                <p className="text-slate-400 italic py-2 text-center">No matching records found.</p>
+              )}
+
+              {searchResults.materials.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Materials</h4>
+                  <div className="space-y-1">
+                    {searchResults.materials.map(m => (
+                      <Link 
+                        key={m.id} 
+                        to={`/materials/${m.id}`} 
+                        onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
+                        className="flex justify-between items-center p-2 bg-slate-50 rounded-xl font-bold text-slate-800"
+                      >
+                        <span>{m.materialName}</span>
+                        <span className="text-[10px] text-slate-400">{m.sku}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {searchResults.suppliers.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Suppliers</h4>
+                  <div className="space-y-1">
+                    {searchResults.suppliers.map(s => (
+                      <Link 
+                        key={s.id} 
+                        to={`/suppliers/${s.id}`} 
+                        onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
+                        className="flex justify-between items-center p-2 bg-slate-50 rounded-xl font-bold text-slate-800"
+                      >
+                        <span>{s.name}</span>
+                        <span className="text-[10px] text-slate-400">{s.phone}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {searchResults.invoices.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Invoices</h4>
+                  <div className="space-y-1">
+                    {searchResults.invoices.map(i => (
+                      <Link 
+                        key={i.id} 
+                        to={`/invoices/${i.id}`} 
+                        onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
+                        className="flex justify-between items-center p-2 bg-slate-50 rounded-xl font-bold text-slate-800"
+                      >
+                        <span>{i.invoiceNumber}</span>
+                        <span className="text-[10px] text-slate-400">{i.customerName}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Header Controls */}
+      <div className="flex items-center gap-1.5 md:gap-4">
+        {/* Mobile Search Button Trigger */}
+        <button
+          type="button"
+          onClick={() => setMobileSearchOpen(true)}
+          aria-label="Open search"
+          className="flex h-10 w-10 md:hidden cursor-pointer items-center justify-center rounded-full bg-slate-100 text-slate-700 active:scale-95 transition-transform"
+        >
+          <Search size={16} />
+        </button>
+
+        {/* Desktop Search */}
         <div className="relative hidden lg:block">
           <input
             type="text"

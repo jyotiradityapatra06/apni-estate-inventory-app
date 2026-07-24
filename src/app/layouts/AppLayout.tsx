@@ -24,24 +24,24 @@ export const AppLayout = () => {
         background: isDark ? C.dark : C.bg,
         fontFamily: "'Plus Jakarta Sans', sans-serif",
       }}
-      className="h-screen w-full overflow-hidden relative"
+      className="h-[100dvh] w-full overflow-hidden relative"
     >
       {/* Desktop / Tablet Left Sidebar */}
       <DesktopSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
 
       {/* Main App Area */}
-      <div className={`flex h-screen flex-col overflow-hidden relative transition-all duration-300 ${collapsed ? "lg:ml-[72px]" : "lg:ml-[248px]"}`}>
-        {/* Desktop / Tablet Top Header */}
+      <div className={`flex h-[100dvh] flex-col overflow-hidden relative transition-all duration-300 ${collapsed ? "lg:ml-[72px]" : "lg:ml-[248px]"}`}>
+        {/* Top Header */}
         <AppHeader isDark={isDark} />
 
-        {/* Scrollable Page Body - THE SINGLE MAIN VERTICAL SCROLLER */}
+        {/* Scrollable Page Body - SINGLE MAIN VERTICAL SCROLLER */}
         <main
           ref={mainScrollRef}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain w-full pb-28 lg:pb-8"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain w-full pb-[calc(84px+max(16px,env(safe-area-inset-bottom)))] lg:pb-8 scroll-smooth-mobile"
           style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}
         >
-          {/* Centered Desktop Content Container */}
-          <div className="max-w-[1440px] mx-auto w-full px-4 py-5 md:px-6 md:py-6 lg:px-8 lg:py-8">
+          {/* Centered Content Container */}
+          <div className="max-w-[1440px] mx-auto w-full px-3 py-3 md:px-6 md:py-6 lg:px-8 lg:py-8">
             <Outlet />
           </div>
         </main>

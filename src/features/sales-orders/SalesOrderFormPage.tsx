@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
-import { Plus, Trash2 } from "lucide-react";
+import { useNavigate, useSearchParams, Link } from "react-router";
+import { Plus, Trash2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { customerApi } from "../../api/customer.api";
 import { inventoryApi, type InventoryItemData } from "../../api/inventory.api";
 import { PageHeader, SectionHeader } from "../../app/components/common/PageHeader";
+import { MobileStickyFooter } from "../../app/components/mobile/MobileStickyFooter";
 import salesOrderApi from "../../api/salesOrder.api";
 import type { Customer } from "../../types/customer.types";
 import { fmt } from "../../utils/currency";
@@ -12,7 +13,7 @@ import { calculateLine, calculateOrder } from "./salesOrderCalculations";
 
 type Line = { inventoryItemId: string; godownId: string; quantity: string; rate: string; discountRate: string; gstRate: string };
 const blank = (): Line => ({ inventoryItemId: "", godownId: "", quantity: "", rate: "", discountRate: "0", gstRate: "0" });
-const cls = "mt-2 min-h-12 w-full rounded-lg border bg-white px-3 text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none";
+const cls = "mt-2 min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none";
 
 export function SalesOrderFormPage() {
   const nav = useNavigate();
@@ -132,14 +133,41 @@ export function SalesOrderFormPage() {
   if (loading) return <div className="h-64 animate-pulse rounded-xl bg-slate-200" />;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-5 pb-28">
+    <div className="mx-auto max-w-5xl space-y-5 pb-32">
       <PageHeader title="New Sale" description="Create a customer order and save it as a Draft." />
-      {error && <p className="rounded-lg bg-red-50 p-3 font-semibold text-red-800">{error}</p>}
+      {error && <p className="rounded-xl bg-red-50 p-3 font-semibold text-xs text-red-800 border border-red-200">{error}</p>}
       
-      <section className="rounded-xl border bg-white p-4 md:p-6">
+      {/* Zero Data Alerts for New Accounts */}
+      {!customers.length && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
+          <AlertCircle className="text-amber-600 shrink-0 mt-0.5" size={18} />
+          <div className="text-xs text-amber-900 space-y-1">
+            <p className="font-bold">No customers found</p>
+            <p>Please add your first customer before creating a sales order.</p>
+            <Link to="/customers/new" className="inline-block font-bold text-orange-600 underline mt-1">
+              + Add Customer First
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {!materials.length && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
+          <AlertCircle className="text-amber-600 shrink-0 mt-0.5" size={18} />
+          <div className="text-xs text-amber-900 space-y-1">
+            <p className="font-bold">No materials found</p>
+            <p>Please create your first material to add items to a sale.</p>
+            <Link to="/materials/new" className="inline-block font-bold text-orange-600 underline mt-1">
+              + Create First Material
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
         <SectionHeader title="Customer" />
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <label className="text-sm font-semibold">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
             Customer
             <select required value={customerId} onChange={e => setCustomerId(e.target.value)} className={cls}>
               <option value="">Choose customer</option>
@@ -148,8 +176,8 @@ export function SalesOrderFormPage() {
               ))}
             </select>
           </label>
-          <label className="text-sm font-semibold">
-            Tax mode
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+            Tax Mode
             <select value={taxMode} onChange={e => setTaxMode(e.target.value as "GST" | "NON_GST")} className={cls}>
               <option value="GST">GST Sales Order</option>
               <option value="NON_GST">Non-GST Sales Order</option>
@@ -165,9 +193,18 @@ export function SalesOrderFormPage() {
           const calc = calculateLine(line, taxMode);
           const balances = a.material?.godownStocks || [];
           return (
-            <article key={i} className="rounded-xl border bg-white p-4">
-              <div className="grid gap-4 lg:grid-cols-6">
-                <label className="text-sm font-semibold lg:col-span-2">
+            <article key={i} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-orange-600">Item #{i + 1}</span>
+                {items.length > 1 && (
+                  <button type="button" aria-label={`Remove item ${i + 1}`} onClick={() => setItems(x => x.filter((_, n) => n !== i))} className="text-red-600 hover:bg-red-50 p-1.5 rounded-lg cursor-pointer">
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-6">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
                   Material
                   <select required value={line.inventoryItemId} onChange={e => {
                     const m = materials.find(x => x.id === e.target.value);
@@ -186,7 +223,7 @@ export function SalesOrderFormPage() {
                     ))}
                   </select>
                 </label>
-                <label className="text-sm font-semibold">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
                   Godown
                   <select required disabled={!a.material} value={line.godownId} onChange={e => change(i, "godownId", e.target.value)} className={cls}>
                     <option value="">Choose Godown</option>
@@ -195,34 +232,27 @@ export function SalesOrderFormPage() {
                     ))}
                   </select>
                 </label>
-                <label className="text-sm font-semibold">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
                   Quantity
-                  <input required type="number" min="0.001" step="0.001" max={line.godownId ? a.value : undefined} value={line.quantity} onChange={e => change(i, "quantity", e.target.value)} className={cls} />
+                  <input required type="number" inputMode="decimal" min="0.001" step="0.001" max={line.godownId ? a.value : undefined} value={line.quantity} onChange={e => change(i, "quantity", e.target.value)} className={cls} />
                 </label>
-                <label className="text-sm font-semibold">
-                  Rate
-                  <input required type="number" min="0" step="0.01" value={line.rate} onChange={e => change(i, "rate", e.target.value)} className={cls} />
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                  Rate (₹)
+                  <input required type="number" inputMode="decimal" min="0" step="0.01" value={line.rate} onChange={e => change(i, "rate", e.target.value)} className={cls} />
                 </label>
-                <label className="text-sm font-semibold">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
                   Discount %
-                  <div className="flex gap-1">
-                    <input type="number" min="0" max="100" step="0.01" value={line.discountRate} onChange={e => change(i, "discountRate", e.target.value)} className={cls} />
-                    {items.length > 1 && (
-                      <button type="button" aria-label={`Remove item ${i + 1}`} onClick={() => setItems(x => x.filter((_, n) => n !== i))} className="mt-2 h-12 w-12 text-red-700">
-                        <Trash2 className="mx-auto" size={19} />
-                      </button>
-                    )}
-                  </div>
+                  <input type="number" inputMode="decimal" min="0" max="100" step="0.01" value={line.discountRate} onChange={e => change(i, "discountRate", e.target.value)} className={cls} />
                 </label>
 
                 {a.balance && (
-                  <div className="grid grid-cols-3 gap-2 rounded-lg bg-slate-50 p-3 text-xs lg:col-span-3">
+                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 p-3 text-xs md:col-span-4 border border-slate-100">
                     <Mini label="Physical" value={`${a.balance.quantity} ${a.material?.unit}`} />
                     <Mini label="Reserved" value={`${a.balance.reservedQuantity || 0} ${a.material?.unit}`} />
                     <Mini label="Available" value={`${a.value} ${a.material?.unit}`} />
                   </div>
                 )}
-                <div className="grid grid-cols-3 gap-2 rounded-lg bg-blue-50 p-3 text-xs lg:col-span-3">
+                <div className="grid grid-cols-3 gap-2 rounded-xl bg-orange-50/60 p-3 text-xs md:col-span-2 border border-orange-100">
                   <Mini label="Taxable" value={fmt(calc.taxable)} />
                   <Mini label="Tax" value={fmt(calc.tax)} />
                   <Mini label="Line Total" value={fmt(calc.total)} />
@@ -231,59 +261,90 @@ export function SalesOrderFormPage() {
             </article>
           );
         })}
-        <button type="button" onClick={() => setItems(x => [...x, blank()])} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-blue-300 font-semibold text-blue-700">
-          <Plus size={19} />
+        <button type="button" onClick={() => setItems(x => [...x, blank()])} className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-orange-300 font-bold text-xs text-orange-600 hover:bg-orange-50 cursor-pointer transition-colors">
+          <Plus size={18} />
           Add another material
         </button>
       </section>
 
-      <section className="rounded-xl border bg-white p-4 md:p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
         <SectionHeader title="Delivery Information and Notes" />
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <label className="text-sm font-semibold">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
             Expected delivery
             <input type="date" value={details.expectedDeliveryDate} onChange={e => setDetails({ ...details, expectedDeliveryDate: e.target.value })} className={cls} />
           </label>
-          <label className="text-sm font-semibold">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
             Place of supply code
             <input maxLength={2} inputMode="numeric" value={details.placeOfSupplyCode} onChange={e => setDetails({ ...details, placeOfSupplyCode: e.target.value })} className={cls} />
           </label>
-          <label className="text-sm font-semibold">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
             Billing address
             <textarea value={details.billingAddress} onChange={e => setDetails({ ...details, billingAddress: e.target.value })} className={`${cls} min-h-24 p-3`} />
           </label>
-          <label className="text-sm font-semibold">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
             Delivery address
             <textarea value={details.deliveryAddress} onChange={e => setDetails({ ...details, deliveryAddress: e.target.value })} className={`${cls} min-h-24 p-3`} />
           </label>
-          <label className="text-sm font-semibold md:col-span-2">
+          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
             Notes
             <textarea value={details.notes} onChange={e => setDetails({ ...details, notes: e.target.value })} className={`${cls} min-h-20 p-3`} />
           </label>
         </div>
       </section>
 
-      <section className="ml-auto max-w-lg rounded-xl bg-slate-950 p-5 text-white">
+      <section className="ml-auto max-w-lg rounded-2xl bg-slate-950 p-5 text-white shadow-sm space-y-2">
         <Row label="Subtotal" value={fmt(summary.subtotal)} />
         <Row label="Discount" value={fmt(summary.discount)} />
         <Row label="Tax" value={fmt(summary.tax)} />
-        <div className="mt-3 border-t border-slate-700 pt-3">
+        <div className="mt-3 border-t border-slate-800 pt-3">
           <Row label="Order Total" value={fmt(summary.total)} large />
         </div>
-        <p className="mt-3 text-xs text-slate-300">
+        <p className="mt-3 text-[10px] text-slate-400 font-medium">
           {items.length} line{items.length === 1 ? "" : "s"}. Backend totals remain authoritative. Stock is reserved only after confirmation.
         </p>
       </section>
 
-      <div className="fixed inset-x-0 bottom-[72px] z-30 grid grid-cols-2 gap-2 border-t bg-white p-3 md:static md:ml-auto md:flex md:justify-end md:border-0 md:bg-transparent">
-        <button disabled={saving} onClick={() => save(false)} className="min-h-12 rounded-lg border px-5 font-semibold">
+      {/* Mobile Safe Area Fixed Action Footer */}
+      <MobileStickyFooter className="md:hidden">
+        <button 
+          disabled={saving} 
+          onClick={() => save(false)} 
+          className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+        >
           {saving && !confirming ? "Saving..." : "Save Draft"}
         </button>
-        <button disabled={saving} onClick={() => {
-          const m = validate();
-          if (m) setError(m);
-          else setReview(true);
-        }} className="min-h-12 rounded-lg bg-blue-700 px-5 font-semibold text-white">
+        <button 
+          disabled={saving} 
+          onClick={() => {
+            const m = validate();
+            if (m) setError(m);
+            else setReview(true);
+          }} 
+          className="flex-1 min-h-[44px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs font-bold text-white cursor-pointer press-active"
+        >
+          Confirm Order
+        </button>
+      </MobileStickyFooter>
+
+      {/* Desktop Action Area (>=768px) */}
+      <div className="hidden md:flex md:justify-end md:gap-3">
+        <button 
+          disabled={saving} 
+          onClick={() => save(false)} 
+          className="min-h-11 rounded-xl border border-slate-200 px-5 text-sm font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+        >
+          {saving && !confirming ? "Saving..." : "Save Draft"}
+        </button>
+        <button 
+          disabled={saving} 
+          onClick={() => {
+            const m = validate();
+            if (m) setError(m);
+            else setReview(true);
+          }} 
+          className="min-h-11 rounded-xl bg-orange-600 hover:bg-orange-700 px-6 text-sm font-bold text-white cursor-pointer"
+        >
           Confirm Order
         </button>
       </div>
@@ -297,12 +358,12 @@ export function SalesOrderFormPage() {
               <Mini label="Items" value={`${items.length} Material${items.length === 1 ? "" : "s"}`} />
               <Mini label="Order Total" value={fmt(summary.total)} />
             </div>
-            <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+            <p className="mt-4 rounded-xl bg-amber-50 p-3 text-xs text-amber-900 border border-amber-100">
               Confirming this order will reserve the required stock. Physical stock will not be deducted.
             </p>
             <div className="mt-5 flex gap-2">
-              <button onClick={() => setReview(false)} className="min-h-12 flex-1 rounded-lg border font-semibold">Back</button>
-              <button disabled={saving} onClick={() => save(true)} className="min-h-12 flex-[2] rounded-lg bg-blue-700 font-semibold text-white">
+              <button onClick={() => setReview(false)} className="min-h-11 flex-1 rounded-xl border font-bold text-slate-700">Back</button>
+              <button disabled={saving} onClick={() => save(true)} className="min-h-11 flex-[2] rounded-xl bg-orange-600 font-bold text-white">
                 {saving ? "Confirming..." : "Confirm Order"}
               </button>
             </div>
@@ -316,18 +377,20 @@ export function SalesOrderFormPage() {
 function Mini({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-slate-500">{label}</p>
-      <b>{value}</b>
+      <p className="text-slate-500 text-[10px] uppercase font-bold">{label}</p>
+      <b className="text-slate-900">{value}</b>
     </div>
   );
 }
 
 function Row({ label, value, large = false }: { label: string; value: string; large?: boolean }) {
   return (
-    <div className={`flex justify-between gap-3 ${large ? "text-xl" : "text-sm"}`}>
+    <div className={`flex justify-between gap-3 ${large ? "text-lg font-bold" : "text-xs text-slate-300"}`}>
       <span>{label}</span>
       <b>{value}</b>
     </div>
   );
 }
+
 export default SalesOrderFormPage;
+

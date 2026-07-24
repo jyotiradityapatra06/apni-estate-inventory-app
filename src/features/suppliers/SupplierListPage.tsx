@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { Factory, MoreVertical, Phone, Plus, Search, Landmark, ShoppingBag, ShieldAlert } from "lucide-react";
+import { Factory, MoreVertical, Phone, Plus, Search, Landmark, ShoppingBag, ShieldAlert, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { supplierApi } from "../../api/supplier.api";
 import { purchaseApi } from "../../api/purchase.api";
@@ -8,6 +8,8 @@ import { PageHeader } from "../../app/components/common/PageHeader";
 import { ConfirmDialog } from "../../app/components/common/ConfirmDialog";
 import { StatCard } from "../../app/components/common/Card";
 import { EmptyState, LoadingSkeleton } from "../../app/components/common/FeedbackStates";
+import { MobileDataCard } from "../../app/components/mobile/MobileDataCard";
+import { MobileFilterDrawer } from "../../app/components/mobile/MobileFilterDrawer";
 import { useAuth } from "../../hooks/useAuth";
 import type { Supplier } from "../../types/supplier.types";
 import { hasPermission } from "../../utils/permissions";
@@ -25,6 +27,8 @@ export function SupplierListPage() {
   const [purchases, setPurchases] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [active, setActive] = useState("ALL");
+  const [draftActive, setDraftActive] = useState("ALL");
+  const [filterOpen, setFilterOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [menu, setMenu] = useState("");
@@ -76,6 +80,21 @@ export function SupplierListPage() {
     }
   };
 
+  const filtersPanel = (
+    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+      Supplier Status
+      <select 
+        value={draftActive} 
+        onChange={e => setDraftActive(e.target.value)} 
+        className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+      >
+        <option value="ALL">All Suppliers</option>
+        <option value="ACTIVE">Active Suppliers</option>
+        <option value="INACTIVE">Inactive Suppliers</option>
+      </select>
+    </label>
+  );
+
   return (
     <div className="space-y-6 pb-8">
       {/* Header */}
@@ -100,32 +119,39 @@ export function SupplierListPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-[1fr_240px_auto]">
-          <label className="relative">
-            <Search className="absolute left-3 top-3 text-slate-400" size={18}/>
+      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm space-y-3">
+        <div className="flex gap-2">
+          <div className="relative min-w-0 flex-1">
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={18}/>
             <input 
               aria-label="Search suppliers" 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
               placeholder="Search supplier, phone, GST number or code" 
-              className="h-10 w-full rounded-lg border pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="h-10 w-full rounded-lg border border-slate-200 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
             />
-          </label>
-          <select 
-            aria-label="Supplier status" 
-            value={active} 
-            onChange={e => setActive(e.target.value)} 
-            className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          </div>
+          <button 
+            onClick={() => { setDraftActive(active); setFilterOpen(true); }} 
+            className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer shrink-0"
           >
-            <option value="ALL">All Suppliers</option>
-            <option value="ACTIVE">Active Suppliers</option>
-            <option value="INACTIVE">Inactive Suppliers</option>
-          </select>
+            <Filter size={15}/>
+            Filters
+            {active !== "ALL" && (
+              <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[10px] text-white">
+                1
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Desktop Filter Bar */}
+        <div className="hidden md:flex md:items-center md:gap-3 border-t pt-3">
+          {filtersPanel}
           {(search || active !== "ALL") && (
             <button 
-              onClick={() => { setSearch(""); setActive("ALL"); }} 
-              className="font-bold text-xs text-slate-700 hover:bg-slate-50 px-4 h-10 border rounded-lg cursor-pointer"
+              onClick={() => { setSearch(""); setActive("ALL"); setDraftActive("ALL"); }} 
+              className="font-bold text-xs text-slate-700 hover:bg-slate-50 px-4 h-10 border rounded-lg cursor-pointer mt-5"
             >
               Clear
             </button>
@@ -140,19 +166,84 @@ export function SupplierListPage() {
       ) : visible.length === 0 ? (
         <EmptyState 
           title="No Suppliers Added" 
-          description={data.length ? "Try adjusting filters or search keywords." : "Add suppliers to track purchases and payments."} 
+          description={data.length ? "Try adjusting filters or search keywords." : "Add your first supplier to track purchases and payments."} 
           icon={Factory} 
           action={
             canCreate && (
               <Link to="/suppliers/new" className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-5 text-xs font-bold text-white transition-colors cursor-pointer">
-                Add Supplier
+                Add First Supplier
               </Link>
             )
           }
         />
       ) : (
         <>
-          {/* Desktop Table View */}
+          {/* Mobile Reusable Card Viewport (<768px) */}
+          <div className="space-y-3.5 md:hidden">
+            {visible.map(s => {
+              const supplierPurchases = purchases.filter(p => p.supplierId === s.id && p.status !== "CANCELLED");
+              const totalPurchases = supplierPurchases.length;
+              const lastPurchase = supplierPurchases.length > 0 
+                ? new Date(Math.max(...supplierPurchases.map(p => new Date(p.orderDate).getTime()))).toLocaleDateString("en-IN") 
+                : "No POs yet";
+              const outstandingPayable = supplierPurchases.reduce((sum, p) => sum + Number(p.balanceDue || 0), 0);
+
+              return (
+                <MobileDataCard
+                  key={s.id}
+                  title={s.name}
+                  subtitle={`${s.supplierCode || "VENDOR"} · ${s.phone}`}
+                  badge={
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${s.isActive ? "bg-green-50 text-green-700" : "bg-slate-100 text-slate-500"}`}>
+                      {s.isActive ? "Active" : "Inactive"}
+                    </span>
+                  }
+                  onClick={() => nav(`/suppliers/${s.id}`)}
+                  primaryMetric={{
+                    label: "Outstanding Payable",
+                    value: (
+                      <span className={outstandingPayable > 0 ? "text-red-600 font-black" : "text-slate-900 font-black"}>
+                        {fmt(outstandingPayable)}
+                      </span>
+                    ),
+                    helper: outstandingPayable > 0 ? "Overdue Balance" : "Account Settled"
+                  }}
+                  secondaryMetrics={[
+                    { label: "Total Purchases", value: `${totalPurchases} PO(s)` },
+                    { label: "Last PO Date", value: lastPurchase }
+                  ]}
+                  metadata={[
+                    { label: "GSTIN", value: s.gstin || "Unregistered" },
+                    { label: "Contact Person", value: s.contactPerson || "—" }
+                  ]}
+                  actions={
+                    <>
+                      <button
+                        onClick={() => nav(`/suppliers/${s.id}`)}
+                        className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                      >
+                        View Supplier
+                      </button>
+                      <button
+                        onClick={() => nav(`/purchases/new?supplierId=${s.id}`)}
+                        className="flex-1 min-h-[44px] rounded-xl bg-orange-50 text-xs font-bold text-[#F97316] hover:bg-orange-100 cursor-pointer press-active border border-orange-100"
+                      >
+                        + Purchase PO
+                      </button>
+                      <button
+                        onClick={() => nav(`/financials/payables?supplierId=${s.id}`)}
+                        className="min-h-[44px] px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                      >
+                        Ledger
+                      </button>
+                    </>
+                  }
+                />
+              );
+            })}
+          </div>
+
+          {/* Desktop Table View (>=768px) */}
           <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-slate-600 border-b">
@@ -218,73 +309,27 @@ export function SupplierListPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Mobile Card Viewport */}
-          <div className="grid gap-4 md:hidden">
-            {visible.map(s => {
-              const supplierPurchases = purchases.filter(p => p.supplierId === s.id && p.status !== "CANCELLED");
-              const totalPurchases = supplierPurchases.length;
-              const outstandingPayable = supplierPurchases.reduce((sum, p) => sum + Number(p.balanceDue || 0), 0);
-
-              return (
-                <article key={s.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
-                  <div className="flex justify-between items-start gap-3">
-                    <div>
-                      <h3 className="font-bold text-slate-900 text-sm leading-tight">{s.name}</h3>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{s.supplierCode} &middot; {s.phone}</p>
-                    </div>
-                    {canUpdate && (
-                      <button 
-                        aria-label={`Actions for ${s.name}`} 
-                        onClick={() => setMenu(menu === s.id ? "" : s.id)} 
-                        className="h-8 w-8 shrink-0 rounded-lg hover:bg-slate-100 flex items-center justify-center cursor-pointer border"
-                      >
-                        <MoreVertical size={16}/>
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
-                    <div>
-                      <span className="text-slate-400 block text-[9px] uppercase font-bold">Outstanding Payable</span>
-                      <strong className={`text-sm font-black mt-0.5 block ${outstandingPayable > 0 ? "text-red-600" : "text-slate-950"}`}>
-                        {fmt(outstandingPayable)}
-                      </strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block text-[9px] uppercase font-bold">Total Purchases</span>
-                      <strong className="text-slate-700 text-xs mt-0.5 block font-bold">{totalPurchases} PO(s)</strong>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 pt-2 border-t border-slate-100">
-                    <Link to={`/suppliers/${s.id}`} className="flex-1 flex min-h-9 items-center justify-center rounded-xl border text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">
-                      View details
-                    </Link>
-                    <button 
-                      onClick={() => nav(`/purchases/new?supplierId=${s.id}`)}
-                      className="flex-1 flex min-h-9 items-center justify-center gap-1.5 rounded-xl bg-orange-50 text-xs font-bold text-orange-600 hover:bg-orange-100 cursor-pointer"
-                    >
-                      Create Purchase
-                    </button>
-                  </div>
-                  {menu === s.id && (
-                    <div className="mt-2 pt-2 border-t border-slate-100">
-                      <Actions 
-                        inline 
-                        view={() => nav(`/suppliers/${s.id}`)} 
-                        edit={canUpdate ? () => nav(`/suppliers/${s.id}/edit`) : undefined} 
-                        del={canDelete ? () => setDeleting(s) : undefined}
-                        onClose={() => setMenu("")}
-                      />
-                    </div>
-                  )}
-                </article>
-              );
-            })}
-          </div>
         </>
       )}
+
+      {/* Reusable Mobile Filter Drawer */}
+      <MobileFilterDrawer
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        title="Filter Suppliers"
+        subtitle="Filter suppliers by active status"
+        activeFilterCount={active !== "ALL" ? 1 : 0}
+        onReset={() => {
+          setDraftActive("ALL");
+          setActive("ALL");
+        }}
+        onApply={() => {
+          setActive(draftActive);
+          setFilterOpen(false);
+        }}
+      >
+        {filtersPanel}
+      </MobileFilterDrawer>
 
       <ConfirmDialog 
         open={!!deleting} 
@@ -313,4 +358,5 @@ function Actions({ view, edit, del, inline = false, onClose }: { view: () => voi
     </div>
   );
 }
+
 export default SupplierListPage;
