@@ -20,7 +20,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
       const decoded = verifyToken(token);
       const user = await prisma.user.findUnique({
         where: { id: decoded.userId },
-        select: { id: true, businessId: true, role: true, isActive: true },
+        select: { id: true, businessId: true, role: true, name: true, phone: true, isActive: true },
       });
 
       if (!user || !user.isActive) {
@@ -31,6 +31,8 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
         userId: user.id,
         businessId: user.businessId,
         role: user.role,
+        name: user.name,
+        phone: user.phone || undefined,
       };
       next();
     } catch (err) {
@@ -87,7 +89,7 @@ export const authorizeDeliveryAccess = (req: Request, res: Response, next: NextF
   }
 
   const role = (req.user.role || "").toUpperCase();
-  if (role !== "OWNER" && role !== "MANAGER") {
+  if (role !== "OWNER" && role !== "MANAGER" && role !== "DRIVER") {
     return res.status(403).json({
       success: false,
       message: "You do not have permission to access Delivery Management."

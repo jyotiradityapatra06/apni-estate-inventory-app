@@ -36,18 +36,50 @@ const detailInclude = {
 
 const linkedWhere = (businessId: string, id: string) => ({ id, businessId, fulfilmentMode: LINKED_MODE });
 
-export const getAll = async (businessId: string, rawQuery: unknown) => {
+export const getAll = async (
+  businessId: string,
+  rawQuery: unknown,
+  currentUser?: { userId: string; role: string; name?: string; phone?: string }
+) => {
   const query = listLinkedDeliveryQuerySchema.parse(rawQuery);
   const where: Prisma.DeliveryWhereInput = { businessId, fulfilmentMode: LINKED_MODE };
   if (query.status) where.status = query.status.toUpperCase();
   if (query.salesOrderId) where.salesOrderId = query.salesOrderId;
   if (query.invoiceId) where.invoiceId = query.invoiceId;
   if (query.customerId) where.customerId = query.customerId;
+  if (query.challanNumber) where.challanNumber = query.challanNumber;
+
+  if (currentUser && currentUser.role.toUpperCase() === "DRIVER") {
+    const driverOr: Prisma.DeliveryWhereInput[] = [
+      { dispatchedById: currentUser.userId },
+      { createdById: currentUser.userId },
+    ];
+    if (currentUser.phone) driverOr.push({ driverPhone: currentUser.phone });
+    if (currentUser.name) driverOr.push({ driverName: currentUser.name });
+    where.OR = driverOr;
+  }
+
   return prisma.delivery.findMany({ where, include: detailInclude, orderBy: { createdAt: "desc" } });
 };
 
-export const getById = async (businessId: string, id: string) => {
-  const delivery = await prisma.delivery.findFirst({ where: linkedWhere(businessId, id), include: detailInclude });
+export const getById = async (
+  businessId: string,
+  id: string,
+  currentUser?: { userId: string; role: string; name?: string; phone?: string }
+) => {
+  const where: Prisma.DeliveryWhereInput = linkedWhere(businessId, id);
+
+  if (currentUser && currentUser.role.toUpperCase() === "DRIVER") {
+    const driverOr: Prisma.DeliveryWhereInput[] = [
+      { dispatchedById: currentUser.userId },
+      { createdById: currentUser.userId },
+    ];
+    if (currentUser.phone) driverOr.push({ driverPhone: currentUser.phone });
+    if (currentUser.name) driverOr.push({ driverName: currentUser.name });
+    where.OR = driverOr;
+  }
+
+  const delivery = await prisma.delivery.findFirst({ where, include: detailInclude });
   if (!delivery) throw new ApiError(404, "Linked delivery not found.");
   return delivery;
 };
@@ -169,11 +201,13 @@ export const create = async (businessId: string, userId: string, input: unknown)
       await tx.salesOrderItem.update({ where: { id: orderItem.id }, data: { reservedQuantity: { increment: reservationShortfall } } });
     }
     const deliveryNumber = await nextDocumentNumber(tx, businessId, "LINKED_DELIVERY", "DEL");
+    const challanNumber = await nextDocumentNumber(tx, businessId, "DELIVERY_CHALLAN", "DC");
     const total = selected.reduce((sum, item) => sum.plus(item.quantity), new Prisma.Decimal(0));
     const mixedUnits = new Set(selected.map(({ orderItem }) => orderItem.unit)).size > 1;
     return tx.delivery.create({
       data: {
         deliveryNumber,
+        challanNumber,
         customerName: order.customerName,
         customerPhone: order.customerPhone,
         deliveryAddress: order.deliveryAddress || order.billingAddress || order.customer.shippingAddress || order.customer.billingAddress || "Address not provided",

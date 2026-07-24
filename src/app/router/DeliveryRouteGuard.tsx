@@ -12,7 +12,9 @@ export const DeliveryRouteGuard: React.FC = () => {
     if (!isLoading && user) {
       const role = user.role.toUpperCase();
       if (role !== "OWNER" && role !== "MANAGER") {
-        toast.error("You do not have permission to access Delivery Management.");
+        if (role !== "DRIVER") {
+          toast.error("You do not have permission to access Delivery Management.");
+        }
         setShouldRedirect(true);
       }
     }
@@ -44,7 +46,7 @@ export const DeliveryRouteGuard: React.FC = () => {
   const role = user.role.toUpperCase();
   if (role !== "OWNER" && role !== "MANAGER") {
     if (shouldRedirect) {
-      return <Navigate to="/inventory" replace />;
+      return <Navigate to={role === "DRIVER" ? "/driver/trips" : "/inventory"} replace />;
     }
     return (
       <div

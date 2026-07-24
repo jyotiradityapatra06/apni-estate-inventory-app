@@ -104,6 +104,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
     "purchase-returns:view", "purchase-returns:create",
   ],
   [UserRole.DRIVER]: [
+    "deliveries:view",
+    "deliveries:complete",
     "trips:view_assigned",
     "delivery:update_status",
     "delivery:upload_proof",

@@ -512,6 +512,7 @@ model PurchaseReceiptItem {
 model Delivery {
   id                       String         @id @default(uuid())
   deliveryNumber           String
+  challanNumber            String?
   customerName             String
   customerPhone            String?
   deliveryAddress          String
@@ -571,6 +572,8 @@ model Delivery {
   @@index([businessId, fulfilmentMode])
   @@index([businessId, status])
   @@index([businessId, scheduledDate])
+  @@index([businessId, challanNumber])
+  @@unique([businessId, challanNumber])
 }
 
 model SalesOrder {

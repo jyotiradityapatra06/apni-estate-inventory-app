@@ -1,5 +1,6 @@
 import { prisma } from "../config/db";
 import { ApiError } from "../utils/apiError";
+import { nextDocumentNumber } from "./numberSequence.service";
 
 export const getAll = async (businessId: string) => {
   return prisma.delivery.findMany({
@@ -28,25 +29,28 @@ export const create = async (
     paymentStatus?: string;
   }
 ) => {
-  const deliveryNumber = `DEL-${Math.floor(10000 + Math.random() * 90000)}`;
+  return prisma.$transaction(async (tx) => {
+    const deliveryNumber = `DEL-${Math.floor(10000 + Math.random() * 90000)}`;
+    const challanNumber = await nextDocumentNumber(tx, businessId, "DELIVERY_CHALLAN", "DC");
+    const scheduledDate = data.scheduledDate ? new Date(data.scheduledDate) : null;
 
-  const scheduledDate = data.scheduledDate ? new Date(data.scheduledDate) : null;
-
-  return prisma.delivery.create({
-    data: {
-      deliveryNumber,
-      customerName: data.customerName,
-      customerPhone: data.customerPhone || null,
-      deliveryAddress: data.deliveryAddress,
-      materialName: data.materialName,
-      quantity: Number(data.quantity),
-      unit: data.unit,
-      scheduledDate,
-      notes: data.notes || null,
-      status: "PENDING",
-      paymentStatus: data.paymentStatus || "PENDING",
-      businessId,
-    },
+    return tx.delivery.create({
+      data: {
+        deliveryNumber,
+        challanNumber,
+        customerName: data.customerName,
+        customerPhone: data.customerPhone || null,
+        deliveryAddress: data.deliveryAddress,
+        materialName: data.materialName,
+        quantity: Number(data.quantity),
+        unit: data.unit,
+        scheduledDate,
+        notes: data.notes || null,
+        status: "PENDING",
+        paymentStatus: data.paymentStatus || "PENDING",
+        businessId,
+      },
+    });
   });
 };
 

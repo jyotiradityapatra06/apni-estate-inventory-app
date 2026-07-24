@@ -24,6 +24,7 @@ export const listLinkedDeliveryQuerySchema = z.object({
   salesOrderId: z.string().trim().optional(),
   invoiceId: z.string().trim().optional(),
   customerId: z.string().trim().optional(),
+  challanNumber: z.string().trim().optional(),
 });
 
 export const readyLinkedDeliverySchema = z.object({

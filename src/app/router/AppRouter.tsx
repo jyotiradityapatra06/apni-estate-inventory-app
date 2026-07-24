@@ -69,6 +69,7 @@ const GodownFormPage=lazy(()=>import("../../features/godowns/GodownFormPage").th
 const TransferListPage=lazy(()=>import("../../features/transfers/TransferListPage").then(m=>({default:m.TransferListPage})));
 const TransferFormPage=lazy(()=>import("../../features/transfers/TransferFormPage").then(m=>({default:m.TransferFormPage})));
 const TransferDetailPage=lazy(()=>import("../../features/transfers/TransferDetailPage").then(m=>({default:m.TransferDetailPage})));
+const DriverTripsPage=lazy(()=>import("../../pages/driver/DriverTripsPage"));
 const RouteLoading=()=> <div className="space-y-3" role="status" aria-label="Loading page"><div className="h-8 w-48 animate-pulse rounded bg-slate-200"/><div className="h-32 animate-pulse rounded-xl bg-slate-200"/><div className="h-32 animate-pulse rounded-xl bg-slate-200"/></div>;
 
 const HomeRedirect = () => {
@@ -177,7 +178,10 @@ export const AppRouter = () => {
               <Route path="/more" element={<HomeRedirect />} />
               <Route path="/profile" element={<Navigate to="/management" replace />} />
               <Route path="/team" element={<Navigate to="/management/team" replace />} />
-              <Route path="/driver" element={<Navigate to="/unauthorized" replace />} />
+              <Route element={<PermissionGuard permission="deliveries:view" />}>
+                <Route path="/driver/trips" element={<DriverTripsPage />} />
+              </Route>
+              <Route path="/driver" element={<Navigate to="/driver/trips" replace />} />
             </Route>
           </Route>
 
