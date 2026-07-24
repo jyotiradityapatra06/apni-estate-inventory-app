@@ -18,7 +18,21 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
 
   const total = materials.length;
 
-  if (total === 0) {
+  const outOfStockCount = materials.filter((m) => m.quantity <= 0).length;
+  const lowStockCount = materials.filter((m) => m.quantity > 0 && availableStock(m) <= minimumStock(m)).length;
+  const healthyCount = materials.filter((m) => m.quantity > 0 && availableStock(m) > minimumStock(m)).length;
+
+  const healthyPct = total > 0 ? Math.round((healthyCount / total) * 100) : 0;
+  const lowPct = total > 0 ? Math.round((lowStockCount / total) * 100) : 0;
+  const outOfStockPct = total > 0 ? Math.round((outOfStockCount / total) * 100) : 0;
+
+  const chartData = [
+    { name: "Healthy Stock", value: healthyCount, percentage: healthyPct, color: "#16A34A" },
+    { name: "Low Stock", value: lowStockCount, percentage: lowPct, color: "#F97316" },
+    { name: "Out of Stock", value: outOfStockCount, percentage: outOfStockPct, color: "#DC2626" }
+  ].filter(d => d.value > 0);
+
+  if (total === 0 || chartData.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -52,20 +66,6 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
     );
   }
 
-  const outOfStockCount = materials.filter((m) => m.quantity <= 0).length;
-  const lowStockCount = materials.filter((m) => m.quantity > 0 && availableStock(m) <= minimumStock(m)).length;
-  const healthyCount = materials.filter((m) => m.quantity > 0 && availableStock(m) > minimumStock(m)).length;
-
-  const healthyPct = Math.round((healthyCount / total) * 100);
-  const lowPct = Math.round((lowStockCount / total) * 100);
-  const outOfStockPct = Math.round((outOfStockCount / total) * 100);
-
-  const chartData = [
-    { name: "Healthy Stock", value: healthyCount, percentage: healthyPct, color: "#16A34A" },
-    { name: "Low Stock", value: lowStockCount, percentage: lowPct, color: "#F97316" },
-    { name: "Out of Stock", value: outOfStockCount, percentage: outOfStockPct, color: "#DC2626" }
-  ].filter(d => d.value > 0);
-
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-sm space-y-4">
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -84,8 +84,8 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
 
       <div className="grid gap-4 sm:grid-cols-12 items-center">
         {/* Recharts Donut Pie Chart */}
-        <div className="sm:col-span-5 h-44 w-full relative flex items-center justify-center">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="sm:col-span-5 w-full min-h-[180px] h-48 relative flex items-center justify-center">
+          <ResponsiveContainer width="100%" height={180} minHeight={180}>
             <PieChart>
               <Tooltip
                 contentStyle={{ backgroundColor: "#0F172A", color: "#FFF", borderRadius: "12px", fontSize: "11px", border: "none" }}

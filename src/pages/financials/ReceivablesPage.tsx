@@ -115,14 +115,14 @@ export default function ReceivablesPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b pb-3">
           <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Customer Outstanding Accounts</h3>
           
-          <div className="flex gap-2">
-            <div className="relative min-w-0 flex-1 sm:w-64">
-              <Search className="absolute left-3 top-2.5 text-slate-400" size={16}/>
+          <div className="flex gap-2.5">
+            <div className="relative min-w-0 flex-1 sm:w-80">
+              <Search className="absolute left-3.5 top-3 text-slate-400" size={18}/>
               <input 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
-                placeholder="Search customer name or phone" 
-                className="w-full rounded-lg border border-slate-200 pl-9 pr-3 h-9 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                placeholder="Search customer name, phone, or GSTIN…" 
+                className="w-full rounded-xl border border-slate-200 pl-10 pr-4 h-11 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
               />
             </div>
             <button 

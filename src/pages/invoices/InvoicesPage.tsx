@@ -142,16 +142,16 @@ export default function InvoicesPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm space-y-3">
-        <div className="flex gap-2">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+        <div className="flex gap-2.5">
           <div className="relative min-w-0 flex-1">
-            <Search className="absolute left-3 top-2.5 text-slate-400" size={18}/>
+            <Search className="absolute left-3.5 top-3 text-slate-400" size={18}/>
             <input 
               aria-label="Search invoices" 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              placeholder="Invoice, Sale, customer or phone" 
-              className="h-10 w-full rounded-lg border border-slate-200 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              placeholder="Search by invoice number, customer name, phone or sale order…" 
+              className="h-11 w-full rounded-xl border border-slate-200 pl-10 pr-4 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
             />
           </div>
           <button 

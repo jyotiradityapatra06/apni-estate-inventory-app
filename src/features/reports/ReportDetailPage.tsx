@@ -158,47 +158,60 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
       </div>
 
       {/* Filters Bar */}
-      <div className="report-actions rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div className="report-actions rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+          <span className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+            <Filter size={15} className="text-orange-500" />
+            Report Filters & Date Preset
+          </span>
+          <button 
+            onClick={reset} 
+            className="text-xs font-extrabold text-orange-600 hover:underline cursor-pointer"
+          >
+            Reset Filters
+          </button>
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <select 
             aria-label="Date preset" 
             onChange={e => preset(e.target.value)} 
-            className="h-10 rounded-lg border bg-white px-2 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer"
           >
             <option value="">Custom Date Range</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>
             <option value="month">This Month</option>
             <option value="last-month">Last Month</option>
-            <option value="fy">Financial Year</option>
+            <option value="fy">Financial Year (Apr-Mar)</option>
           </select>
-          <input aria-label="From date" type="date" value={from} onChange={e => { setFrom(e.target.value); setPage(1); }} className="h-10 rounded-lg border px-2 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
-          <input aria-label="To date" type="date" value={to} onChange={e => { setTo(e.target.value); setPage(1); }} className="h-10 rounded-lg border px-2 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
-          <input aria-label="Status filter" value={status} onChange={e => { setStatus(e.target.value.toUpperCase()); setPage(1); }} placeholder="Status (e.g. Paid)" className="h-10 rounded-lg border px-3 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
-          <select aria-label="Invoice type" value={invoiceType} onChange={e => { setInvoiceType(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-white px-2 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
-            <option value="">GST & Non-GST</option>
-            <option value="GST">GST Invoice</option>
-            <option value="NON_GST">Non-GST Bill</option>
+          <input aria-label="From date" type="date" value={from} onChange={e => { setFrom(e.target.value); setPage(1); }} className="h-11 rounded-xl border border-slate-200 px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
+          <input aria-label="To date" type="date" value={to} onChange={e => { setTo(e.target.value); setPage(1); }} className="h-11 rounded-xl border border-slate-200 px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
+          <input aria-label="Status filter" value={status} onChange={e => { setStatus(e.target.value.toUpperCase()); setPage(1); }} placeholder="Filter Status (e.g. PAID)" className="h-11 rounded-xl border border-slate-200 px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"/>
+          <select aria-label="Invoice type" value={invoiceType} onChange={e => { setInvoiceType(e.target.value); setPage(1); }} className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer">
+            <option value="">All Bill Types (GST & Non-GST)</option>
+            <option value="GST">GST Tax Invoice Only</option>
+            <option value="NON_GST">Non-GST Bill Only</option>
           </select>
           <button 
             onClick={reset} 
-            className="h-10 rounded-lg border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+            className="h-11 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
           >
-            Reset Filters
+            Clear Filters
           </button>
         </div>
       </div>
 
-      {error && <p className="rounded-lg bg-red-50 p-3 text-red-800 text-xs">{error}</p>}
+      {error && <p className="rounded-xl bg-red-50 p-4 text-red-800 text-xs font-bold border border-red-200">{error}</p>}
 
       {loading ? (
         <div className="h-56 animate-pulse rounded-2xl bg-slate-200" />
       ) : data && (
         <div className="space-y-6">
           {data.metadata.warnings.length > 0 && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50/20 p-4 text-amber-900 text-xs">
-              <b>{data.metadata.isEstimated ? "Estimated Report Data" : "Attention"}</b>
-              {data.metadata.warnings.map(w => <p key={w} className="mt-1">{w}</p>)}
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 text-xs space-y-1">
+              <b className="font-black">{data.metadata.isEstimated ? "Estimated Management Report" : "Attention Notice"}</b>
+              {data.metadata.warnings.map(w => <p key={w}>{w}</p>)}
             </div>
           )}
 
@@ -217,12 +230,12 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
           {/* Nested summaries */}
           {nested.map(([k, v]) => (
             <section key={k} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3 text-xs">
-              <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">{human(k)}</h3>
+              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider border-b pb-3">{human(k)}</h3>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 {Object.entries(v as Record<string, unknown>).map(([a, b]) => (
                   <div key={a} className="border-b last:border-0 pb-2 md:border-b-0 md:pb-0">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{human(a)}</span>
-                    <strong className="text-slate-800 mt-1 block">{number(b)}</strong>
+                    <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block">{human(a)}</span>
+                    <strong className="text-slate-900 font-black text-sm mt-1 block">{number(b)}</strong>
                   </div>
                 ))}
               </div>
@@ -232,12 +245,12 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
           {/* Breakdowns */}
           {Object.entries(data.breakdowns).slice(0, 3).map(([name, items]) => items.length > 0 && (
             <section key={name} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3 text-xs">
-              <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">{human(name)}</h3>
+              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider border-b pb-3">{human(name)}</h3>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {items.slice(0, 10).map(x => (
-                  <div key={x.name} className="flex justify-between gap-3 rounded-xl bg-slate-50 p-3 border border-slate-100 font-semibold">
-                    <span className="text-slate-700">{x.name}</span>
-                    <strong className="text-slate-950">{number(x.total)}</strong>
+                  <div key={x.name} className="flex justify-between items-center gap-3 rounded-xl bg-slate-50 p-3.5 border border-slate-200/80 font-semibold">
+                    <span className="text-slate-700 font-extrabold text-xs">{x.name}</span>
+                    <strong className="text-slate-950 font-black text-sm">{number(x.total)}</strong>
                   </div>
                 ))}
               </div>
@@ -247,39 +260,39 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
           {/* Detail Rows */}
           {data.rows.length ? (
             <div className="space-y-4">
-              <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Detailed Report Logs</h3>
+              <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider">Detailed Itemized Report Logs</h3>
               
-              {/* Desktop Table */}
+              {/* Desktop Table View (>=768px) */}
               <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 border-b">
+                  <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
                     <tr>
-                      {keys.map(k => <th key={k} className="p-3 font-semibold text-slate-500 uppercase tracking-wider">{human(k)}</th>)}
+                      {keys.map(k => <th key={k} className="px-4 py-3.5 font-black text-[11px] text-slate-500 uppercase tracking-wider">{human(k)}</th>)}
                     </tr>
                   </thead>
                   <tbody>
                     {data.rows.map((row, i) => (
-                      <tr key={String(row.id || i)} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
-                        {keys.map(k => <td key={k} className="p-3 text-slate-600 font-medium">{String(row[k] ?? "—")}</td>)}
+                      <tr key={String(row.id || i)} className="border-b last:border-0 border-slate-100 hover:bg-slate-50/60 transition-colors">
+                        {keys.map(k => <td key={k} className="px-4 py-3.5 text-slate-700 font-semibold">{String(row[k] ?? "—")}</td>)}
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* Mobile Card List */}
-              <div className="grid gap-4 md:hidden">
+              {/* Mobile Reusable Card View (<768px) */}
+              <div className="grid gap-3.5 md:hidden">
                 {data.rows.map((row, i) => (
-                  <article key={String(row.id || i)} className="rounded-xl border bg-white p-4 shadow-sm text-xs space-y-2">
-                    {keys.slice(0, 5).map(k => (
-                      <div key={k} className="flex justify-between gap-3 py-0.5 font-medium">
-                        <span className="text-slate-400 uppercase text-[10px] font-bold">{human(k)}</span>
-                        <strong className="text-right text-slate-900">{String(row[k] ?? "—")}</strong>
+                  <article key={String(row.id || i)} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm text-xs space-y-2.5">
+                    {keys.slice(0, 6).map(k => (
+                      <div key={k} className="flex justify-between items-center gap-3 py-1 border-b last:border-0 border-slate-100 font-semibold">
+                        <span className="text-slate-400 uppercase text-[10px] font-black">{human(k)}</span>
+                        <strong className="text-right text-slate-900 font-black text-xs">{String(row[k] ?? "—")}</strong>
                       </div>
                     ))}
                     {config.source && (
-                      <Link to={config.source} className="mt-3 flex min-h-9 items-center justify-center rounded-xl border text-xs font-bold text-slate-700 hover:bg-slate-50">
-                        View Source Records
+                      <Link to={config.source} className="mt-3 flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 transition-colors">
+                        View Source Document Records →
                       </Link>
                     )}
                   </article>

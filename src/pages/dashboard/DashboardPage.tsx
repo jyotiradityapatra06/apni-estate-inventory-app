@@ -102,7 +102,7 @@ export default function DashboardPage() {
       <MobileSupplierMetrics dashboard={dashboard} />
 
       {/* 2. Desktop Command Center (>= 768px) */}
-      <div className="hidden md:block space-y-6 pb-12">
+      <div className="hidden md:block space-y-8 pb-16">
       {/* 1. Top Welcome Section */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b pb-5">
         <div>
@@ -112,16 +112,16 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-1 md:text-3xl">
             {greeting}, {user?.name || "Owner"} 👋
           </h1>
-          <p className="text-xs font-medium text-slate-500 mt-1">
-            Role: <span className="font-semibold text-slate-700">{user?.role}</span> &middot; {todayDate}
+          <p className="text-xs sm:text-sm font-semibold text-slate-500 mt-1">
+            Role: <span className="font-bold text-slate-700">{user?.role}</span> &middot; {todayDate}
           </p>
         </div>
         <div>
           <button
             onClick={refresh}
-            className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer active:scale-95 transition-transform"
+            className="flex min-h-[42px] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs sm:text-sm font-extrabold text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer active:scale-95 transition-transform"
           >
-            <RefreshCw size={14} className={dashboard.inventory.loading ? "animate-spin text-orange-500" : ""} />
+            <RefreshCw size={16} className={dashboard.inventory.loading ? "animate-spin text-orange-500" : ""} />
             Sync Dashboard
           </button>
         </div>
@@ -132,8 +132,8 @@ export default function DashboardPage() {
         <div className="rounded-2xl border border-orange-200 bg-orange-50/20 p-5 shadow-sm space-y-4">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-bold text-slate-900 text-sm">Welcome to APNI ESTATE &mdash; Complete your business setup 🚀</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Follow this step-by-step checklist to configure your construction material ERP.</p>
+              <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">Welcome to APNI ESTATE &mdash; Complete your business setup 🚀</h3>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-medium">Follow this step-by-step checklist to configure your construction material ERP.</p>
             </div>
             <button 
               onClick={dismissSetup} 
@@ -144,7 +144,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex justify-between text-xs font-bold text-slate-700">
+            <div className="flex justify-between text-xs sm:text-sm font-bold text-slate-700">
               <span>Setup Progress ({doneCount} of {setupSteps.length} complete)</span>
               <span>{progressPercent}%</span>
             </div>
@@ -161,19 +161,19 @@ export default function DashboardPage() {
               <Link 
                 key={idx} 
                 to={step.path}
-                className={`rounded-xl border p-3 block text-left text-xs transition-colors ${
+                className={`rounded-xl border p-3 block text-left text-xs sm:text-sm transition-colors ${
                   step.done 
                     ? "bg-green-50/50 border-green-200 text-green-800 animate-fade-in" 
                     : "bg-white hover:bg-slate-50 border-slate-200 text-slate-700"
                 }`}
               >
-                <div className="flex items-center justify-between font-bold">
+                <div className="flex items-center justify-between font-extrabold">
                   <span>{idx + 1}. {step.label}</span>
                   <span className={step.done ? "text-green-600 font-extrabold" : "text-slate-300"}>
                     {step.done ? "✓" : "○"}
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1">
+                <p className="text-[11px] text-slate-400 mt-1 font-semibold">
                   {step.done ? "Completed successfully" : "Click to set up"}
                 </p>
               </Link>
@@ -186,16 +186,16 @@ export default function DashboardPage() {
       <DashboardQuickActions />
 
       {/* 3. Business Overview Cards */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-bold tracking-wider text-slate-500 uppercase">Financial Health</h2>
+      <section className="space-y-3.5">
+        <h2 className="text-xs font-black tracking-wider text-slate-500 uppercase">Financial Health</h2>
         <DashboardSummaryCards dashboard={dashboard} />
       </section>
 
       {/* Desktop side-by-side or stacked grid layout */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-8 lg:grid-cols-3">
         
         {/* Left/Middle Column (Inventory & Operations) */}
-        <div className="space-y-6 lg:col-span-2">
+        <div className="space-y-8 lg:col-span-2">
           
           {/* 4. Inventory Health Breakdown Chart */}
           <InventoryHealthChart materials={dashboard.inventory.data} />

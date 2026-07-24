@@ -339,65 +339,79 @@ export default function PurchaseDetailsPage() {
         onConfirm={act}
       />
 
-      {/* 6. Goods Receipt Dialog */}
+      {/* Goods Receipt Dialog */}
       {receiving && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/50 sm:items-center sm:p-4">
-          <div className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 sm:max-w-xl sm:rounded-2xl space-y-4">
+          <div className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 sm:max-w-xl sm:rounded-2xl space-y-4 shadow-xl">
             <div>
-              <h2 className="text-base font-black text-slate-900 tracking-tight">Receive Materials</h2>
-              <p className="text-xs text-slate-400 font-bold uppercase mt-1">Record incoming stock received at warehouse</p>
+              <h2 className="text-lg font-black text-slate-900 tracking-tight">Receive Materials into Warehouse</h2>
+              <p className="text-xs text-slate-500 font-semibold mt-0.5">Verify incoming material quantities from supplier delivery challan.</p>
+            </div>
+
+            {/* Stock Confirmation Notice */}
+            <div className="rounded-xl border border-green-200 bg-green-50 p-3 flex items-start gap-2.5 text-xs text-green-900 font-medium">
+              <CheckCircle size={17} className="shrink-0 text-green-600 mt-0.5" />
+              <span><strong>Stock Update Confirmation:</strong> Entering received quantities will immediately update physical inventory balances in the designated Godown warehouses.</span>
             </div>
             
             <div className="space-y-4">
               {order.items.filter(i => Number(i.receivedQuantity) < Number(i.quantity)).map(i => (
-                <div key={i.id} className="rounded-xl border border-slate-100 bg-slate-50 p-4 space-y-3 text-xs">
-                  <span className="font-bold text-slate-800 text-sm block">{i.materialName}</span>
+                <div key={i.id} className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-3 text-xs">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="font-black text-slate-900 text-sm block">{i.materialName}</span>
+                      <span className="text-[10px] text-slate-500 font-extrabold uppercase mt-0.5 block">
+                        Target Warehouse: <strong className="text-orange-600">{i.godown.name}</strong> · SKU: {i.sku}
+                      </span>
+                    </div>
+                  </div>
                   
-                  <div className="grid grid-cols-3 gap-2 text-center border-b pb-2 border-slate-200/50">
+                  <div className="grid grid-cols-3 gap-2 text-center border-y py-2.5 border-slate-200/70">
                     <div>
-                      <span className="text-[9px] uppercase font-bold text-slate-400">Ordered</span>
-                      <strong className="block text-slate-800 mt-0.5">{formatQuantity(i.quantity, i.unit)}</strong>
+                      <span className="text-[9px] uppercase font-black text-slate-400 block">Ordered</span>
+                      <strong className="block text-slate-950 font-black mt-0.5">{formatQuantity(i.quantity, i.unit)}</strong>
                     </div>
                     <div>
-                      <span className="text-[9px] uppercase font-bold text-slate-400">Received</span>
-                      <strong className="block text-green-700 mt-0.5">{formatQuantity(i.receivedQuantity, i.unit)}</strong>
+                      <span className="text-[9px] uppercase font-black text-slate-400 block">Prev Received</span>
+                      <strong className="block text-green-700 font-black mt-0.5">{formatQuantity(i.receivedQuantity, i.unit)}</strong>
                     </div>
                     <div>
-                      <span className="text-[9px] uppercase font-bold text-slate-400">Remaining</span>
-                      <strong className="block text-red-600 mt-0.5">{formatQuantity(Number(i.quantity) - Number(i.receivedQuantity), i.unit)}</strong>
+                      <span className="text-[9px] uppercase font-black text-slate-400 block">Remaining</span>
+                      <strong className="block text-red-600 font-black mt-0.5">{formatQuantity(Number(i.quantity) - Number(i.receivedQuantity), i.unit)}</strong>
                     </div>
                   </div>
 
                   <label className="block space-y-1">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Current receiving quantity</span>
+                    <span className="text-[10px] text-slate-700 font-black uppercase tracking-wider block">Quantity Received Now ({i.unit}) *</span>
                     <input 
                       aria-label={`Receive ${i.materialName}`} 
                       type="number" 
                       min="0" 
                       max={Number(i.quantity) - Number(i.receivedQuantity)} 
                       step="0.001" 
+                      placeholder="0.00"
                       value={qty[i.id] || ""} 
                       onChange={e => setQty({ ...qty, [i.id]: e.target.value })} 
-                      className="mt-2 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                      className="mt-1 h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                     />
                   </label>
                 </div>
               ))}
             </div>
             
-            <div className="flex gap-3 pt-4 border-t">
+            <div className="flex gap-3 pt-4 border-t border-slate-100">
               <button 
                 onClick={() => setReceiving(false)} 
-                className="min-h-10 flex-1 rounded-xl border text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                className="min-h-11 flex-1 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
               >
                 Cancel
               </button>
               <button 
                 disabled={receiveBusy} 
                 onClick={receive} 
-                className="min-h-10 flex-[2] rounded-xl bg-orange-600 font-bold text-white text-xs hover:bg-orange-700 disabled:opacity-60 transition-colors cursor-pointer"
+                className="min-h-11 flex-[2] rounded-xl bg-[#F97316] font-extrabold text-white text-xs hover:bg-orange-600 disabled:opacity-60 transition-colors cursor-pointer shadow-xs"
               >
-                {receiveBusy ? "Receiving..." : "Receive and Add Stock"}
+                {receiveBusy ? "Updating Stock…" : "Confirm Goods Receipt & Add Stock"}
               </button>
             </div>
           </div>

@@ -135,62 +135,62 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
   if (loading) return <LoadingSkeleton rows={6} />;
   if (error && mode === "edit" && !material) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
 
-  const inputClass = "mt-2 min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
+  const inputClass = "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 
   return (
     <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-32">
       <PageHeader
-        title={mode === "create" ? "Add Material" : "Edit Material"}
-        description={mode === "create" ? "Add a material and its opening stock." : "Update material details. Use Stock In or Stock Out to change quantity."}
+        title={mode === "create" ? "Add New Material" : "Edit Material Details"}
+        description={mode === "create" ? "Add a construction material item to your catalog and set its opening stock." : "Update material details. Use Stock In or Stock Out to record quantity changes."}
       />
 
-      {error && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-800">{error}</p>}
+      {error && <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-bold text-red-800">{error}</p>}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-6 space-y-4">
-        <SectionHeader title="Basic Details" />
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-5">
+        <SectionHeader title="Basic Details" description="Material name, category, SKU, and unit specs." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Material Name
-            <input ref={firstRef} required value={form.materialName} onChange={e => change("materialName", e.target.value)} className={inputClass} />
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Material Name *
+            <input ref={firstRef} required value={form.materialName} onChange={e => change("materialName", e.target.value)} placeholder="e.g. Ultratech PPC Cement 50kg" className={inputClass} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Category
-            <input required value={form.category} onChange={e => change("category", e.target.value)} placeholder="Cement, Steel, Sand…" className={inputClass} />
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Category *
+            <input required value={form.category} onChange={e => change("category", e.target.value)} placeholder="Cement, Steel, Bricks, Sand, Hardware…" className={inputClass} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Unit
-            <input required value={form.unit} onChange={e => change("unit", e.target.value)} placeholder="Bags, Tonnes, Pieces…" className={inputClass} />
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Unit of Measurement *
+            <input required value={form.unit} onChange={e => change("unit", e.target.value)} placeholder="Bags, Tonnes, MT, Pieces, Cu.Ft…" className={inputClass} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            SKU / Item Code
-            <input required value={form.sku} onChange={e => change("sku", e.target.value)} className={inputClass} />
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            SKU / Item Code *
+            <input required value={form.sku} onChange={e => change("sku", e.target.value)} placeholder="e.g. CEM-ULT-50" className={inputClass} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Brand
-            <input value={form.brand} onChange={e => change("brand", e.target.value)} className={inputClass} />
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Brand / Manufacturer
+            <input value={form.brand} onChange={e => change("brand", e.target.value)} placeholder="e.g. UltraTech, Tata Tiscon, Ambuja" className={inputClass} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Minimum Stock Level
-            <input type="number" inputMode="decimal" min="0" step="0.001" value={form.minimumStockLevel} onChange={e => change("minimumStockLevel", e.target.value)} className={inputClass} />
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Minimum Reorder Stock Level
+            <input type="number" inputMode="decimal" min="0" step="0.001" value={form.minimumStockLevel} onChange={e => change("minimumStockLevel", e.target.value)} placeholder="e.g. 50" className={inputClass} />
           </label>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-6 space-y-4">
-        <SectionHeader title="Pricing and Supplier" />
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-5">
+        <SectionHeader title="Pricing and Supplier" description="Set cost price, selling price, and preferred vendor." />
         <div className="grid gap-4 md:grid-cols-3">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Purchase Price (₹)
-            <input type="number" inputMode="decimal" min="0.01" step="0.01" value={form.costPrice} onChange={e => change("costPrice", e.target.value)} className={inputClass} />
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Purchase Cost Price (₹)
+            <input type="number" inputMode="decimal" min="0.01" step="0.01" value={form.costPrice} onChange={e => change("costPrice", e.target.value)} placeholder="0.00" className={inputClass} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
             Selling Price (₹)
-            <input type="number" inputMode="decimal" min="0.01" step="0.01" value={form.sellingPrice} onChange={e => change("sellingPrice", e.target.value)} className={inputClass} />
+            <input type="number" inputMode="decimal" min="0.01" step="0.01" value={form.sellingPrice} onChange={e => change("sellingPrice", e.target.value)} placeholder="0.00" className={inputClass} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
             Preferred Supplier
             <select value={form.defaultSupplierId} onChange={e => change("defaultSupplierId", e.target.value)} className={inputClass}>
-              <option value="">No preferred supplier</option>
+              <option value="">No preferred supplier selected</option>
               {suppliers.map(supplier => (
                 <option key={supplier.id} value={supplier.id}>
                   {supplier.name}
@@ -202,13 +202,13 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
       </section>
 
       {mode === "create" && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-6 space-y-4">
-          <SectionHeader title="Opening Stock" description="This creates the first stock-history entry." />
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-5">
+          <SectionHeader title="Opening Stock" description="Specify initial warehouse location and quantity in stock." />
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Godown
+            <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+              Godown / Warehouse *
               <select required value={form.godownId} onChange={e => change("godownId", e.target.value)} className={inputClass}>
-                <option value="">Choose godown</option>
+                <option value="">Choose godown location…</option>
                 {godowns.map(godown => (
                   <option key={godown.id} value={godown.id}>
                     {godown.name}
@@ -216,8 +216,8 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
                 ))}
               </select>
             </label>
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Opening Quantity
+            <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+              Opening Quantity in Hand
               <input type="number" inputMode="decimal" min="0" step="0.001" value={form.openingStock} onChange={e => change("openingStock", e.target.value)} className={inputClass} />
             </label>
           </div>
@@ -225,37 +225,37 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
       )}
 
       <section className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-        <button type="button" onClick={() => setMore(!more)} className="flex min-h-12 w-full items-center justify-between px-4 text-xs font-extrabold uppercase tracking-wider text-slate-700 hover:bg-slate-50 cursor-pointer">
-          More Details (GST & HSN)
+        <button type="button" onClick={() => setMore(!more)} className="flex min-h-12 w-full items-center justify-between px-5 text-xs font-black uppercase tracking-wider text-slate-700 hover:bg-slate-50 cursor-pointer">
+          Tax & HSN Compliance Details (Optional)
           <ChevronDown size={18} className={more ? "rotate-180 transition-transform" : "transition-transform"} />
         </button>
         {more && (
-          <div className="grid gap-4 border-t border-slate-100 p-4 md:grid-cols-2">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <div className="grid gap-4 border-t border-slate-100 p-5 md:grid-cols-2">
+            <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
               HSN Code
-              <input value={form.hsnCode} onChange={e => change("hsnCode", e.target.value)} className={inputClass} />
+              <input value={form.hsnCode} onChange={e => change("hsnCode", e.target.value)} placeholder="e.g. 2523" className={inputClass} />
             </label>
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+            <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
               GST Rate %
-              <input type="number" inputMode="decimal" min="0" max="100" step="0.01" value={form.taxRate} onChange={e => change("taxRate", e.target.value)} className={inputClass} />
+              <input type="number" inputMode="decimal" min="0" max="100" step="0.01" value={form.taxRate} onChange={e => change("taxRate", e.target.value)} placeholder="e.g. 28" className={inputClass} />
             </label>
           </div>
         )}
       </section>
 
-      {/* Mobile Safe Area Fixed Action Footer */}
+      {/* Mobile Fixed Action Footer */}
       <MobileStickyFooter className="lg:hidden">
         <button 
           type="button" 
           onClick={() => navigate(-1)} 
-          className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+          className="flex-1 min-h-[48px] rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
         >
           Cancel
         </button>
         <button 
           disabled={saving} 
           type="submit" 
-          className="flex-[2] min-h-[44px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs font-bold text-white cursor-pointer press-active disabled:opacity-60"
+          className="flex-[2] min-h-[48px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs sm:text-sm font-extrabold text-white cursor-pointer press-active disabled:opacity-60"
         >
           {saving ? "Saving…" : mode === "create" ? "Add Material" : "Save Changes"}
         </button>
@@ -266,14 +266,14 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
         <button 
           type="button" 
           onClick={() => navigate(-1)} 
-          className="min-h-11 rounded-xl border border-slate-200 px-5 text-sm font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+          className="min-h-[46px] rounded-xl border border-slate-200 px-6 text-sm font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
         >
           Cancel
         </button>
         <button 
           disabled={saving} 
           type="submit" 
-          className="min-h-11 rounded-xl bg-orange-600 hover:bg-orange-700 px-6 text-sm font-bold text-white cursor-pointer disabled:opacity-60"
+          className="min-h-[46px] rounded-xl bg-[#F97316] hover:bg-orange-600 px-8 text-sm font-extrabold text-white cursor-pointer shadow-sm disabled:opacity-60"
         >
           {saving ? "Saving…" : mode === "create" ? "Add Material" : "Save Changes"}
         </button>

@@ -123,37 +123,76 @@ export function PurchaseForm() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
-        <SectionHeader title="Supplier and Delivery" />
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+        <SectionHeader title="Supplier and Expected Delivery" description="Select vendor and set estimated delivery arrival date." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Supplier
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Supplier Vendor *
             <select value={supplierId} onChange={e => setSupplierId(e.target.value)} className={cls}>
-              <option value="">Choose supplier</option>
+              <option value="">Choose supplier vendor…</option>
               {suppliers.map(x => (
                 <option key={x.id} value={x.id}>
-                  {x.name} - {x.phone}
+                  {x.name} ({x.phone}){x.gstin ? ` · GST: ${x.gstin}` : ""}
                 </option>
               ))}
             </select>
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
             Expected Delivery Date
             <input type="date" value={date} onChange={e => setDate(e.target.value)} className={cls} />
           </label>
         </div>
+
+        {/* Selected Supplier Card Preview */}
+        {(() => {
+          const sel = suppliers.find(s => s.id === supplierId);
+          if (!sel) return null;
+          return (
+            <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-4 space-y-2 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-black text-sm text-slate-900">{sel.name} {sel.companyName ? `(${sel.companyName})` : ""}</span>
+                {sel.gstin && (
+                  <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-extrabold text-[10px] uppercase border border-blue-100">
+                    GSTIN: {sel.gstin}
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-slate-600 pt-1">
+                <div>
+                  <span className="text-[10px] font-black uppercase text-slate-400 block">Phone</span>
+                  <strong className="text-slate-900 font-bold block">{sel.phone}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase text-slate-400 block">Current Payable Dues</span>
+                  <strong className="font-black text-slate-900 block">{fmt(sel.openingPayable || 0)}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase text-slate-400 block">Payment Terms</span>
+                  <strong className="text-slate-900 font-bold block">{sel.paymentTerms || "Standard"}</strong>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </section>
 
-      <section className="space-y-3">
-        <SectionHeader title="Materials" description="Choose the Godown where received stock will be stored." />
+      <section className="space-y-4">
+        <SectionHeader title="Purchase Line Items" description="Select materials and target destination Godown for stock arrival." />
+        
+        {/* Stock Impact Banner */}
+        <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-3.5 flex items-center gap-2.5 text-xs text-blue-900 font-medium">
+          <AlertCircle size={17} className="shrink-0 text-blue-600" />
+          <span><strong>Stock Impact Notice:</strong> Creating a Purchase Order reserves inventory space. Physical stock will be automatically added to the chosen Godown upon <strong>Goods Receipt (GRN)</strong>.</span>
+        </div>
+
         {items.map((x, i) => {
           const m = materials.find(y => y.id === x.inventoryItemId);
           const g = m?.godownStocks || [];
           const v = calc(x);
           return (
-            <article key={i} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-orange-600">Material #{i + 1}</span>
+            <article key={i} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <span className="text-xs font-black uppercase tracking-wider text-orange-600">Material Item #{i + 1}</span>
                 {items.length > 1 && (
                   <button aria-label="Remove Material" onClick={() => setItems(a => a.filter((_, n) => n !== i))} className="text-red-600 hover:bg-red-50 p-1.5 rounded-lg cursor-pointer">
                     <Trash2 size={16} />
@@ -162,8 +201,8 @@ export function PurchaseForm() {
               </div>
 
               <div className="grid gap-3 md:grid-cols-6">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
-                  Material
+                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                  Material Item *
                   <select
                     value={x.inventoryItemId}
                     onChange={e => {
@@ -184,18 +223,18 @@ export function PurchaseForm() {
                     }}
                     className={cls}
                   >
-                    <option value="">Choose Material</option>
+                    <option value="">Choose Material item…</option>
                     {materials.map(y => (
                       <option key={y.id} value={y.id}>
-                        {y.materialName} - {y.unit}
+                        {y.materialName} ({y.unit}) · SKU: {y.sku}
                       </option>
                     ))}
                   </select>
                 </label>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
-                  Godown
+                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                  Destination Godown *
                   <select value={x.godownId} onChange={e => set(i, "godownId", e.target.value)} className={cls}>
-                    <option value="">Choose Godown</option>
+                    <option value="">Choose Godown warehouse…</option>
                     {g.map(y => (
                       <option key={y.godown.id} value={y.godown.id}>
                         {y.godown.name}
@@ -203,24 +242,25 @@ export function PurchaseForm() {
                     ))}
                   </select>
                 </label>
-                <Field label="Quantity" value={x.quantity} set={v => set(i, "quantity", v)} />
-                <Field label="Rate (₹)" value={x.rate} set={v => set(i, "rate", v)} />
+                <Field label="Quantity *" value={x.quantity} set={v => set(i, "quantity", v)} />
+                <Field label="Cost Rate (₹) *" value={x.rate} set={v => set(i, "rate", v)} />
                 <Field label="Discount %" value={x.discountRate} set={v => set(i, "discountRate", v)} />
-                <Field label="GST %" value={x.gstRate} set={v => set(i, "gstRate", v)} />
-                <div className="rounded-xl bg-orange-50/60 p-3 md:col-span-2 border border-orange-100">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">Line Total</p>
-                  <b className="text-sm font-black text-slate-900">{fmt(v.total)}</b>
+                <Field label="GST Tax %" value={x.gstRate} set={v => set(i, "gstRate", v)} />
+                <div className="rounded-xl bg-orange-50/60 p-3 md:col-span-2 border border-orange-100 flex flex-col justify-center">
+                  <span className="text-[10px] text-slate-400 font-black uppercase block">Calculated Line Total</span>
+                  <b className="text-base font-black text-slate-900 mt-0.5 block">{fmt(v.total)}</b>
                 </div>
               </div>
             </article>
           );
         })}
         <button
+          type="button"
           onClick={() => setItems(a => [...a, blank()])}
-          className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-orange-300 font-bold text-xs text-orange-600 hover:bg-orange-50 cursor-pointer transition-colors"
+          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-orange-300 font-extrabold text-xs text-orange-600 hover:bg-orange-50 cursor-pointer transition-colors"
         >
           <Plus size={18} />
-          Add another Material
+          + Add Another Material Item
         </button>
       </section>
 
@@ -281,9 +321,9 @@ export function PurchaseForm() {
 
 function Field({ label, value, set }: { label: string; value: string; set: (v: string) => void }) {
   return (
-    <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+    <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
       {label}
-      <input type="number" inputMode="decimal" min="0" step="0.01" value={value} onChange={e => set(e.target.value)} className={cls} />
+      <input type="number" inputMode="decimal" min="0" step="0.001" placeholder="0.00" value={value} onChange={e => set(e.target.value)} className={cls} />
     </label>
   );
 }

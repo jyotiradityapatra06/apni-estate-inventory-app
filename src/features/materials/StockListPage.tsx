@@ -168,25 +168,25 @@ export function StockListPage() {
       </div>
 
       {/* 4. Smart Search & Filters */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4">
-        <div className="flex gap-2">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-sm space-y-4">
+        <div className="flex gap-2.5">
           <div className="relative min-w-0 flex-1">
-            <Search className="absolute left-3 top-2.5 text-slate-400" size={18}/>
+            <Search className="absolute left-3.5 top-3 text-slate-400" size={20}/>
             <input 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              placeholder="Search material name, SKU or category" 
-              className="w-full rounded-lg border border-slate-200 pl-10 pr-3 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              placeholder="Search by material name, SKU, or category (e.g. Cement, Steel 12mm, Bricks)…" 
+              className="w-full rounded-xl border border-slate-200 pl-11 pr-4 h-11 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
             />
           </div>
           <button 
             onClick={() => { setDraft(filters); setFilterOpen(true); }} 
-            className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer"
+            className="flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-200 px-4 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer"
           >
-            <Filter size={15}/>
+            <Filter size={16}/>
             Filters
             {activeCount > 0 && (
-              <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[10px] text-white">
+              <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[10px] text-white font-extrabold">
                 {activeCount}
               </span>
             )}
@@ -194,18 +194,18 @@ export function StockListPage() {
         </div>
 
         {/* Desktop Filter Panel */}
-        <div className="hidden md:grid md:grid-cols-4 gap-4 items-end border-t pt-3">
+        <div className="hidden md:grid md:grid-cols-4 gap-4 items-end border-t border-slate-100 pt-3.5">
           {filtersPanel}
           <div className="flex gap-2">
             <button 
               onClick={() => setFilters(draft)} 
-              className="h-10 flex-1 rounded-lg bg-orange-600 hover:bg-orange-700 text-xs font-bold text-white cursor-pointer transition-colors"
+              className="h-10 flex-1 rounded-xl bg-orange-600 hover:bg-orange-700 text-xs font-extrabold text-white cursor-pointer transition-colors"
             >
               Apply Filters
             </button>
             <button 
               onClick={() => { setDraft(initialFilters); setFilters(initialFilters); }} 
-              className="h-10 px-4 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              className="h-10 px-4 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-600 hover:bg-slate-50 cursor-pointer"
             >
               Clear
             </button>
@@ -224,7 +224,7 @@ export function StockListPage() {
           icon={Package} 
           action={
             canCreate && !materials.data.length ? (
-              <button onClick={() => navigate("/materials/new")} className="min-h-10 rounded-xl bg-orange-600 hover:bg-orange-700 px-5 text-xs font-bold text-white transition-colors cursor-pointer">
+              <button onClick={() => navigate("/materials/new")} className="min-h-11 rounded-xl bg-orange-600 hover:bg-orange-700 px-5 text-xs sm:text-sm font-extrabold text-white transition-colors cursor-pointer">
                 Add First Material
               </button>
             ) : undefined
@@ -243,30 +243,30 @@ export function StockListPage() {
                 <MobileDataCard
                   key={item.id}
                   title={item.materialName}
-                  subtitle={`${item.sku} · ${item.category}`}
+                  subtitle={`SKU: ${item.sku} · ${item.category}`}
                   badge={<BusinessStatusBadge status={status} />}
                   onClick={() => navigate(`/materials/${item.id}`)}
                   primaryMetric={{
                     label: "Available Quantity",
                     value: <QuantityDisplay value={availableStock(item)} unit={item.unit} />,
-                    helper: `Min limit: ${minimumStock(item)} ${item.unit}`
+                    helper: `Min reorder limit: ${minimumStock(item)} ${item.unit}`
                   }}
                   secondaryMetrics={[
-                    { label: "Stock Value", value: fmt(itemStockValue) },
-                    { label: "Godown / Location", value: godownsText }
+                    { label: "Stock Valuation", value: fmt(itemStockValue) },
+                    { label: "Godowns", value: godownsText }
                   ]}
                   actions={
                     <>
                       <button
                         onClick={() => navigate(`/materials/${item.id}`)}
-                        className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                        className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
                       >
                         View Details
                       </button>
                       {canIn && (
                         <button
                           onClick={() => openMovement("IN", item)}
-                          className="flex-1 min-h-[44px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs font-bold text-white cursor-pointer press-active"
+                          className="flex-1 min-h-[44px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs font-extrabold text-white cursor-pointer press-active"
                         >
                           + Stock In
                         </button>
@@ -274,7 +274,7 @@ export function StockListPage() {
                       {hasPermission(user, "godowns:transfer") && (
                         <button
                           onClick={() => navigate(`/transfers/new?materialId=${item.id}`)}
-                          className="min-h-[44px] px-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                          className="min-h-[44px] px-3.5 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
                         >
                           Transfer
                         </button>
@@ -291,46 +291,86 @@ export function StockListPage() {
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-slate-600 border-b">
                 <tr>
-                  <th className="p-4 font-semibold text-xs uppercase tracking-wider text-slate-500">Material</th>
-                  <th className="font-semibold text-xs uppercase tracking-wider text-slate-500">Category</th>
-                  <th className="font-semibold text-xs uppercase tracking-wider text-slate-500">Unit</th>
-                  <th className="font-semibold text-xs uppercase tracking-wider text-slate-500">Available Quantity</th>
-                  <th className="font-semibold text-xs uppercase tracking-wider text-slate-500">Godowns & Warehouses</th>
-                  <th className="font-semibold text-xs uppercase tracking-wider text-slate-500">Stock Status</th>
-                  <th className="w-28 font-semibold text-xs uppercase tracking-wider text-slate-500 text-right pr-6">Actions</th>
+                  <th className="p-4 font-black text-xs uppercase tracking-wider text-slate-500">Material Name & SKU</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Category</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Unit</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Available Quantity</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Godowns & Warehouses</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Stock Status</th>
+                  <th className="w-32 font-black text-xs uppercase tracking-wider text-slate-500 text-right pr-6">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {filtered.map((item) => {
                   const status = stockStatus(item);
                   const godownsText = item.godownStocks?.map((gs) => gs.godown.name).join(", ") || "—";
+                  const isLow = status === "LOW_STOCK";
+                  const isOut = ["OUT_OF_STOCK", "FULLY_RESERVED"].includes(status);
+
                   return (
-                    <tr key={item.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+                    <tr 
+                      key={item.id} 
+                      className={`transition-colors ${
+                        isOut ? "bg-red-50/20 hover:bg-red-50/40" : isLow ? "bg-amber-50/30 hover:bg-amber-50/50" : "hover:bg-slate-50/60"
+                      }`}
+                    >
                       <td className="p-4">
                         <button onClick={() => navigate(`/materials/${item.id}`)} className="text-left cursor-pointer group">
-                          <span className="block font-bold text-slate-900 group-hover:text-orange-600 transition-colors">{item.materialName}</span>
-                          <span className="text-xs text-slate-400 font-medium">{item.sku}</span>
+                          <span className="block font-black text-slate-900 text-sm sm:text-base group-hover:text-orange-600 transition-colors leading-tight">
+                            {item.materialName}
+                          </span>
+                          <span className="text-xs text-slate-400 font-semibold">SKU: {item.sku}</span>
                         </button>
                       </td>
-                      <td className="text-slate-600 font-medium">{item.category}</td>
-                      <td className="text-slate-500 font-medium">{item.unit}</td>
-                      <td className="font-black text-slate-900"><QuantityDisplay value={availableStock(item)} unit={item.unit}/></td>
-                      <td className="text-slate-600 text-xs max-w-[200px] truncate" title={godownsText}>{godownsText}</td>
-                      <td><BusinessStatusBadge status={status}/></td>
+                      <td className="text-slate-700 font-bold text-xs sm:text-sm">{item.category}</td>
+                      <td className="text-slate-600 font-extrabold text-xs uppercase">{item.unit}</td>
+                      <td className="font-black text-slate-900 text-base sm:text-lg">
+                        <QuantityDisplay value={availableStock(item)} unit={item.unit}/>
+                      </td>
+                      <td className="text-slate-600 text-xs font-semibold max-w-[200px] truncate" title={godownsText}>
+                        {godownsText}
+                      </td>
+                      <td>
+                        <BusinessStatusBadge status={status}/>
+                      </td>
                       <td className="text-right pr-6">
-                        <div className="flex items-center justify-end">
-                          <button onClick={() => navigate(`/materials/${item.id}`)} className="min-h-9 px-3 font-bold text-orange-600 hover:text-orange-700 cursor-pointer">
+                        <div className="flex items-center justify-end gap-1">
+                          <button 
+                            onClick={() => navigate(`/materials/${item.id}`)} 
+                            className="min-h-9 px-3 font-extrabold text-xs sm:text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg cursor-pointer"
+                          >
                             View
                           </button>
                           <details className="relative">
-                            <summary aria-label={`More actions for ${item.materialName}`} className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg hover:bg-slate-100 border border-transparent">
-                              <MoreVertical size={16}/>
+                            <summary aria-label={`More actions for ${item.materialName}`} className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-lg hover:bg-slate-100 border border-transparent">
+                              <MoreVertical size={18}/>
                             </summary>
-                            <div className="absolute right-0 z-20 w-40 rounded-xl border bg-white p-1 shadow-lg border-slate-100 text-left">
-                              {canIn && <button onClick={() => openMovement("IN", item)} className="min-h-9 w-full rounded px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">Stock In</button>}
-                              {canOut && <button onClick={() => openMovement("OUT", item)} className="min-h-9 w-full rounded px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">Stock Out</button>}
-                              {canUpdate && <button onClick={() => navigate(`/materials/${item.id}/edit`)} className="min-h-9 w-full rounded px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">Edit</button>}
-                              {canDelete && <button onClick={() => remove(item)} className="min-h-9 w-full rounded px-3 text-xs font-semibold text-red-600 hover:bg-slate-50 cursor-pointer text-left">Delete</button>}
+                            <div className="absolute right-0 z-20 w-44 rounded-xl border bg-white p-1.5 shadow-xl border-slate-100 text-left space-y-0.5">
+                              {canIn && (
+                                <button onClick={() => openMovement("IN", item)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">
+                                  + Stock In
+                                </button>
+                              )}
+                              {canOut && (
+                                <button onClick={() => openMovement("OUT", item)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">
+                                  - Stock Out
+                                </button>
+                              )}
+                              {hasPermission(user, "godowns:transfer") && (
+                                <button onClick={() => navigate(`/transfers/new?materialId=${item.id}`)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">
+                                  Transfer Stock
+                                </button>
+                              )}
+                              {canUpdate && (
+                                <button onClick={() => navigate(`/materials/${item.id}/edit`)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">
+                                  Edit Details
+                                </button>
+                              )}
+                              {canDelete && (
+                                <button onClick={() => remove(item)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer text-left">
+                                  Delete Item
+                                </button>
+                              )}
                             </div>
                           </details>
                         </div>

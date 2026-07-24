@@ -14,7 +14,51 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
   const { user } = useAuth();
   const canAddStock = hasPermission(user, "inventory:create");
 
-  if (!movements || movements.length === 0) {
+  // Aggregate stock movements by date label
+  const movementMap: Record<string, { label: string; stockIn: number; stockOut: number }> = {};
+
+  let totalStockIn = 0;
+  let totalStockOut = 0;
+
+  if (movements && movements.length > 0) {
+    movements.slice(0, 30).forEach((tx: any) => {
+      const rawDate = tx.createdAt || tx.date;
+      if (!rawDate) return;
+
+      const date = new Date(rawDate);
+      const key = date.toLocaleDateString("en-IN", { month: "short", day: "2-digit" });
+      if (!movementMap[key]) {
+        movementMap[key] = { label: key, stockIn: 0, stockOut: 0 };
+      }
+
+      const qty = Math.abs(Number(tx.quantity || 0));
+      const typeUpper = String(tx.type || "").toUpperCase();
+
+      const isIncoming = typeUpper === "IN" || typeUpper.includes("IN") || typeUpper === "PURCHASE" || typeUpper === "RECEIPT";
+      const isOutgoing = typeUpper === "OUT" || typeUpper.includes("OUT") || typeUpper === "SALE" || typeUpper === "DISPATCH";
+
+      if (isIncoming) {
+        movementMap[key].stockIn += qty;
+        totalStockIn += qty;
+      } else if (isOutgoing) {
+        movementMap[key].stockOut += qty;
+        totalStockOut += qty;
+      } else {
+        // Default fallback if type is positive / negative
+        if (Number(tx.quantity) > 0) {
+          movementMap[key].stockIn += qty;
+          totalStockIn += qty;
+        } else {
+          movementMap[key].stockOut += qty;
+          totalStockOut += qty;
+        }
+      }
+    });
+  }
+
+  const chartData = Object.values(movementMap).reverse();
+
+  if (!movements || movements.length === 0 || chartData.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -48,48 +92,6 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
     );
   }
 
-  // Aggregate stock movements by date label
-  const movementMap: Record<string, { label: string; stockIn: number; stockOut: number }> = {};
-
-  let totalStockIn = 0;
-  let totalStockOut = 0;
-
-  movements.slice(0, 30).forEach((tx: any) => {
-    const rawDate = tx.createdAt || tx.date;
-    if (!rawDate) return;
-
-    const date = new Date(rawDate);
-    const key = date.toLocaleDateString("en-IN", { month: "short", day: "2-digit" });
-    if (!movementMap[key]) {
-      movementMap[key] = { label: key, stockIn: 0, stockOut: 0 };
-    }
-
-    const qty = Math.abs(Number(tx.quantity || 0));
-    const typeUpper = String(tx.type || "").toUpperCase();
-
-    const isIncoming = typeUpper === "IN" || typeUpper.includes("IN") || typeUpper === "PURCHASE" || typeUpper === "RECEIPT";
-    const isOutgoing = typeUpper === "OUT" || typeUpper.includes("OUT") || typeUpper === "SALE" || typeUpper === "DISPATCH";
-
-    if (isIncoming) {
-      movementMap[key].stockIn += qty;
-      totalStockIn += qty;
-    } else if (isOutgoing) {
-      movementMap[key].stockOut += qty;
-      totalStockOut += qty;
-    } else {
-      // Default fallback if type is positive / negative
-      if (Number(tx.quantity) > 0) {
-        movementMap[key].stockIn += qty;
-        totalStockIn += qty;
-      } else {
-        movementMap[key].stockOut += qty;
-        totalStockOut += qty;
-      }
-    }
-  });
-
-  const chartData = Object.values(movementMap).reverse();
-
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-sm space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-3">
@@ -110,8 +112,8 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
         </div>
       </div>
 
-      <div className="h-52 w-full pt-1">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-full min-h-[220px] h-56 pt-1">
+        <ResponsiveContainer width="100%" height={220} minHeight={220}>
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />

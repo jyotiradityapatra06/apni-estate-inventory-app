@@ -99,28 +99,77 @@ export function MaterialDetailPage() {
       {/* Header */}
       <PageHeader 
         title={material.materialName} 
-        description={`SKU: ${material.sku} &middot; Category: ${material.category}`} 
+        description={`SKU: ${material.sku} &middot; Category: ${material.category}${material.brand ? ` &middot; Brand: ${material.brand}` : ""}`} 
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             <BusinessStatusBadge status={stockStatus(material)}/>
+            {canIn && (
+              <button 
+                onClick={() => setMovement("IN")} 
+                className="flex min-h-10 items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 px-4 text-xs font-extrabold text-white transition-colors shadow-sm cursor-pointer"
+              >
+                <ArrowDownToLine size={15}/>
+                + Stock In
+              </button>
+            )}
+            {canOut && (
+              <button 
+                onClick={() => setMovement("OUT")} 
+                className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-extrabold text-white transition-colors shadow-sm cursor-pointer"
+              >
+                <ArrowUpFromLine size={15}/>
+                - Stock Out
+              </button>
+            )}
+            {hasPermission(user, "godowns:transfer") && (
+              <button 
+                onClick={() => navigate(`/transfers/new?materialId=${material.id}`)} 
+                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-extrabold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                <ArrowLeftRight size={15}/>
+                Transfer Stock
+              </button>
+            )}
             {canUpdate && (
               <button 
                 onClick={() => navigate(`/materials/${id}/edit`)} 
-                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
               >
-                <Pencil size={14}/>
-                Edit Material
+                <Pencil size={15}/>
+                Edit Item
               </button>
             )}
           </div>
         }
       />
 
-      {/* Summary StatCards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Current Stock" value={<QuantityDisplay value={physicalStock(material)} unit={material.unit}/>} helper="Total quantity in hand" icon={Package} />
-        <StatCard label="Stock Value" value={fmt(stockVal)} helper="Asset value based on cost price" icon={Landmark} />
-        <StatCard label="Location" value={material.godownStocks?.length || 0} helper={locationText} icon={Boxes} />
+      {/* Summary Prominent StatCards */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <StatCard 
+          label="Available Stock" 
+          value={<QuantityDisplay value={availableStock(material)} unit={material.unit}/>} 
+          helper={`Physical: ${physicalStock(material)} ${material.unit}`} 
+          icon={Package} 
+        />
+        <StatCard 
+          label="Total Stock Value" 
+          value={fmt(stockVal)} 
+          helper="Asset worth based on cost price" 
+          icon={Landmark} 
+        />
+        <StatCard 
+          label="Min Reorder Level" 
+          value={`${minimumStock(material)} ${material.unit}`} 
+          helper="Threshold for low stock alert" 
+          icon={AlertTriangle} 
+          className={availableStock(material) <= minimumStock(material) ? "border-amber-200 bg-amber-50/20" : ""}
+        />
+        <StatCard 
+          label="Warehouse Storage" 
+          value={material.godownStocks?.length || 0} 
+          helper={locationText} 
+          icon={Boxes} 
+        />
       </div>
 
       {/* Tabs */}
@@ -130,13 +179,13 @@ export function MaterialDetailPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-4 px-1 text-xs font-bold border-b-2 uppercase tracking-wider cursor-pointer ${
+              className={`pb-3.5 px-1 text-xs sm:text-sm font-extrabold border-b-2 uppercase tracking-wider cursor-pointer ${
                 activeTab === tab 
                   ? "border-orange-500 text-orange-600" 
                   : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
               }`}
             >
-              {tab === "timeline" ? "Stock Movement" : tab}
+              {tab === "timeline" ? "Stock Movement" : tab === "overview" ? "Overview & Warehouses" : "Transaction History"}
             </button>
           ))}
         </nav>
@@ -147,12 +196,12 @@ export function MaterialDetailPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Details Table */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2 space-y-4">
-            <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Material Information</h3>
+            <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider border-b border-slate-100 pb-3">Material Specifications & Pricing</h3>
             <dl className="grid gap-4 sm:grid-cols-2">
               {info.filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => (
-                <div key={label} className="border-b last:border-0 pb-2">
-                  <dt className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{label}</dt>
-                  <dd className="mt-1 text-sm font-semibold text-slate-800">{value}</dd>
+                <div key={label} className="border-b border-slate-100 last:border-0 pb-2.5">
+                  <dt className="text-[11px] text-slate-500 font-extrabold uppercase tracking-wider">{label}</dt>
+                  <dd className="mt-1 text-sm font-extrabold text-slate-900">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -160,37 +209,37 @@ export function MaterialDetailPage() {
 
           {/* Godowns list */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-            <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Warehouse balances</h3>
+            <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider border-b border-slate-100 pb-3">Warehouse Stock Breakdown</h3>
             <div className="space-y-4">
               {material.godownStocks?.map((row) => (
-                <div key={row.id} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-3">
+                <div key={row.id} className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-3">
                   <div className="flex items-start justify-between">
-                    <span className="font-bold text-xs text-slate-900">{row.godown.name}</span>
+                    <span className="font-black text-sm text-slate-900">{row.godown.name}</span>
                     <BusinessStatusBadge status={godownAvailable(row) <= 0 ? "OUT_OF_STOCK" : godownAvailable(row) <= minimumStock(material) ? "LOW_STOCK" : "IN_STOCK"}/>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-center text-xs">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400">Total</span>
-                      <strong className="block text-slate-900 mt-0.5"><QuantityDisplay value={row.quantity} unit={material.unit}/></strong>
+                      <span className="text-[10px] uppercase font-black text-slate-400">Total</span>
+                      <strong className="block text-slate-900 text-sm font-black mt-0.5"><QuantityDisplay value={row.quantity} unit={material.unit}/></strong>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400">Reserved</span>
-                      <strong className="block text-slate-900 mt-0.5"><QuantityDisplay value={row.reservedQuantity ?? 0} unit={material.unit}/></strong>
+                      <span className="text-[10px] uppercase font-black text-slate-400">Reserved</span>
+                      <strong className="block text-slate-900 text-sm font-black mt-0.5"><QuantityDisplay value={row.reservedQuantity ?? 0} unit={material.unit}/></strong>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400">Available</span>
-                      <strong className="block text-slate-900 mt-0.5"><QuantityDisplay value={godownAvailable(row)} unit={material.unit}/></strong>
+                      <span className="text-[10px] uppercase font-black text-slate-400">Available</span>
+                      <strong className="block text-green-700 text-sm font-black mt-0.5"><QuantityDisplay value={godownAvailable(row)} unit={material.unit}/></strong>
                     </div>
                   </div>
                   <div className="flex gap-2 pt-1">
                     {canIn && (
-                      <button onClick={() => setMovement("IN")} className="flex-1 min-h-[30px] rounded-lg border border-slate-200 text-[10px] font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">
-                        Stock In
+                      <button onClick={() => setMovement("IN")} className="flex-1 min-h-[34px] rounded-lg border border-slate-200 bg-white text-xs font-extrabold text-slate-700 hover:bg-slate-100 cursor-pointer">
+                        + Stock In
                       </button>
                     )}
                     {canOut && (
-                      <button onClick={() => setMovement("OUT")} className="flex-1 min-h-[30px] rounded-lg border border-slate-200 text-[10px] font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">
-                        Stock Out
+                      <button onClick={() => setMovement("OUT")} className="flex-1 min-h-[34px] rounded-lg border border-slate-200 bg-white text-xs font-extrabold text-slate-700 hover:bg-slate-100 cursor-pointer">
+                        - Stock Out
                       </button>
                     )}
                   </div>

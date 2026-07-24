@@ -164,38 +164,70 @@ export function SalesOrderFormPage() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-        <SectionHeader title="Customer" />
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Customer
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+        <SectionHeader title="Customer & Billing Type" description="Select customer account and choose GST or Non-GST billing." />
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Select Customer *
             <select required value={customerId} onChange={e => setCustomerId(e.target.value)} className={cls}>
-              <option value="">Choose customer</option>
+              <option value="">Choose customer account…</option>
               {customers.map(c => (
-                <option key={c.id} value={c.id}>{c.name} - {c.phone}{c.gstin ? ` - ${c.gstin}` : ""}</option>
+                <option key={c.id} value={c.id}>{c.name} ({c.phone}){c.gstin ? ` · GST: ${c.gstin}` : ""}</option>
               ))}
             </select>
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-            Tax Mode
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Billing / Tax Mode *
             <select value={taxMode} onChange={e => setTaxMode(e.target.value as "GST" | "NON_GST")} className={cls}>
-              <option value="GST">GST Sales Order</option>
-              <option value="NON_GST">Non-GST Sales Order</option>
+              <option value="GST">GST Sales Order (Tax Invoice)</option>
+              <option value="NON_GST">Non-GST Sales Order (Bill of Supply)</option>
             </select>
           </label>
         </div>
+
+        {/* Selected Customer Card Preview */}
+        {customer && (
+          <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-4 space-y-2 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-black text-sm text-slate-900">{customer.name}</span>
+              {customer.gstin && (
+                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-extrabold text-[10px] uppercase border border-blue-100">
+                  GSTIN: {customer.gstin}
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-slate-600 pt-1">
+              <div>
+                <span className="text-[10px] font-black uppercase text-slate-400 block">Phone</span>
+                <strong className="text-slate-900 font-bold block">{customer.phone}</strong>
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase text-slate-400 block">Outstanding Dues</span>
+                <strong className={`font-black block ${customer.outstandingBalance > 0 ? "text-red-600" : "text-slate-900"}`}>
+                  {fmt(customer.outstandingBalance)}
+                </strong>
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase text-slate-400 block">Credit Limit</span>
+                <strong className="text-slate-900 font-bold block">{fmt(customer.creditLimit)}</strong>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
-      <section className="space-y-3">
-        <SectionHeader title="Order Items" description="Choose a material and the exact Godown supplying it." />
+      <section className="space-y-4">
+        <SectionHeader title="Order Items" description="Choose materials, supplying warehouse godown, quantity, and rate." />
         {items.map((line, i) => {
           const a = available(line);
           const calc = calculateLine(line, taxMode);
           const balances = a.material?.godownStocks || [];
+          const isOverStock = line.godownId && Number(line.quantity) > a.value;
+
           return (
-            <article key={i} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-orange-600">Item #{i + 1}</span>
+            <article key={i} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                <span className="text-xs font-black uppercase tracking-wider text-orange-600">Material Item #{i + 1}</span>
                 {items.length > 1 && (
                   <button type="button" aria-label={`Remove item ${i + 1}`} onClick={() => setItems(x => x.filter((_, n) => n !== i))} className="text-red-600 hover:bg-red-50 p-1.5 rounded-lg cursor-pointer">
                     <Trash2 size={16} />
@@ -204,8 +236,8 @@ export function SalesOrderFormPage() {
               </div>
 
               <div className="grid gap-3 md:grid-cols-6">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
-                  Material
+                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                  Material Item *
                   <select required value={line.inventoryItemId} onChange={e => {
                     const m = materials.find(x => x.id === e.target.value);
                     setItems(x => x.map((l, n) => n === i ? {
@@ -217,53 +249,60 @@ export function SalesOrderFormPage() {
                       quantity: ""
                     } : l));
                   }} className={cls}>
-                    <option value="">Choose material</option>
+                    <option value="">Choose material item…</option>
                     {materials.map(m => (
-                      <option key={m.id} value={m.id}>{m.materialName} - {m.sku} - {m.unit}</option>
+                      <option key={m.id} value={m.id}>{m.materialName} ({m.unit}) · SKU: {m.sku}</option>
                     ))}
                   </select>
                 </label>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
-                  Godown
+                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                  Supplying Godown *
                   <select required disabled={!a.material} value={line.godownId} onChange={e => change(i, "godownId", e.target.value)} className={cls}>
-                    <option value="">Choose Godown</option>
+                    <option value="">Choose Godown warehouse…</option>
                     {balances.map(b => (
-                      <option key={b.id} value={b.godown.id}>{b.godown.name} - {Math.max(0, b.quantity - Number(b.reservedQuantity || 0))} available</option>
+                      <option key={b.id} value={b.godown.id}>{b.godown.name} ({Math.max(0, b.quantity - Number(b.reservedQuantity || 0))} {a.material?.unit} avail)</option>
                     ))}
                   </select>
                 </label>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Quantity
-                  <input required type="number" inputMode="decimal" min="0.001" step="0.001" max={line.godownId ? a.value : undefined} value={line.quantity} onChange={e => change(i, "quantity", e.target.value)} className={cls} />
+                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                  Quantity ({a.material ? a.material.unit : "Qty"}) *
+                  <input required type="number" inputMode="decimal" min="0.001" step="0.001" placeholder="0.00" value={line.quantity} onChange={e => change(i, "quantity", e.target.value)} className={cls} />
                 </label>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Rate (₹)
-                  <input required type="number" inputMode="decimal" min="0" step="0.01" value={line.rate} onChange={e => change(i, "rate", e.target.value)} className={cls} />
+                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                  Unit Rate (₹) *
+                  <input required type="number" inputMode="decimal" min="0" step="0.01" placeholder="0.00" value={line.rate} onChange={e => change(i, "rate", e.target.value)} className={cls} />
                 </label>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
+                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
                   Discount %
                   <input type="number" inputMode="decimal" min="0" max="100" step="0.01" value={line.discountRate} onChange={e => change(i, "discountRate", e.target.value)} className={cls} />
                 </label>
 
                 {a.balance && (
-                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 p-3 text-xs md:col-span-4 border border-slate-100">
-                    <Mini label="Physical" value={`${a.balance.quantity} ${a.material?.unit}`} />
-                    <Mini label="Reserved" value={`${a.balance.reservedQuantity || 0} ${a.material?.unit}`} />
-                    <Mini label="Available" value={`${a.value} ${a.material?.unit}`} />
+                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 p-3 text-xs md:col-span-4 border border-slate-100 text-center">
+                    <Mini label="Physical Stock" value={`${a.balance.quantity} ${a.material?.unit}`} />
+                    <Mini label="Reserved Stock" value={`${a.balance.reservedQuantity || 0} ${a.material?.unit}`} />
+                    <Mini label="Net Available" value={`${a.value} ${a.material?.unit}`} isGreen />
                   </div>
                 )}
-                <div className="grid grid-cols-3 gap-2 rounded-xl bg-orange-50/60 p-3 text-xs md:col-span-2 border border-orange-100">
+                <div className="grid grid-cols-3 gap-2 rounded-xl bg-orange-50/60 p-3 text-xs md:col-span-2 border border-orange-100 text-center">
                   <Mini label="Taxable" value={fmt(calc.taxable)} />
                   <Mini label="Tax" value={fmt(calc.tax)} />
-                  <Mini label="Line Total" value={fmt(calc.total)} />
+                  <Mini label="Line Total" value={fmt(calc.total)} isOrange />
                 </div>
+
+                {isOverStock && (
+                  <div className="md:col-span-6 rounded-xl border border-red-200 bg-red-50 p-3 flex items-center gap-2 text-xs font-bold text-red-800">
+                    <AlertCircle size={16} className="shrink-0 text-red-600" />
+                    <span>Insufficient stock! Only {a.value} {a.material?.unit} available in {a.balance?.godown.name}.</span>
+                  </div>
+                )}
               </div>
             </article>
           );
         })}
-        <button type="button" onClick={() => setItems(x => [...x, blank()])} className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-orange-300 font-bold text-xs text-orange-600 hover:bg-orange-50 cursor-pointer transition-colors">
+        <button type="button" onClick={() => setItems(x => [...x, blank()])} className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-orange-300 font-extrabold text-xs text-orange-600 hover:bg-orange-50 cursor-pointer transition-colors">
           <Plus size={18} />
-          Add another material
+          + Add Another Material Item
         </button>
       </section>
 
@@ -374,11 +413,11 @@ export function SalesOrderFormPage() {
   );
 }
 
-function Mini({ label, value }: { label: string; value: string }) {
+function Mini({ label, value, isGreen = false, isOrange = false }: { label: string; value: string; isGreen?: boolean; isOrange?: boolean }) {
   return (
     <div>
-      <p className="text-slate-500 text-[10px] uppercase font-bold">{label}</p>
-      <b className="text-slate-900">{value}</b>
+      <span className="text-slate-400 text-[10px] uppercase font-black block">{label}</span>
+      <b className={`text-xs sm:text-sm font-black mt-0.5 block ${isGreen ? "text-green-700" : isOrange ? "text-orange-600" : "text-slate-900"}`}>{value}</b>
     </div>
   );
 }

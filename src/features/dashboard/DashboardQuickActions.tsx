@@ -13,8 +13,8 @@ export function DashboardQuickActions() {
   ];
 
   return (
-    <section className="space-y-3">
-      <h2 className="text-sm font-bold tracking-wider text-slate-500 uppercase">Quick Actions</h2>
+    <section className="space-y-3.5">
+      <h2 className="text-xs font-black tracking-wider text-slate-500 uppercase">Quick Actions</h2>
       <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-5 md:overflow-visible" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
         {actions.map((action) => {
           const Icon = action.icon;
@@ -22,12 +22,12 @@ export function DashboardQuickActions() {
             <button
               key={action.label}
               onClick={() => navigate(action.path)}
-              className="flex min-w-[125px] flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-center transition-all duration-200 hover:shadow-md hover:border-orange-400 group cursor-pointer"
+              className="flex min-w-[135px] flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 py-4 text-center transition-all duration-200 hover:shadow-md hover:border-orange-400 group cursor-pointer"
             >
               <span className={`flex h-12 w-12 items-center justify-center rounded-xl border transition-transform group-hover:scale-110 ${action.bg}`}>
                 <Icon size={22} />
               </span>
-              <span className="text-xs font-bold text-slate-900 leading-tight">
+              <span className="text-xs sm:text-sm font-extrabold text-slate-900 leading-snug">
                 {action.label}
               </span>
             </button>

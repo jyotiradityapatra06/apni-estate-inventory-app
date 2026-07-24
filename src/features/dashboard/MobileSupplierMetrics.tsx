@@ -109,17 +109,17 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
   const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
 
   return (
-    <div className="space-y-5 md:hidden pb-12">
+    <div className="space-y-7 md:hidden pb-16">
       {/* 1. Mobile Business Compact Header */}
       <div className="flex items-center justify-between rounded-2xl bg-[#0F172A] p-4 text-white shadow-md">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-orange-400">
+          <p className="text-xs font-bold uppercase tracking-wider text-orange-400">
             {greeting}
           </p>
           <h2 className="text-lg font-black tracking-tight truncate text-white mt-0.5">
             {business?.name || "APNI ESTATE Material Store"}
           </h2>
-          <p className="text-[11px] font-semibold text-slate-400 mt-1">
+          <p className="text-xs font-semibold text-slate-400 mt-1">
             Logged in as <span className="text-white font-bold">{user?.name || "Owner"}</span> ({user?.role})
           </p>
         </div>
@@ -127,19 +127,19 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           onClick={handleRefresh}
           disabled={refreshing}
           aria-label="Refresh dashboard"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-slate-300 hover:text-white cursor-pointer active:scale-95 transition-transform"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-slate-300 hover:text-white cursor-pointer active:scale-95 transition-transform"
         >
-          <RefreshCw size={16} className={refreshing || dashboard.inventory.loading ? "animate-spin text-orange-400" : ""} />
+          <RefreshCw size={18} className={refreshing || dashboard.inventory.loading ? "animate-spin text-orange-400" : ""} />
         </button>
       </div>
 
       {/* 2. Business Health Summary (Horizontal Carousel) */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">
             Financial Health
           </h3>
-          <span className="text-[10px] font-bold text-slate-400">Swipe &rarr;</span>
+          <span className="text-xs font-bold text-slate-400">Swipe &rarr;</span>
         </div>
 
         <div
@@ -149,15 +149,15 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           {/* Sales Card */}
           <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Sales</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-50 text-[#F97316]">
-                <IndianRupee size={14} />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Total Sales</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-[#F97316]">
+                <IndianRupee size={16} />
               </span>
             </div>
-            <strong className="text-xl font-black text-slate-900 block leading-none">
+            <strong className="text-2xl font-black text-slate-900 block leading-none">
               {totalSales > 0 ? fmt(totalSales) : "₹0"}
             </strong>
-            <p className="text-[10px] text-slate-400 font-semibold truncate">
+            <p className="text-xs text-slate-500 font-semibold truncate mt-1">
               {totalSales > 0 ? `${invoices.length} Sales Invoices` : "No sales logged yet"}
             </p>
           </div>
@@ -165,15 +165,15 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           {/* Purchases Card */}
           <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Purchases</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
-                <ShoppingBag size={14} />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Total Purchases</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+                <ShoppingBag size={16} />
               </span>
             </div>
-            <strong className="text-xl font-black text-slate-900 block leading-none">
+            <strong className="text-2xl font-black text-slate-900 block leading-none">
               {totalPurchases > 0 ? fmt(totalPurchases) : "₹0"}
             </strong>
-            <p className="text-[10px] text-slate-400 font-semibold truncate">
+            <p className="text-xs text-slate-500 font-semibold truncate mt-1">
               {totalPurchases > 0 ? `${purchasesList.length} Orders` : "No purchases logged yet"}
             </p>
           </div>
@@ -181,50 +181,50 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           {/* Receivables Card */}
           <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Receivables</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                <Landmark size={14} />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Receivables</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                <Landmark size={16} />
               </span>
             </div>
-            <strong className={`text-xl font-black block leading-none ${totalReceivables > 0 ? "text-orange-600" : "text-slate-900"}`}>
+            <strong className={`text-2xl font-black block leading-none ${totalReceivables > 0 ? "text-orange-600" : "text-slate-900"}`}>
               {fmt(totalReceivables)}
             </strong>
-            <p className="text-[10px] text-slate-400 font-semibold truncate">Pending customer dues</p>
+            <p className="text-xs text-slate-500 font-semibold truncate mt-1">Pending customer dues</p>
           </div>
 
           {/* Payables Card */}
           <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Payables</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 text-red-600">
-                <Landmark size={14} />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Payables</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                <Landmark size={16} />
               </span>
             </div>
-            <strong className={`text-xl font-black block leading-none ${totalPayables > 0 ? "text-red-600" : "text-slate-900"}`}>
+            <strong className={`text-2xl font-black block leading-none ${totalPayables > 0 ? "text-red-600" : "text-slate-900"}`}>
               {fmt(totalPayables)}
             </strong>
-            <p className="text-[10px] text-slate-400 font-semibold truncate">Due to suppliers</p>
+            <p className="text-xs text-slate-500 font-semibold truncate mt-1">Due to suppliers</p>
           </div>
 
           {/* Stock Value Card */}
           <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Stock Valuation</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                <Package size={14} />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Stock Valuation</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                <Package size={16} />
               </span>
             </div>
-            <strong className="text-xl font-black text-slate-900 block leading-none">
+            <strong className="text-2xl font-black text-slate-900 block leading-none">
               {fmt(totalStockValue)}
             </strong>
-            <p className="text-[10px] text-slate-400 font-semibold truncate">Physical store inventory</p>
+            <p className="text-xs text-slate-500 font-semibold truncate mt-1">Physical store inventory</p>
           </div>
         </div>
       </div>
 
       {/* 3. Supplier Quick Actions Grid */}
-      <div className="space-y-2">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 px-1">
+      <div className="space-y-2.5">
+        <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 px-1">
           Supplier Quick Actions
         </h3>
         <div className="grid grid-cols-2 gap-2.5">
@@ -312,8 +312,8 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
         </div>
 
         {hasChartData ? (
-          <div className="h-48 w-full pt-2">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="w-full min-h-[200px] h-52 pt-2">
+            <ResponsiveContainer width="100%" height={200} minHeight={200}>
               <AreaChart data={trendSeries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">

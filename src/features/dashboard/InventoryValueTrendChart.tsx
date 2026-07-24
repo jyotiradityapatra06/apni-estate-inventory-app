@@ -86,6 +86,29 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
 
   const trendData = trendDataReversed.reverse();
 
+  if (!materials || materials.length === 0 || trendData.length === 0) {
+    return (
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <DollarSign size={18} className="text-[#F97316]" />
+            <h3 className="font-extrabold text-sm text-slate-900">Inventory Value Trend</h3>
+          </div>
+        </div>
+
+        <div className="py-8 text-center space-y-2">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#F97316]">
+            <Landmark size={24} />
+          </div>
+          <h4 className="font-extrabold text-sm text-slate-900">Not enough inventory history yet</h4>
+          <p className="text-xs text-slate-400 max-w-[280px] mx-auto">
+            Continue adding stock transactions to see inventory value trends over time.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-sm space-y-4">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-3">
@@ -99,8 +122,8 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
         </div>
       </div>
 
-      <div className="h-48 w-full pt-1">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-full min-h-[200px] h-52 pt-1">
+        <ResponsiveContainer width="100%" height={200} minHeight={200}>
           <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorValuation" x1="0" y1="0" x2="0" y2="1">

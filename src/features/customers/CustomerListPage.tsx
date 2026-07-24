@@ -100,32 +100,32 @@ export function CustomerListPage() {
       </div>
 
       {/* Filter panel */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-[1fr_220px_auto]">
           <label className="relative">
-            <Search className="absolute left-3 top-3 text-slate-400" size={18}/>
+            <Search className="absolute left-3.5 top-3 text-slate-400" size={18}/>
             <input 
               aria-label="Search customers" 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
-              placeholder="Search name, phone, GST number or code" 
-              className="h-10 w-full rounded-lg border pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              placeholder="Search customer name, phone number, GSTIN or code…" 
+              className="h-11 w-full rounded-xl border border-slate-200 pl-10 pr-4 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
             />
           </label>
           <select 
             aria-label="Balance status" 
             value={balance} 
             onChange={e => setBalance(e.target.value)} 
-            className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            className="h-11 rounded-xl border border-slate-200 bg-white px-3.5 text-xs sm:text-sm font-extrabold text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           >
-            <option value="ALL">All balances</option>
-            <option value="DUE">Amount Due</option>
-            <option value="CLEAR">No Amount Due</option>
+            <option value="ALL">All Accounts</option>
+            <option value="DUE">Outstanding Dues Only</option>
+            <option value="CLEAR">No Amount Due (Settled)</option>
           </select>
           {(search || balance !== "ALL") && (
             <button 
               onClick={() => { setSearch(""); setBalance("ALL"); }} 
-              className="font-bold text-xs text-slate-700 hover:bg-slate-50 px-4 h-10 border rounded-lg cursor-pointer"
+              className="font-extrabold text-xs text-slate-700 hover:bg-slate-50 px-4 h-11 border border-slate-200 rounded-xl cursor-pointer"
             >
               Clear
             </button>
@@ -144,60 +144,77 @@ export function CustomerListPage() {
           icon={Users} 
           action={
             canCreate && (
-              <Link to="/customers/new" className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-5 text-xs font-bold text-white transition-colors cursor-pointer">
-                Add Customer
+              <Link to="/customers/new" className="flex min-h-11 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-5 text-xs sm:text-sm font-extrabold text-white transition-colors cursor-pointer">
+                + Add First Customer
               </Link>
             )
           }
         />
       ) : (
         <>
-          {/* Desktop Table Viewport */}
+          {/* Desktop Table Viewport (>=768px) */}
           <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-slate-600 border-b">
                 <tr>
-                  {["Customer", "Phone", "GST Number", "Total Orders", "Last Purchase", "Outstanding Amount", "Actions"].map(x => (
-                    <th key={x} className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-slate-500">{x}</th>
+                  {["Customer Name & Code", "Phone & Contact", "GSTIN", "Total Orders", "Last Purchase", "Outstanding Due", "Quick Actions"].map(x => (
+                    <th key={x} className="px-4 py-3.5 font-black text-xs uppercase tracking-wider text-slate-500">{x}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {visible.map(c => {
                   const custOrders = orders.filter(o => o.customerId === c.id && o.status !== "CANCELLED");
                   const totalOrders = custOrders.length;
                   const lastPurchase = custOrders.length > 0 
                     ? new Date(Math.max(...custOrders.map(o => new Date(o.orderDate).getTime()))).toLocaleDateString("en-IN") 
                     : "—";
+                  const hasDue = c.outstandingBalance > 0;
 
                   return (
-                    <tr key={c.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+                    <tr key={c.id} className={`transition-colors ${hasDue ? "bg-amber-50/20 hover:bg-amber-50/40" : "hover:bg-slate-50/60"}`}>
                       <td className="px-4 py-3.5">
-                        <Link to={`/customers/${c.id}`} className="font-bold text-slate-900 hover:text-orange-600 transition-colors">
+                        <Link to={`/customers/${c.id}`} className="font-black text-slate-900 text-sm sm:text-base hover:text-orange-600 transition-colors block">
                           {c.name}
                         </Link>
-                        <p className="text-xs text-slate-400 font-medium">{c.customerCode}</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase">{c.customerCode}</p>
                       </td>
                       <td className="px-4 py-3.5">
-                        <a href={`tel:${c.phone}`} className="text-orange-600 font-semibold hover:underline">
+                        <a href={`tel:${c.phone}`} className="flex items-center gap-1.5 text-orange-600 font-black text-xs sm:text-sm hover:underline">
+                          <Phone size={13} />
                           {c.phone}
                         </a>
                       </td>
-                      <td className="px-4 py-3.5 text-slate-600 font-medium">{c.gstin || "—"}</td>
-                      <td className="px-4 py-3.5 text-slate-600 font-semibold">{totalOrders} order(s)</td>
-                      <td className="px-4 py-3.5 text-slate-500 font-medium">{lastPurchase}</td>
-                      <td className={`px-4 py-3.5 font-black ${c.outstandingBalance > 0 ? "text-red-600" : "text-slate-900"}`}>
-                        {fmt(c.outstandingBalance)}
+                      <td className="px-4 py-3.5 text-slate-700 font-extrabold text-xs uppercase">{c.gstin || "—"}</td>
+                      <td className="px-4 py-3.5 text-slate-700 font-extrabold text-xs sm:text-sm">{totalOrders} order(s)</td>
+                      <td className="px-4 py-3.5 text-slate-500 font-semibold text-xs">{lastPurchase}</td>
+                      <td className="px-4 py-3.5">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black ${
+                          hasDue ? "bg-red-100 text-red-800 border border-red-200" : "bg-slate-100 text-slate-700"
+                        }`}>
+                          {fmt(c.outstandingBalance)}
+                        </span>
                       </td>
                       <td className="relative px-4 py-3.5">
-                        <div className="flex items-center">
-                          <Link to={`/customers/${c.id}`} className="font-bold text-xs text-orange-600 hover:text-orange-700 px-3 py-1 hover:bg-slate-50 rounded-lg">
-                            View
+                        <div className="flex items-center gap-1">
+                          <Link 
+                            to={`/sales-orders/new?customerId=${c.id}`} 
+                            className="font-extrabold text-xs text-white bg-orange-600 hover:bg-orange-700 px-3 py-1.5 rounded-lg shadow-xs transition-colors"
+                          >
+                            + Sale
                           </Link>
+                          {hasDue && (
+                            <Link 
+                              to={`/payments/new?customerId=${c.id}`} 
+                              className="font-extrabold text-xs text-white bg-[#0F172A] hover:bg-slate-800 px-2.5 py-1.5 rounded-lg shadow-xs transition-colors"
+                            >
+                              Receive
+                            </Link>
+                          )}
                           <button 
                             aria-label={`Actions for ${c.name}`} 
                             onClick={() => setMenu(menu === c.id ? "" : c.id)} 
-                            className="h-8 w-8 rounded-lg hover:bg-slate-100 flex items-center justify-center cursor-pointer"
+                            className="h-8 w-8 rounded-lg hover:bg-slate-100 flex items-center justify-center cursor-pointer ml-1"
                           >
                             <MoreVertical size={16}/>
                           </button>
@@ -218,51 +235,72 @@ export function CustomerListPage() {
             </table>
           </div>
 
-          {/* Mobile Card Layout Viewport */}
+          {/* Mobile Card Layout Viewport (<768px) */}
           <div className="grid gap-4 md:hidden">
             {visible.map(c => {
               const custOrders = orders.filter(o => o.customerId === c.id && o.status !== "CANCELLED");
               const totalOrders = custOrders.length;
+              const hasDue = c.outstandingBalance > 0;
+
               return (
-                <article key={c.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+                <article key={c.id} className={`rounded-2xl border bg-white p-4 shadow-sm space-y-3 ${
+                  hasDue ? "border-amber-300/80 bg-amber-50/10" : "border-slate-200"
+                }`}>
                   <div className="flex justify-between items-start gap-3">
                     <div>
-                      <h3 className="font-bold text-slate-900 text-sm leading-tight">{c.name}</h3>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{c.customerCode} &middot; {c.phone}</p>
+                      <Link to={`/customers/${c.id}`} className="font-black text-slate-900 text-base leading-tight block hover:text-orange-600">
+                        {c.name}
+                      </Link>
+                      <p className="text-xs text-slate-500 font-bold mt-0.5">{c.customerCode} &middot; {c.phone}</p>
+                      {c.gstin && <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-0.5">GSTIN: {c.gstin}</p>}
                     </div>
                     {canUpdate && (
                       <button 
                         aria-label={`Actions for ${c.name}`} 
                         onClick={() => setMenu(menu === c.id ? "" : c.id)} 
-                        className="h-8 w-8 shrink-0 rounded-lg hover:bg-slate-100 flex items-center justify-center cursor-pointer border"
+                        className="h-9 w-9 shrink-0 rounded-xl hover:bg-slate-100 flex items-center justify-center cursor-pointer border border-slate-200"
                       >
-                        <MoreVertical size={16}/>
+                        <MoreVertical size={18}/>
                       </button>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-2.5 border-t border-slate-100">
                     <div>
-                      <span className="text-slate-400 block text-[9px] uppercase font-bold">Outstanding</span>
-                      <strong className={`text-sm font-black mt-0.5 block ${c.outstandingBalance > 0 ? "text-red-600" : "text-slate-950"}`}>
+                      <span className="text-slate-400 block text-[10px] uppercase font-black">Outstanding Dues</span>
+                      <strong className={`text-sm font-black mt-0.5 block ${hasDue ? "text-red-700" : "text-slate-950"}`}>
                         {fmt(c.outstandingBalance)}
                       </strong>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[9px] uppercase font-bold">Total Orders</span>
-                      <strong className="text-slate-700 text-xs mt-0.5 block font-bold">{totalOrders} order(s)</strong>
+                      <span className="text-slate-400 block text-[10px] uppercase font-black">Total Orders</span>
+                      <strong className="text-slate-700 text-xs mt-0.5 block font-extrabold">{totalOrders} order(s)</strong>
                     </div>
                   </div>
 
-                  <div className="flex gap-2 pt-2 border-t border-slate-100">
-                    <Link to={`/customers/${c.id}`} className="flex-1 flex min-h-9 items-center justify-center rounded-xl border text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">
-                      View details
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                    <Link 
+                      to={`/sales-orders/new?customerId=${c.id}`} 
+                      className="flex-1 min-h-[44px] flex items-center justify-center rounded-xl bg-orange-600 text-xs font-black text-white hover:bg-orange-700 cursor-pointer press-active"
+                    >
+                      + Create Sale
                     </Link>
-                    <a href={`tel:${c.phone}`} className="px-4 flex min-h-9 items-center justify-center gap-1.5 rounded-xl bg-orange-50 text-xs font-bold text-orange-600 hover:bg-orange-100 cursor-pointer">
-                      <Phone size={13}/>
-                      Call
+                    {hasDue && (
+                      <Link 
+                        to={`/payments/new?customerId=${c.id}`} 
+                        className="min-h-[44px] px-3.5 flex items-center justify-center rounded-xl bg-[#0F172A] text-xs font-black text-white hover:bg-slate-800 cursor-pointer press-active"
+                      >
+                        Receive
+                      </Link>
+                    )}
+                    <a 
+                      href={`tel:${c.phone}`} 
+                      className="px-3.5 min-h-[44px] flex items-center justify-center gap-1 rounded-xl border border-slate-200 text-xs font-black text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                    >
+                      <Phone size={14} />
                     </a>
                   </div>
+
                   {menu === c.id && (
                     <div className="mt-2 pt-2 border-t border-slate-100">
                       <Menu 

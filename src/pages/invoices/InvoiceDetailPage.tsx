@@ -8,7 +8,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { hasPermission } from "../../utils/permissions";
 import { fmt, formatQuantity } from "../../utils/currency";
 import type { Invoice } from "../../features/invoices/invoice.types";
-import { ArrowLeft, Printer, FileCheck, Ban, CreditCard, Landmark, DollarSign } from "lucide-react";
+import { ArrowLeft, Printer, FileCheck, Ban, CreditCard, Landmark, DollarSign, Share2 } from "lucide-react";
 
 export default function InvoiceDetailPage() {
   const { id = "" } = useParams();
@@ -79,55 +79,74 @@ export default function InvoiceDetailPage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button 
             onClick={() => window.print()} 
-            className="flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors"
+            className="flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-black text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors shadow-xs"
           >
-            <Printer size={14} className="mr-1.5" />
+            <Printer size={15} className="mr-1.5 text-slate-500" />
             Print Bill
           </button>
+          <button 
+            onClick={() => {
+              const text = `Invoice ${x.invoiceNumber} for ${x.customerName}\nTotal Amount: ${fmt(x.totalAmount)}\nBalance Due: ${fmt(x.balanceDue)}\nLink: ${window.location.href}`;
+              window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+            }} 
+            className="flex min-h-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-xs font-black text-emerald-800 hover:bg-emerald-100 cursor-pointer transition-colors shadow-xs"
+          >
+            <Share2 size={15} className="mr-1.5 text-emerald-600" />
+            Share WhatsApp
+          </button>
+          {Number(x.balanceDue) > 0 && manage && (
+            <Link 
+              to={`/payments/new?invoiceId=${x.id}`} 
+              className="flex min-h-11 items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 px-4 text-xs font-black text-white shadow-xs transition-colors cursor-pointer"
+            >
+              <DollarSign size={15} className="mr-1.5" />
+              Receive Payment
+            </Link>
+          )}
           {manage && x.status === "DRAFT" && (
             <button 
               onClick={() => setAction("issue")} 
-              className="flex min-h-10 items-center justify-center rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white shadow-sm cursor-pointer transition-colors"
+              className="flex min-h-11 items-center justify-center rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-black text-white shadow-xs cursor-pointer transition-colors"
             >
-              <FileCheck size={14} className="mr-1.5" />
+              <FileCheck size={15} className="mr-1.5" />
               Issue Invoice
             </button>
           )}
           {manage && ["DRAFT", "ISSUED"].includes(x.status) && (
             <button 
               onClick={() => setAction("cancel")} 
-              className="flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-white px-4 text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+              className="flex min-h-11 items-center justify-center rounded-xl border border-red-200 bg-white px-4 text-xs font-black text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
             >
-              <Ban size={14} className="mr-1.5" />
+              <Ban size={15} className="mr-1.5" />
               Cancel Bill
             </button>
           )}
         </div>
       </div>
 
-      {/* 9. Payment Integration Summary Banner */}
+      {/* Payment Integration Summary Banner */}
       {x.status !== "CANCELLED" && (
-        <div className="invoice-actions rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="invoice-actions rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4 text-xs">
-            <div className="px-3 py-2 bg-green-50 rounded-xl border border-green-100">
-              <span className="text-[9px] uppercase font-bold text-green-700 block">Received Amount</span>
-              <strong className="text-green-800 text-sm font-black mt-0.5 block">{fmt(x.amountPaid)}</strong>
+            <div className="px-3.5 py-2 bg-green-50 rounded-xl border border-green-100">
+              <span className="text-[10px] uppercase font-black text-green-700 block">Received Amount</span>
+              <strong className="text-green-800 text-base font-black mt-0.5 block">{fmt(x.amountPaid)}</strong>
             </div>
-            <div className="px-3 py-2 bg-red-50 rounded-xl border border-red-100">
-              <span className="text-[9px] uppercase font-bold text-red-700 block">Outstanding Balance</span>
-              <strong className="text-red-800 text-sm font-black mt-0.5 block">{fmt(x.balanceDue)}</strong>
+            <div className="px-3.5 py-2 bg-red-50 rounded-xl border border-red-100">
+              <span className="text-[10px] uppercase font-black text-red-700 block">Outstanding Balance</span>
+              <strong className="text-red-800 text-base font-black mt-0.5 block">{fmt(x.balanceDue)}</strong>
             </div>
           </div>
           {Number(x.balanceDue) > 0 && manage && (
             <Link 
               to={`/payments/new?invoiceId=${x.id}`} 
-              className="flex min-h-10 items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 px-4 text-xs font-bold text-white shadow-sm transition-colors cursor-pointer"
+              className="flex min-h-11 items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 px-5 text-xs font-extrabold text-white shadow-xs transition-colors cursor-pointer"
             >
-              <DollarSign size={14} className="mr-1.5" />
-              Receive Payment
+              <DollarSign size={16} className="mr-1.5" />
+              Record Payment Receipt
             </Link>
           )}
         </div>

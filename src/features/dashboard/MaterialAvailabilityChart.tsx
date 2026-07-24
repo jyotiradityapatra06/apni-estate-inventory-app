@@ -78,8 +78,8 @@ export const MaterialAvailabilityChart: React.FC<MaterialAvailabilityChartProps>
         </button>
       </div>
 
-      <div className="h-56 w-full pt-1">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-full min-h-[220px] h-56 pt-1">
+        <ResponsiveContainer width="100%" height={220} minHeight={220}>
           <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
             <XAxis type="number" hide />
             <YAxis
