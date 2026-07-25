@@ -97,37 +97,37 @@ export default function ReportsPage() {
           <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-6 pt-1">
             <KpiCard
               label="Sales Revenue"
-              value={fmt(overview?.totalSales || overview?.sales || 0)}
+              value={fmt(overview?.sales || 0)}
               color="text-slate-900"
               bg="bg-slate-50"
             />
             <KpiCard
               label="Purchases Cost"
-              value={fmt(overview?.totalPurchases || overview?.purchases || 0)}
+              value={fmt(overview?.purchases || 0)}
               color="text-slate-900"
               bg="bg-slate-50"
             />
             <KpiCard
               label="Stock Valuation"
-              value={fmt(overview?.stockValuation || overview?.inventoryValue || 0)}
+              value={fmt(overview?.inventoryValue || 0)}
               color="text-blue-700"
               bg="bg-blue-50/70"
             />
             <KpiCard
               label="Customer Receivables"
-              value={fmt(overview?.customerReceivables || overview?.receivables || 0)}
+              value={fmt(overview?.receivables || 0)}
               color="text-amber-800"
               bg="bg-amber-50/70"
             />
             <KpiCard
               label="Supplier Payables"
-              value={fmt(overview?.supplierPayables || overview?.payables || 0)}
+              value={fmt(overview?.payables || 0)}
               color="text-red-700"
               bg="bg-red-50/70"
             />
             <KpiCard
               label="Estimated Net Profit"
-              value={fmt(overview?.netProfit || overview?.profit || 0)}
+              value={fmt(overview?.netProfitEstimate || 0)}
               color="text-emerald-700"
               bg="bg-emerald-50/70"
               highlight

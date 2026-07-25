@@ -18,7 +18,7 @@ const dates = (q: Q, current = false) => {
   return { gte: from, lte: to };
 };
 
-const metadata = (q: Q, warnings: string[] = [], estimated = false) => {
+const metadata = (q: Q, warnings: string[] = [], estimated = false, reportClassification = "MANAGEMENT_SUMMARY") => {
   const now = new Date(),
     from = q.from || new Date(now.getFullYear(), now.getMonth(), 1),
     to = q.to || now;
@@ -28,6 +28,7 @@ const metadata = (q: Q, warnings: string[] = [], estimated = false) => {
     generatedAt: new Date().toISOString(),
     currency: "INR",
     isEstimated: estimated,
+    reportClassification,
     warnings,
   };
 };
@@ -166,7 +167,8 @@ export const purchases = async (businessId: string, raw: unknown) => {
   const q = await base(businessId, raw, async (q) => validateId(businessId, "supplier", q.supplierId)),
     where: Prisma.PurchaseOrderWhereInput = {
       businessId,
-      status: q.status ? q.status : { not: "CANCELLED" },
+      // Exclude DRAFT and CANCELLED purchase orders from actual purchase calculations so only active/processed orders (e.g. SENT, RECEIVED, COMPLETED) are reported.
+      status: q.status ? q.status : { notIn: ["DRAFT", "CANCELLED"] },
       orderDate: dates(q),
       ...(q.supplierId ? { supplierId: q.supplierId } : {}),
     };
@@ -252,15 +254,24 @@ export const inventory = async (businessId: string, raw: unknown) => {
     }),
     movements = await prisma.stockTransaction.findMany({
       where: { businessId, createdAt: dates(q), ...(q.materialId ? { inventoryItemId: q.materialId } : {}) },
-      select: { inventoryItemId: true, type: true, quantity: true, reason: true },
+      select: { inventoryItemId: true, type: true, quantity: true, reason: true, referenceType: true },
     }),
     by = new Map<string, any>();
 
   for (const m of movements) {
     const v = by.get(m.inventoryItemId) || { stockIn: 0, stockOut: 0, adjustments: 0 };
     const qty = n(m.quantity);
-    if (m.reason === "MANUAL_ADJUSTMENT") {
-      v.adjustments += m.type === "OUT" ? -qty : qty;
+    // Identify manual adjustments, material creations/edits, and non-operational movements vs standard operational movements
+    const isAdjustment =
+      m.reason === "MANUAL_ADJUSTMENT" ||
+      m.reason === "OPENING_STOCK" ||
+      m.reason === "MATERIAL_EDIT" ||
+      m.referenceType === "MATERIAL" ||
+      (!["SALES_DELIVERY", "SALES_DELIVERY_REVERSAL", "PURCHASE_RECEIPT", "GODOWN_TRANSFER", "SALES_RETURN", "PURCHASE_RETURN"].includes(m.reason || "") &&
+        !["DELIVERY", "PURCHASE_RECEIPT", "STOCK_TRANSFER", "SALES_RETURN", "PURCHASE_RETURN"].includes(m.referenceType || ""));
+
+    if (isAdjustment) {
+      v.adjustments += ["OUT", "TRANSFER_OUT", "PURCHASE_RETURN"].includes(m.type) ? -qty : qty;
     } else if (["IN", "TRANSFER_IN", "SALES_RETURN"].includes(m.type)) {
       v.stockIn += qty;
     } else if (["OUT", "TRANSFER_OUT", "PURCHASE_RETURN"].includes(m.type)) {
@@ -432,7 +443,9 @@ export const customerOutstanding = async (businessId: string, raw: unknown) => {
     },
     rows,
     pagination: pagination(q, all.length),
-    metadata: metadata(q),
+    metadata: metadata(q, [
+      "Shows current unpaid customer balances. Date filters are not applied because outstanding is a point-in-time balance.",
+    ]),
   };
 };
 
@@ -497,7 +510,9 @@ export const supplierOutstanding = async (businessId: string, raw: unknown) => {
     },
     rows,
     pagination: pagination(q, all.length),
-    metadata: metadata(q),
+    metadata: metadata(q, [
+      "Shows current supplier payable balances. Date filters are not applied because payable is a point-in-time balance.",
+    ]),
   };
 };
 
@@ -621,10 +636,12 @@ export const gst = async (businessId: string, raw: unknown) => {
     metadata: metadata(
       q,
       [
-        "Operational estimate only; not an official GST return.",
+        "This report is a management summary for GST tracking and reconciliation.",
+        "This report is not a GST return filing document.",
         "Purchase input GST is proportionally estimated from received value minus completed returns.",
       ],
-      true
+      true,
+      "MANAGEMENT_SUMMARY"
     ),
   };
 };
@@ -681,11 +698,13 @@ export const profitLoss = async (businessId: string, raw: unknown) => {
     metadata: metadata(
       q,
       [
-        "Management estimate, not an audited statement.",
-        "COGS uses current last purchase cost because historical weighted-average cost is unavailable.",
+        "Profit & Loss is a management estimate, not an audited financial statement.",
+        "COGS is calculated using current material cost price because historical FIFO/weighted average costing is not implemented.",
+        "Future inventory costing upgrades may change historical profit calculations.",
         ...(missing.length ? [`${missing.length} sold lines are excluded from COGS because cost is unavailable.`] : []),
       ],
-      true
+      true,
+      "MANAGEMENT_ESTIMATE"
     ),
   };
 };

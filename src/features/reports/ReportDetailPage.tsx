@@ -6,6 +6,10 @@ import { fmt } from "../../utils/currency";
 import { reportConfigs, type ReportKey } from "./report.config";
 import { ArrowLeft, Printer, FileDown, Search, Filter, Calendar, Landmark } from "lucide-react";
 import { StatCard } from "../../app/components/common/Card";
+import { ReportWarningBanner } from "../../components/reports/ReportWarningBanner";
+import { ReportMobileCard } from "../../components/reports/ReportMobileCard";
+import { ReportCharts } from "../../components/reports/ReportCharts";
+import { ReportFilterDrawer } from "../../components/reports/ReportFilterDrawer";
 
 const local = (d: Date) => {
   const x = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -157,8 +161,8 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
         />
       </div>
 
-      {/* Filters Bar */}
-      <div className="report-actions rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+      {/* Desktop Filters Bar (>=768px) */}
+      <div className="report-actions hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3 md:block">
         <div className="flex items-center justify-between border-b border-slate-100 pb-2">
           <span className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
             <Filter size={15} className="text-orange-500" />
@@ -202,18 +206,33 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
         </div>
       </div>
 
+      {/* Mobile Filter Drawer (<768px) */}
+      <ReportFilterDrawer
+        from={from}
+        to={to}
+        status={status}
+        invoiceType={invoiceType}
+        paymentMode={paymentMode}
+        setFrom={setFrom}
+        setTo={setTo}
+        setStatus={setStatus}
+        setInvoiceType={setInvoiceType}
+        setPaymentMode={setPaymentMode}
+        preset={preset}
+        onApply={() => setPage(1)}
+        onReset={reset}
+      />
+
       {error && <p className="rounded-xl bg-red-50 p-4 text-red-800 text-xs font-bold border border-red-200">{error}</p>}
 
       {loading ? (
         <div className="h-56 animate-pulse rounded-2xl bg-slate-200" />
       ) : data && (
         <div className="space-y-6">
-          {data.metadata.warnings.length > 0 && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 text-xs space-y-1">
-              <b className="font-black">{data.metadata.isEstimated ? "Estimated Management Report" : "Attention Notice"}</b>
-              {data.metadata.warnings.map(w => <p key={w}>{w}</p>)}
-            </div>
-          )}
+          <ReportWarningBanner
+            classification={data.metadata.reportClassification}
+            warnings={data.metadata.warnings}
+          />
 
           {/* Metrics summary cards */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -241,6 +260,9 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
               </div>
             </section>
           ))}
+
+          {/* Analytics Visualizations */}
+          <ReportCharts type={type} breakdowns={data.breakdowns} />
 
           {/* Breakdowns */}
           {Object.entries(data.breakdowns).slice(0, 3).map(([name, items]) => items.length > 0 && (
@@ -283,19 +305,12 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
               {/* Mobile Reusable Card View (<768px) */}
               <div className="grid gap-3.5 md:hidden">
                 {data.rows.map((row, i) => (
-                  <article key={String(row.id || i)} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm text-xs space-y-2.5">
-                    {keys.slice(0, 6).map(k => (
-                      <div key={k} className="flex justify-between items-center gap-3 py-1 border-b last:border-0 border-slate-100 font-semibold">
-                        <span className="text-slate-400 uppercase text-[10px] font-black">{human(k)}</span>
-                        <strong className="text-right text-slate-900 font-black text-xs">{String(row[k] ?? "—")}</strong>
-                      </div>
-                    ))}
-                    {config.source && (
-                      <Link to={config.source} className="mt-3 flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 transition-colors">
-                        View Source Document Records →
-                      </Link>
-                    )}
-                  </article>
+                  <ReportMobileCard
+                    key={String(row.id || i)}
+                    type={type}
+                    row={row}
+                    source={config.source}
+                  />
                 ))}
               </div>
 
