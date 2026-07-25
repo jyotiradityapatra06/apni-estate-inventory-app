@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import authApi, { LoginInput, RegisterInput } from "../api/auth.api";
+import { cacheService } from "../offline/cache.service";
 
 export interface User {
   id: string;
@@ -131,6 +132,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
+    if (business?.id && user?.id) {
+      cacheService.clearCacheOnLogout(business.id, user.id).catch((err) => {
+        console.warn("[AuthContext] Failed to clear offline cache on logout:", err);
+      });
+    }
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);

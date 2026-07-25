@@ -5,6 +5,7 @@ import { C } from "../../../constants/colors";
 import { notificationApi, type NotificationData } from "../../../api/notification.api";
 import { useAuth } from "../../../hooks/useAuth";
 import { ThemeToggle } from "../common/ThemeToggle";
+import { OfflineIndicator } from "../common/OfflineIndicator";
 
 export interface AppHeaderProps {
   isDark: boolean;
@@ -382,6 +383,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
       {/* Header Controls */}
       <div className="flex items-center gap-1.5 md:gap-3">
+        <OfflineIndicator />
         <ThemeToggle />
         {/* Mobile Search Button Trigger */}
         <button

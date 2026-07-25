@@ -1,3 +1,5 @@
+import { cacheService } from "../offline/cache.service";
+
 const BASE_URL =
   import.meta.env.VITE_API_URL ?? "http://localhost:5000/api";
 
@@ -14,6 +16,9 @@ export async function apiClient<T = unknown>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
+  const method = (options.method || "GET").toUpperCase();
+  const isGetRequest = method === "GET";
+
   const token = localStorage.getItem("token");
 
   const headers = new Headers(options.headers);
@@ -27,6 +32,7 @@ export async function apiClient<T = unknown>(
 
   const config: RequestInit = {
     ...requestOptions,
+    method,
     headers,
   };
 
@@ -35,7 +41,7 @@ export async function apiClient<T = unknown>(
       typeof body === "string"
         ? body
         : JSON.stringify(body);
-  };
+  }
 
   if (options.body !== undefined) {
     config.body =
@@ -48,6 +54,12 @@ export async function apiClient<T = unknown>(
   try {
     response = await fetch(`${BASE_URL}${path}`, config);
   } catch (e) {
+    if (isGetRequest) {
+      const cached = await cacheService.getCachedResponse<T>(path);
+      if (cached) {
+        return cached.data;
+      }
+    }
     throw new Error("Unable to connect to service. Please check your network connection and try again.");
   }
 
@@ -59,7 +71,21 @@ export async function apiClient<T = unknown>(
     result = null;
   }
 
+  if (response.ok && isGetRequest && result) {
+    // Asynchronously update IndexedDB cache for whitelisted GET endpoints
+    cacheService.setCachedResponse(path, result).catch((err) => {
+      console.warn("[CacheService] Background cache save warning:", err);
+    });
+  }
+
   if (!response.ok) {
+    if (isGetRequest) {
+      const cached = await cacheService.getCachedResponse<T>(path);
+      if (cached) {
+        return cached.data;
+      }
+    }
+
     const payload = result as ApiErrorPayload | null;
 
     if (
