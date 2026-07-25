@@ -128,7 +128,8 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
       req.user.businessId,
       req.params.id,
       req.body,
-      req.user.role
+      req.user.role,
+      req.user.userId
     );
 
     res.status(200).json({

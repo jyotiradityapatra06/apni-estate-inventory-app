@@ -4,14 +4,27 @@ import { nextDocumentNumber } from "./numberSequence.service";
 
 export const getAll = async (businessId: string) => {
   return prisma.delivery.findMany({
-    where: { businessId, fulfilmentMode: "LEGACY" },
+    where: { businessId },
     orderBy: { createdAt: "desc" },
+    include: {
+      createdBy: { select: { id: true, name: true } },
+      dispatchedBy: { select: { id: true, name: true } },
+      completedBy: { select: { id: true, name: true } },
+    },
   });
 };
 
 export const getById = async (businessId: string, id: string) => {
   return prisma.delivery.findFirst({
-    where: { id, businessId, fulfilmentMode: "LEGACY" },
+    where: { id, businessId },
+    include: {
+      items: true,
+      salesOrder: { select: { id: true, orderNumber: true } },
+      invoice: { select: { id: true, invoiceNumber: true } },
+      createdBy: { select: { id: true, name: true } },
+      dispatchedBy: { select: { id: true, name: true } },
+      completedBy: { select: { id: true, name: true } },
+    },
   });
 };
 
@@ -68,11 +81,20 @@ export const update = async (
     notes?: string | null;
     status?: string;
     paymentStatus?: string;
+    vehicleNumber?: string | null;
+    vehicleType?: string | null;
+    driverName?: string | null;
+    driverPhone?: string | null;
+    receiverName?: string | null;
+    proofOfDeliveryReference?: string | null;
+    deliveryNotes?: string | null;
+    cancellationReason?: string | null;
   },
-  userRole: string
+  userRole: string,
+  userId?: string
 ) => {
   const delivery = await prisma.delivery.findFirst({
-    where: { id, businessId, fulfilmentMode: "LEGACY" },
+    where: { id, businessId },
   });
 
   if (!delivery) {
@@ -91,6 +113,17 @@ export const update = async (
     updateData.scheduledDate = data.scheduledDate ? new Date(data.scheduledDate) : null;
   }
   if (data.notes !== undefined) updateData.notes = data.notes;
+
+  // Dispatch & Driver Details
+  if (data.vehicleNumber !== undefined) updateData.vehicleNumber = data.vehicleNumber;
+  if (data.vehicleType !== undefined) updateData.vehicleType = data.vehicleType;
+  if (data.driverName !== undefined) updateData.driverName = data.driverName;
+  if (data.driverPhone !== undefined) updateData.driverPhone = data.driverPhone;
+  if (data.receiverName !== undefined) updateData.receiverName = data.receiverName;
+  if (data.proofOfDeliveryReference !== undefined) updateData.proofOfDeliveryReference = data.proofOfDeliveryReference;
+  if (data.deliveryNotes !== undefined) updateData.deliveryNotes = data.deliveryNotes;
+  if (data.cancellationReason !== undefined) updateData.cancellationReason = data.cancellationReason;
+
   if (data.paymentStatus !== undefined) {
     const payStatus = data.paymentStatus.toUpperCase();
     if (payStatus !== "PENDING" && payStatus !== "RECEIVED") {
@@ -103,26 +136,40 @@ export const update = async (
     const nextStatus = data.status.toUpperCase();
     const currentStatus = delivery.status.toUpperCase();
 
-    if (nextStatus !== "PENDING" && nextStatus !== "OUT_FOR_DELIVERY" && nextStatus !== "DELIVERED") {
-      throw new ApiError(400, "Invalid status. Must be PENDING, OUT_FOR_DELIVERY, or DELIVERED.");
+    const ALLOWED_STATUSES = ["PENDING", "ASSIGNED", "DISPATCHED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"];
+    if (!ALLOWED_STATUSES.includes(nextStatus)) {
+      throw new ApiError(400, `Invalid status. Must be one of: ${ALLOWED_STATUSES.join(", ")}`);
     }
 
     if (nextStatus !== currentStatus) {
       const role = userRole.toUpperCase();
       if (role !== "OWNER") {
-        // MANAGER validation rules
-        // Progressive transitions: PENDING -> OUT_FOR_DELIVERY -> DELIVERED
-        // Or direct PENDING -> DELIVERED
-        const isAllowed =
-          (currentStatus === "PENDING" && nextStatus === "OUT_FOR_DELIVERY") ||
-          (currentStatus === "PENDING" && nextStatus === "DELIVERED") ||
-          (currentStatus === "OUT_FOR_DELIVERY" && nextStatus === "DELIVERED");
+        // Sequential transition rules for MANAGER / STAFF
+        const isValidSequential =
+          (currentStatus === "PENDING" && (nextStatus === "ASSIGNED" || nextStatus === "DISPATCHED" || nextStatus === "OUT_FOR_DELIVERY" || nextStatus === "CANCELLED")) ||
+          (currentStatus === "ASSIGNED" && (nextStatus === "DISPATCHED" || nextStatus === "OUT_FOR_DELIVERY" || nextStatus === "CANCELLED")) ||
+          (currentStatus === "DISPATCHED" && (nextStatus === "OUT_FOR_DELIVERY" || nextStatus === "DELIVERED" || nextStatus === "CANCELLED")) ||
+          (currentStatus === "OUT_FOR_DELIVERY" && (nextStatus === "DELIVERED" || nextStatus === "CANCELLED"));
 
-        if (!isAllowed) {
-          throw new ApiError(403, "Only the business OWNER can revert or correct delivery status transitions.");
+        if (!isValidSequential) {
+          throw new ApiError(403, "Invalid status transition. Sequential workflow: PENDING -> ASSIGNED -> DISPATCHED -> OUT_FOR_DELIVERY -> DELIVERED. Owner approval required for corrections.");
         }
       }
+
       updateData.status = nextStatus;
+
+      if (nextStatus === "DISPATCHED" && !delivery.dispatchedAt) {
+        updateData.dispatchedAt = new Date();
+        if (userId) updateData.dispatchedById = userId;
+      }
+      if (nextStatus === "DELIVERED" && !delivery.deliveredAt) {
+        updateData.deliveredAt = new Date();
+        if (userId) updateData.completedById = userId;
+      }
+      if (nextStatus === "CANCELLED" && !delivery.cancelledAt) {
+        updateData.cancelledAt = new Date();
+        if (userId) updateData.cancelledById = userId;
+      }
     }
   }
 
