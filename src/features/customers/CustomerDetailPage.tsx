@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
-import { Mail, Phone, Plus, DollarSign, Pencil, UserCheck, AlertTriangle } from "lucide-react";
+import { Mail, Phone, Plus, DollarSign, Pencil, UserCheck, AlertTriangle, Receipt, Printer, Eye, Calendar } from "lucide-react";
 import { customerApi } from "../../api/customer.api";
+import paymentApi from "../../api/payment.api";
 import { PageHeader, SectionHeader } from "../../app/components/common/PageHeader";
 import { StatCard } from "../../app/components/common/Card";
+import { BusinessStatusBadge } from "../../app/components/common/BusinessStatusBadge";
 import { useAuth } from "../../hooks/useAuth";
 import type { Customer } from "../../types/customer.types";
 import { hasPermission } from "../../utils/permissions";
@@ -13,6 +15,8 @@ export function CustomerDetailPage() {
   const { id = "" } = useParams();
   const { user } = useAuth();
   const [data, setData] = useState<(Customer & { transactionHistory?: unknown[] }) | null>(null);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [loadingPayments, setLoadingPayments] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -20,12 +24,24 @@ export function CustomerDetailPage() {
       .getById(id)
       .then((r) => setData(r.data))
       .catch((e) => setError(e.message));
+
+    setLoadingPayments(true);
+    paymentApi
+      .getAll(`customerId=${id}`)
+      .then((r) => {
+        setPayments(r.data || []);
+        setLoadingPayments(false);
+      })
+      .catch(() => setLoadingPayments(false));
   }, [id]);
 
   if (error) return <div className="rounded-2xl bg-red-50 p-5 text-red-800 text-sm font-extrabold border border-red-200">{error}</div>;
   if (!data) return <div className="h-64 animate-pulse rounded-2xl bg-slate-200" />;
 
   const hasDue = data.outstandingBalance > 0;
+  const postedPayments = payments.filter((p) => p.status === "POSTED");
+  const totalPaidAmount = postedPayments.reduce((acc, p) => acc + Number(p.amount || 0), 0);
+  const lastPayment = postedPayments.length > 0 ? postedPayments[0] : null;
 
   return (
     <div className="space-y-6 pb-12">
@@ -83,17 +99,17 @@ export function CustomerDetailPage() {
           className={hasDue ? "border-red-200 bg-red-50/20" : "border-green-200 bg-green-50/10"}
         />
         <StatCard
-          label="Credit Limit"
-          value={data.creditLimit > 0 ? fmt(data.creditLimit) : "Unlimited"}
-          helper="Approved credit threshold"
+          label="Total Paid Amount"
+          value={fmt(totalPaidAmount)}
+          helper={`${postedPayments.length} posted receipts`}
           icon={DollarSign}
+          className="border-emerald-200 bg-emerald-50/10"
         />
         <StatCard
-          label="Available Credit"
-          value={data.creditLimit > 0 ? fmt(Math.max(0, data.creditLimit - data.outstandingBalance)) : "Unlimited"}
-          helper="Remaining credit for new sales"
-          icon={DollarSign}
-          className={data.allowCredit === false ? "border-red-200 bg-red-50/30" : "border-slate-200"}
+          label="Last Payment Date"
+          value={lastPayment ? new Date(lastPayment.paymentDate).toLocaleDateString("en-IN") : "No Payments"}
+          helper={lastPayment ? `Receipt #${lastPayment.paymentNumber}` : "No recorded receipts"}
+          icon={Calendar}
         />
         <StatCard
           label="Payment Terms"
@@ -102,6 +118,70 @@ export function CustomerDetailPage() {
           icon={AlertTriangle}
         />
       </div>
+
+      {/* Payment History Section */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between border-b pb-3">
+          <SectionHeader title="Payment History & Receipts" description="Recent customer payments, receipts, and settlement records." />
+          {hasPermission(user, "financials:manage") && (
+            <Link
+              to={`/payments/new?customerId=${data.id}`}
+              className="flex min-h-9 items-center gap-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 px-3 text-xs font-bold text-white transition-colors"
+            >
+              <Plus size={14} /> Record Payment
+            </Link>
+          )}
+        </div>
+
+        {loadingPayments ? (
+          <div className="h-32 animate-pulse rounded-xl bg-slate-100" />
+        ) : payments.length === 0 ? (
+          <div className="py-8 text-center space-y-1 text-slate-500">
+            <p className="font-bold text-sm text-slate-800">No payment receipts recorded</p>
+            <p className="text-xs text-slate-400">No payments have been received from this customer yet.</p>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-slate-200">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold uppercase tracking-wider">
+                <tr>
+                  <th className="p-3">Receipt #</th>
+                  <th className="p-3">Date</th>
+                  <th className="p-3">Invoice Ref</th>
+                  <th className="p-3 text-right">Amount</th>
+                  <th className="p-3">Payment Method</th>
+                  <th className="p-3 text-center">Status</th>
+                  <th className="p-3 text-center">Receipt Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-semibold text-slate-800">
+                {payments.map((p) => (
+                  <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="p-3 font-bold text-slate-900">{p.paymentNumber}</td>
+                    <td className="p-3 text-slate-600">{new Date(p.paymentDate).toLocaleDateString("en-IN")}</td>
+                    <td className="p-3 text-slate-700">{p.invoice?.invoiceNumber || "—"}</td>
+                    <td className="p-3 text-right font-black text-emerald-700">{fmt(p.amount)}</td>
+                    <td className="p-3">
+                      <span className="uppercase text-[10px] font-bold text-slate-700">{p.paymentMethod?.replaceAll("_", " ")}</span>
+                    </td>
+                    <td className="p-3 text-center">
+                      <BusinessStatusBadge status={p.status} />
+                    </td>
+                    <td className="p-3 text-center">
+                      <Link
+                        to={`/payments/${p.id}/receipt`}
+                        className="inline-flex items-center gap-1 min-h-7 rounded-lg bg-slate-900 hover:bg-slate-800 px-2.5 text-[10px] font-bold text-white transition-colors"
+                      >
+                        <Printer size={12} /> Receipt
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       {/* Credit Control & Exposure Card */}
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">

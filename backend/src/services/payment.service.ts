@@ -7,10 +7,77 @@ import { nextDocumentNumber } from "./numberSequence.service";
 import { postLedgerEntry } from "./ledger.service";
 
 const include = {
-  customer: { select: { id: true, customerCode: true, name: true, phone: true } },
-  invoice: { select: { id: true, invoiceNumber: true, status: true, totalAmount: true, balanceDue: true } },
-  receivedBy: { select: { id: true, name: true } },
+  customer: {
+    select: {
+      id: true,
+      customerCode: true,
+      name: true,
+      phone: true,
+      email: true,
+      gstin: true,
+      billingAddress: true,
+    },
+  },
+  invoice: {
+    select: {
+      id: true,
+      invoiceNumber: true,
+      invoiceDate: true,
+      status: true,
+      totalAmount: true,
+      amountPaid: true,
+      balanceDue: true,
+    },
+  },
+  receivedBy: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  },
 };
+
+export const mapPaymentReceipt = (payment: any, business: any) => ({
+  ...payment,
+  receipt: {
+    business: {
+      name: business?.name || "APNI ESTATE",
+      phone: business?.phone || null,
+      address: business?.address || null,
+      gstNumber: business?.gstNumber || null,
+    },
+    customer: {
+      customerCode: payment.customer?.customerCode || "",
+      name: payment.customer?.name || "",
+      phone: payment.customer?.phone || "",
+      email: payment.customer?.email || null,
+      gstin: payment.customer?.gstin || null,
+      billingAddress: payment.customer?.billingAddress || null,
+    },
+    payment: {
+      paymentNumber: payment.paymentNumber,
+      paymentDate: payment.paymentDate,
+      amount: Number(payment.amount),
+      paymentMethod: payment.paymentMethod,
+      referenceNumber: payment.referenceNumber || null,
+      bankName: payment.bankName || null,
+      notes: payment.notes || null,
+      status: payment.status,
+      receivedBy: payment.receivedBy ? { id: payment.receivedBy.id, name: payment.receivedBy.name, email: payment.receivedBy.email } : null,
+    },
+    invoice: payment.invoice
+      ? {
+          invoiceNumber: payment.invoice.invoiceNumber,
+          invoiceDate: payment.invoice.invoiceDate,
+          totalAmount: Number(payment.invoice.totalAmount),
+          amountPaid: Number(payment.invoice.amountPaid),
+          balanceDue: Number(payment.invoice.balanceDue),
+          status: payment.invoice.status,
+        }
+      : null,
+  },
+});
 
 export const getAll = async (businessId: string, rawQuery: unknown) => {
   const query = listPaymentQuerySchema.parse(rawQuery);
@@ -18,13 +85,25 @@ export const getAll = async (businessId: string, rawQuery: unknown) => {
   if (query.customerId) where.customerId = query.customerId;
   if (query.invoiceId) where.invoiceId = query.invoiceId;
   if (query.status) where.status = query.status.toUpperCase();
-  return prisma.customerPayment.findMany({ where, include, orderBy: { paymentDate: "desc" } });
+  const list = await prisma.customerPayment.findMany({ where, include, orderBy: { paymentDate: "desc" } });
+  const now = new Date();
+  return list.map((p) => {
+    const ageDays = Math.max(0, Math.floor((now.getTime() - new Date(p.paymentDate).getTime()) / 86400000));
+    return {
+      ...p,
+      paymentAgeDays: ageDays,
+    };
+  });
 };
 
 export const getById = async (businessId: string, id: string) => {
   const payment = await prisma.customerPayment.findFirst({ where: { id, businessId }, include });
   if (!payment) throw new ApiError(404, "Customer payment not found.");
-  return payment;
+  const business = await prisma.business.findUnique({
+    where: { id: businessId },
+    select: { name: true, phone: true, address: true, gstNumber: true },
+  });
+  return mapPaymentReceipt(payment, business);
 };
 
 export const create = async (businessId: string, userId: string, input: unknown) => {
@@ -33,7 +112,13 @@ export const create = async (businessId: string, userId: string, input: unknown)
   if (amount.lte(0)) throw new ApiError(400, "Payment amount must be greater than zero.");
   return prisma.$transaction(async (tx) => {
     const duplicate = await tx.customerPayment.findFirst({ where: { businessId, idempotencyKey: data.idempotencyKey }, include });
-    if (duplicate) return duplicate;
+    if (duplicate) {
+      const business = await tx.business.findUnique({
+        where: { id: businessId },
+        select: { name: true, phone: true, address: true, gstNumber: true },
+      });
+      return mapPaymentReceipt(duplicate, business);
+    }
     const [customer, invoice] = await Promise.all([
       tx.customer.findFirst({ where: { id: data.customerId, businessId, isActive: true } }),
       tx.invoice.findFirst({ where: { id: data.invoiceId, businessId } }),
@@ -69,8 +154,26 @@ export const create = async (businessId: string, userId: string, input: unknown)
       },
       include,
     });
-    await postLedgerEntry(tx,{businessId,partyType:"CUSTOMER",partyId:customer.id,transactionType:"CUSTOMER_PAYMENT",referenceType:"CUSTOMER_PAYMENT",referenceId:payment.id,amount,debitAmount:0,creditAmount:amount,description:`Payment received against ${invoice.invoiceNumber}`,transactionDate:payment.paymentDate,createdById:userId,idempotencyKey:`CUSTOMER_PAYMENT:${payment.id}`});
-    return payment;
+    await postLedgerEntry(tx, {
+      businessId,
+      partyType: "CUSTOMER",
+      partyId: customer.id,
+      transactionType: "CUSTOMER_PAYMENT",
+      referenceType: "CUSTOMER_PAYMENT",
+      referenceId: payment.id,
+      amount,
+      debitAmount: 0,
+      creditAmount: amount,
+      description: `Payment received against ${invoice.invoiceNumber}`,
+      transactionDate: payment.paymentDate,
+      createdById: userId,
+      idempotencyKey: `CUSTOMER_PAYMENT:${payment.id}`,
+    });
+    const business = await tx.business.findUnique({
+      where: { id: businessId },
+      select: { name: true, phone: true, address: true, gstNumber: true },
+    });
+    return mapPaymentReceipt(payment, business);
   });
 };
 
@@ -92,6 +195,19 @@ export const reverse = async (businessId: string, id: string) => prisma.$transac
     data: { outstandingBalance: { increment: Number(payment.amount.toString()) } },
   });
   await tx.customerPayment.update({ where: { id }, data: { status: "REVERSED", reversedAt: new Date() } });
-  await postLedgerEntry(tx,{businessId,partyType:"CUSTOMER",partyId:payment.customerId,transactionType:"CUSTOMER_PAYMENT_REVERSAL",referenceType:"CUSTOMER_PAYMENT",referenceId:payment.id,amount:payment.amount,debitAmount:payment.amount,creditAmount:0,description:`Payment ${payment.paymentNumber} reversed`,createdById:payment.receivedById,idempotencyKey:`CUSTOMER_PAYMENT_REVERSAL:${payment.id}`});
+  await postLedgerEntry(tx, {
+    businessId,
+    partyType: "CUSTOMER",
+    partyId: payment.customerId,
+    transactionType: "CUSTOMER_PAYMENT_REVERSAL",
+    referenceType: "CUSTOMER_PAYMENT",
+    referenceId: payment.id,
+    amount: payment.amount,
+    debitAmount: payment.amount,
+    creditAmount: 0,
+    description: `Payment ${payment.paymentNumber} reversed`,
+    createdById: payment.receivedById,
+    idempotencyKey: `CUSTOMER_PAYMENT_REVERSAL:${payment.id}`,
+  });
   return tx.customerPayment.findUniqueOrThrow({ where: { id }, include });
 });
