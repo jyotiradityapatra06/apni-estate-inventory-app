@@ -168,6 +168,8 @@ model Customer {
   state              String?
   stateCode          String?
   creditLimit        Float             @default(0)
+  creditDays         Int               @default(0)
+  allowCredit        Boolean           @default(true)
   openingBalance     Float             @default(0)
   outstandingBalance Float             @default(0)
   notes              String?

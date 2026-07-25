@@ -15,6 +15,8 @@ const empty: CustomerInput = {
   billingAddress: "",
   shippingAddress: "",
   creditLimit: 0,
+  creditDays: 0,
+  allowCredit: true,
   openingBalance: 0,
   notes: "",
   isActive: true,
@@ -50,8 +52,10 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
             stateCode: c.stateCode || "",
             billingAddress: c.billingAddress || "",
             shippingAddress: c.shippingAddress || "",
-            creditLimit: c.creditLimit,
-            openingBalance: c.openingBalance,
+            creditLimit: c.creditLimit || 0,
+            creditDays: c.creditDays || 0,
+            allowCredit: c.allowCredit !== false,
+            openingBalance: c.openingBalance || 0,
             notes: c.notes || "",
             isActive: c.isActive,
           });
@@ -206,7 +210,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
-        <SectionHeader title="Credit Limits and Opening Balance" description="Set credit rules and initial balance." />
+        <SectionHeader title="Credit Settings & Balances" description="Configure credit limits, payment terms, and initial outstanding balance." />
         <div className="grid gap-4 md:grid-cols-2">
           <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
             Credit Limit (₹)
@@ -215,13 +219,29 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               inputMode="decimal"
               min="0"
               step="0.01"
-              placeholder="0.00"
+              placeholder="0 (Unlimited credit)"
               value={form.creditLimit}
               onChange={(e) => set("creditLimit", Number(e.target.value))}
               className={cls}
             />
+            <span className="text-[10px] text-slate-400 font-bold normal-case mt-1 block">Set 0 for unlimited credit sales.</span>
           </label>
+
           <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            Credit Period (Days)
+            <input
+              type="number"
+              inputMode="numeric"
+              min="0"
+              placeholder="e.g. 30"
+              value={form.creditDays || 0}
+              onChange={(e) => set("creditDays", Number(e.target.value))}
+              className={cls}
+            />
+            <span className="text-[10px] text-slate-400 font-bold normal-case mt-1 block">Payment due terms in days.</span>
+          </label>
+
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
             Opening Outstanding Balance (₹)
             <input
               type="number"
@@ -234,6 +254,19 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
+
+          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-2">
+            <div>
+              <span className="text-xs font-black text-slate-900 block">Allow Credit Sales</span>
+              <span className="text-[11px] text-slate-500 font-semibold block">Enable or disable credit sales transactions for this customer.</span>
+            </div>
+            <input
+              type="checkbox"
+              checked={form.allowCredit !== false}
+              onChange={(e) => set("allowCredit", e.target.checked)}
+              className="h-5 w-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
+            />
+          </div>
         </div>
       </section>
 

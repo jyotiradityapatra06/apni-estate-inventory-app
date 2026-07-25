@@ -25,6 +25,7 @@ export const createSalesOrderSchema = z.object({
     gstRate: decimalValue.optional(),
   })).min(1, "Add at least one material"),
   roundToRupee: z.boolean().optional(),
+  overrideCreditLimit: z.boolean().optional(),
 });
 
 export const listSalesOrderQuerySchema = z.object({

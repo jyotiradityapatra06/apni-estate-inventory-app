@@ -74,27 +74,72 @@ export function CustomerDetailPage() {
       />
 
       {/* Prominent Stat Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <StatCard
-          label="Outstanding Dues to Receive"
+          label="Outstanding Dues"
           value={fmt(data.outstandingBalance)}
           helper={hasDue ? "Payment pending from customer" : "All dues settled"}
           icon={UserCheck}
           className={hasDue ? "border-red-200 bg-red-50/20" : "border-green-200 bg-green-50/10"}
         />
         <StatCard
-          label="Approved Credit Limit"
-          value={fmt(data.creditLimit)}
-          helper="Maximum allowed credit threshold"
+          label="Credit Limit"
+          value={data.creditLimit > 0 ? fmt(data.creditLimit) : "Unlimited"}
+          helper="Approved credit threshold"
           icon={DollarSign}
         />
         <StatCard
-          label="Opening Outstanding Balance"
-          value={fmt(data.openingBalance)}
-          helper="Balance brought forward at setup"
+          label="Available Credit"
+          value={data.creditLimit > 0 ? fmt(Math.max(0, data.creditLimit - data.outstandingBalance)) : "Unlimited"}
+          helper="Remaining credit for new sales"
+          icon={DollarSign}
+          className={data.allowCredit === false ? "border-red-200 bg-red-50/30" : "border-slate-200"}
+        />
+        <StatCard
+          label="Payment Terms"
+          value={`${data.creditDays || 0} Days`}
+          helper="Standard credit days period"
           icon={AlertTriangle}
         />
       </div>
+
+      {/* Credit Control & Exposure Card */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between">
+          <SectionHeader title="Credit Control & Exposure" description="Credit allowance, payment period, and threshold status." />
+          <span
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider border ${
+              data.allowCredit === false
+                ? "bg-red-50 text-red-700 border-red-200"
+                : data.creditLimit > 0 && data.outstandingBalance > data.creditLimit
+                ? "bg-amber-50 text-amber-800 border-amber-300"
+                : "bg-emerald-50 text-emerald-700 border-emerald-200"
+            }`}
+          >
+            {data.allowCredit === false
+              ? "Credit Blocked"
+              : data.creditLimit > 0 && data.outstandingBalance > data.creditLimit
+              ? "Limit Exceeded"
+              : "Within Limit"}
+          </span>
+        </div>
+        <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 pt-2">
+          <Row label="Allow Credit Sales">
+            <span className={data.allowCredit !== false ? "text-emerald-700" : "text-red-600"}>
+              {data.allowCredit !== false ? "Enabled" : "Disabled (Blocked)"}
+            </span>
+          </Row>
+          <Row label="Approved Credit Limit">
+            {data.creditLimit > 0 ? fmt(data.creditLimit) : "Unlimited Credit"}
+          </Row>
+          <Row label="Credit Days (Terms)">
+            {data.creditDays || 0} Days
+          </Row>
+          <Row label="Available Exposure">
+            {data.creditLimit > 0 ? fmt(Math.max(0, data.creditLimit - data.outstandingBalance)) : "N/A (Unlimited)"}
+          </Row>
+        </dl>
+      </section>
 
       {/* Contact and Business Details */}
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">

@@ -177,7 +177,16 @@ export function CustomerListPage() {
                         <Link to={`/customers/${c.id}`} className="font-black text-slate-900 text-sm sm:text-base hover:text-orange-600 transition-colors block">
                           {c.name}
                         </Link>
-                        <p className="text-xs text-slate-400 font-bold uppercase">{c.customerCode}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-xs text-slate-400 font-bold uppercase">{c.customerCode}</span>
+                          {c.allowCredit === false ? (
+                            <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black text-red-700 uppercase border border-red-200">Credit Blocked</span>
+                          ) : c.creditLimit > 0 && c.outstandingBalance > c.creditLimit ? (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-800 uppercase border border-amber-300">Limit Exceeded</span>
+                          ) : c.creditLimit > 0 ? (
+                            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black text-emerald-700 uppercase border border-emerald-200">Within Limit</span>
+                          ) : null}
+                        </div>
                       </td>
                       <td className="px-4 py-3.5">
                         <a href={`tel:${c.phone}`} className="flex items-center gap-1.5 text-orange-600 font-black text-xs sm:text-sm hover:underline">

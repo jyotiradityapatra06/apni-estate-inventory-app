@@ -64,6 +64,26 @@ export const create = async (businessId: string, userId: string, input: unknown)
     };
   }), data.roundToRupee);
 
+  // Credit Validation Check
+  const newOrderAmount = Number(calculation.totalAmount);
+  const currentOutstanding = customer.outstandingBalance;
+  const totalExposure = currentOutstanding + newOrderAmount;
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const isOwnerOrManager = user?.role === "OWNER" || user?.role === "MANAGER";
+
+  if (data.overrideCreditLimit && !isOwnerOrManager) {
+    throw new ApiError(403, "Staff cannot override customer credit restrictions. Owner or Manager approval required.");
+  }
+
+  if (customer.allowCredit === false && (!data.overrideCreditLimit || !isOwnerOrManager)) {
+    throw new ApiError(400, "Credit sales are disabled for this customer.");
+  }
+
+  if (customer.creditLimit > 0 && totalExposure > customer.creditLimit && (!data.overrideCreditLimit || !isOwnerOrManager)) {
+    throw new ApiError(409, `Credit limit exceeded. Current Outstanding: ₹${currentOutstanding}, New Order: ₹${newOrderAmount}, Limit: ₹${customer.creditLimit}. Owner or Manager approval required.`);
+  }
+
   return prisma.$transaction(async (tx) => {
     const orderNumber = await nextDocumentNumber(tx, businessId, "SALES_ORDER", "SO");
     return tx.salesOrder.create({
@@ -118,6 +138,9 @@ export const confirm = async (businessId: string, id: string, overrideCreditLimi
   if (order.status !== "DRAFT") throw new ApiError(400, "Only draft Sales Orders can be confirmed.");
   const customer = await tx.customer.findFirst({ where: { id: order.customerId, businessId } });
   if (!customer) throw new ApiError(404, "Customer not found.");
+  if (customer.allowCredit === false && !overrideCreditLimit) {
+    throw new ApiError(400, "Credit sales are disabled for this customer.");
+  }
   if (customer.creditLimit > 0 && customer.outstandingBalance + Number(order.totalAmount) > customer.creditLimit && !overrideCreditLimit) {
     throw new ApiError(409, "Customer credit limit exceeded. Owner or Manager approval is required.");
   }

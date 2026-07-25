@@ -7,6 +7,7 @@ import { inventoryApi, type InventoryItemData } from "../../api/inventory.api";
 import { PageHeader, SectionHeader } from "../../app/components/common/PageHeader";
 import { MobileStickyFooter } from "../../app/components/mobile/MobileStickyFooter";
 import salesOrderApi from "../../api/salesOrder.api";
+import { useAuth } from "../../hooks/useAuth";
 import type { Customer } from "../../types/customer.types";
 import { fmt } from "../../utils/currency";
 import { calculateLine, calculateOrder } from "./salesOrderCalculations";
@@ -18,12 +19,16 @@ const cls = "mt-2 min-h-[44px] w-full rounded-xl border border-slate-200 bg-whit
 export function SalesOrderFormPage() {
   const nav = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const isOwnerOrManager = user?.role === "OWNER" || user?.role === "MANAGER";
+
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [materials, setMaterials] = useState<InventoryItemData[]>([]);
   const [customerId, setCustomerId] = useState(searchParams.get("customerId") || "");
   const [taxMode, setTaxMode] = useState<"GST" | "NON_GST">("GST");
   const [items, setItems] = useState<Line[]>([blank()]);
   const [details, setDetails] = useState({ expectedDeliveryDate: "", billingAddress: "", deliveryAddress: "", placeOfSupplyCode: "", notes: "", terms: "" });
+  const [overrideCreditLimit, setOverrideCreditLimit] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -57,6 +62,13 @@ export function SalesOrderFormPage() {
 
   const summary = useMemo(() => calculateOrder(items, taxMode), [items, taxMode]);
 
+  const newOrderAmount = summary.totalAmount;
+  const currentOutstanding = customer?.outstandingBalance || 0;
+  const creditLimit = customer?.creditLimit || 0;
+  const totalExposure = currentOutstanding + newOrderAmount;
+  const isCreditBlocked = customer?.allowCredit === false;
+  const isLimitExceeded = creditLimit > 0 && totalExposure > creditLimit;
+
   const available = (line: Line) => {
     const m = materials.find(x => x.id === line.inventoryItemId);
     const b = m?.godownStocks?.find(x => x.godown.id === line.godownId);
@@ -78,6 +90,13 @@ export function SalesOrderFormPage() {
       const a = available(line);
       if (Number(line.quantity) > a.value) return `Only ${a.value} ${a.material?.unit || "units"} are available in ${a.balance?.godown.name || "the selected Godown"}.`;
     }
+
+    if (isCreditBlocked && !overrideCreditLimit) {
+      return `Credit sales are disabled for ${customer?.name}. Owner or Manager override required.`;
+    }
+    if (isLimitExceeded && !overrideCreditLimit) {
+      return `Credit limit exceeded for ${customer?.name} (Exposure: ₹${fmt(totalExposure)}, Limit: ₹${fmt(creditLimit)}). Manager approval required.`;
+    }
     return "";
   };
 
@@ -90,6 +109,7 @@ export function SalesOrderFormPage() {
     placeOfSupplyCode: details.placeOfSupplyCode || undefined,
     notes: details.notes || undefined,
     terms: details.terms || undefined,
+    overrideCreditLimit: overrideCreditLimit || undefined,
     items: items.map(x => ({
       inventoryItemId: x.inventoryItemId,
       godownId: x.godownId,
@@ -187,31 +207,91 @@ export function SalesOrderFormPage() {
 
         {/* Selected Customer Card Preview */}
         {customer && (
-          <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-4 space-y-2 text-xs">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="font-black text-sm text-slate-900">{customer.name}</span>
-              {customer.gstin && (
-                <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-extrabold text-[10px] uppercase border border-blue-100">
-                  GSTIN: {customer.gstin}
-                </span>
-              )}
+          <div className="space-y-3">
+            <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-4 space-y-2 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-black text-sm text-slate-900">{customer.name}</span>
+                {customer.gstin && (
+                  <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-extrabold text-[10px] uppercase border border-blue-100">
+                    GSTIN: {customer.gstin}
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-600 pt-1">
+                <div>
+                  <span className="text-[10px] font-black uppercase text-slate-400 block">Phone</span>
+                  <strong className="text-slate-900 font-bold block">{customer.phone}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase text-slate-400 block">Outstanding Dues</span>
+                  <strong className={`font-black block ${customer.outstandingBalance > 0 ? "text-red-600" : "text-slate-900"}`}>
+                    {fmt(customer.outstandingBalance)}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase text-slate-400 block">Credit Limit</span>
+                  <strong className="text-slate-900 font-bold block">{customer.creditLimit > 0 ? fmt(customer.creditLimit) : "Unlimited"}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase text-slate-400 block">Available Credit</span>
+                  <strong className="text-slate-900 font-bold block">{customer.creditLimit > 0 ? fmt(Math.max(0, customer.creditLimit - customer.outstandingBalance)) : "Unlimited"}</strong>
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-slate-600 pt-1">
-              <div>
-                <span className="text-[10px] font-black uppercase text-slate-400 block">Phone</span>
-                <strong className="text-slate-900 font-bold block">{customer.phone}</strong>
+
+            {/* Live Credit Warning Banner: Blocked Credit */}
+            {isCreditBlocked && (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-start gap-3 text-xs">
+                <AlertCircle className="text-red-600 shrink-0 mt-0.5" size={18} />
+                <div className="space-y-1 text-red-950 flex-1">
+                  <p className="font-black text-sm text-red-800">Credit Blocked for {customer.name}</p>
+                  <p className="font-semibold text-red-800">Credit sales are disabled for this customer. Only cash/advance sales or Owner/Manager overrides are permitted.</p>
+                  {isOwnerOrManager ? (
+                    <label className="flex items-center gap-2 pt-2 cursor-pointer font-extrabold text-xs text-red-900">
+                      <input
+                        type="checkbox"
+                        checked={overrideCreditLimit}
+                        onChange={(e) => setOverrideCreditLimit(e.target.checked)}
+                        className="h-4 w-4 rounded border-red-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
+                      />
+                      Manager Approval Override (Proceed with credit sale)
+                    </label>
+                  ) : (
+                    <p className="text-[11px] font-bold text-red-700 pt-1">Manager approval is required to bypass this restriction.</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] font-black uppercase text-slate-400 block">Outstanding Dues</span>
-                <strong className={`font-black block ${customer.outstandingBalance > 0 ? "text-red-600" : "text-slate-900"}`}>
-                  {fmt(customer.outstandingBalance)}
-                </strong>
+            )}
+
+            {/* Live Credit Warning Banner: Limit Exceeded */}
+            {!isCreditBlocked && isLimitExceeded && (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 flex items-start gap-3 text-xs">
+                <AlertCircle className="text-amber-700 shrink-0 mt-0.5" size={18} />
+                <div className="space-y-1.5 text-amber-950 flex-1">
+                  <p className="font-black text-sm text-amber-900">Credit Limit Warning for {customer.name}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-1 font-bold text-[11px] bg-amber-100/60 p-2.5 rounded-lg border border-amber-200">
+                    <div>Outstanding: <span className="block text-slate-900">{fmt(currentOutstanding)}</span></div>
+                    <div>New Order: <span className="block text-slate-900">{fmt(newOrderAmount)}</span></div>
+                    <div>Credit Limit: <span className="block text-slate-900">{fmt(creditLimit)}</span></div>
+                    <div>Total Exposure: <span className="block text-red-700">{fmt(totalExposure)}</span></div>
+                  </div>
+                  <p className="font-extrabold text-amber-900">Creating this order will exceed approved credit limit by {fmt(totalExposure - creditLimit)}. Manager approval required.</p>
+                  {isOwnerOrManager ? (
+                    <label className="flex items-center gap-2 pt-1.5 cursor-pointer font-extrabold text-xs text-amber-950">
+                      <input
+                        type="checkbox"
+                        checked={overrideCreditLimit}
+                        onChange={(e) => setOverrideCreditLimit(e.target.checked)}
+                        className="h-4 w-4 rounded border-amber-400 text-orange-600 focus:ring-orange-500 cursor-pointer"
+                      />
+                      Manager Approval Override (Approve Credit Limit Exceed)
+                    </label>
+                  ) : (
+                    <p className="text-[11px] font-bold text-amber-800 pt-0.5">Staff cannot override credit limit. Manager approval required.</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] font-black uppercase text-slate-400 block">Credit Limit</span>
-                <strong className="text-slate-900 font-bold block">{fmt(customer.creditLimit)}</strong>
-              </div>
-            </div>
+            )}
           </div>
         )}
       </section>
