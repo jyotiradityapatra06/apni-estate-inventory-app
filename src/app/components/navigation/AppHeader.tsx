@@ -4,6 +4,7 @@ import { Bell, Search, Trash2, User, X, ChevronRight } from "lucide-react";
 import { C } from "../../../constants/colors";
 import { notificationApi, type NotificationData } from "../../../api/notification.api";
 import { useAuth } from "../../../hooks/useAuth";
+import { ThemeToggle } from "../common/ThemeToggle";
 
 export interface AppHeaderProps {
   isDark: boolean;
@@ -249,11 +250,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
   return (
     <header
-      style={{
-        background: isDark ? C.darkCard : C.white,
-        borderBottom: `1px solid ${borderColor}`,
-      }}
-      className="sticky top-0 z-45 flex h-14 md:h-16 flex-shrink-0 items-center justify-between px-3 md:px-6 select-none"
+      className="sticky top-0 z-45 flex h-14 md:h-16 flex-shrink-0 items-center justify-between px-3 md:px-6 select-none bg-white dark:bg-[#0F172A] border-b border-slate-200 dark:border-slate-800 transition-colors duration-200"
     >
       {/* Mobile Compact Business Header (md:hidden) */}
       <div className="flex items-center gap-2 md:hidden min-w-0">
@@ -262,11 +259,11 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <h1 className="truncate text-xs font-black text-slate-900 leading-tight">
+            <h1 className="truncate text-xs font-black text-slate-900 dark:text-white leading-tight">
               {business?.name || "APNI ESTATE"}
             </h1>
             {user?.role && (
-              <span className="shrink-0 rounded-full bg-orange-50 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wider text-orange-600 border border-orange-100">
+              <span className="shrink-0 rounded-full bg-orange-50 dark:bg-orange-950/50 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wider text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-900/50">
                 {user.role}
               </span>
             )}
@@ -280,8 +277,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
       {/* Desktop Page Title (hidden md:block) */}
       <div className="hidden md:block">
         <h1
-          style={{ color: textColor }}
-          className="max-w-[190px] truncate text-[18px] font-bold md:max-w-none lg:text-xl"
+          className="max-w-[190px] truncate text-[18px] font-bold text-slate-900 dark:text-white md:max-w-none lg:text-xl"
         >
           {title}
         </h1>
@@ -385,7 +381,8 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
       )}
 
       {/* Header Controls */}
-      <div className="flex items-center gap-1.5 md:gap-4">
+      <div className="flex items-center gap-1.5 md:gap-3">
+        <ThemeToggle />
         {/* Mobile Search Button Trigger */}
         <button
           type="button"

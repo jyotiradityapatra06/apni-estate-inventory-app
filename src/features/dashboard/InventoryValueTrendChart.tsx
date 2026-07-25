@@ -3,6 +3,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import { DollarSign, Landmark } from "lucide-react";
 import type { InventoryItemData } from "../../api/inventory.api";
 import { fmt } from "../../utils/currency";
+import { useTheme } from "../../hooks/useTheme";
 
 interface InventoryValueTrendChartProps {
   materials: InventoryItemData[];
@@ -13,6 +14,8 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
   materials = [],
   movements = []
 }) => {
+  const { isDark } = useTheme();
+
   const currentValuation = materials.reduce(
     (sum, item) => sum + Math.max(0, Number(item.quantity || 0)) * Number(item.costPrice || 0),
     0
@@ -20,20 +23,20 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
 
   if (!materials || materials.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <DollarSign size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900">Inventory Value Trend</h3>
+            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Inventory Value Trend</h3>
           </div>
         </div>
 
         <div className="py-8 text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#F97316]">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 dark:bg-orange-950/60 text-[#F97316]">
             <Landmark size={24} />
           </div>
-          <h4 className="font-extrabold text-sm text-slate-900">Not enough inventory history yet</h4>
-          <p className="text-xs text-slate-400 max-w-[280px] mx-auto">
+          <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Not enough inventory history yet</h4>
+          <p className="text-xs text-slate-400 dark:text-slate-400 max-w-[280px] mx-auto">
             Continue adding stock transactions to see inventory value trends over time.
           </p>
         </div>
@@ -86,39 +89,16 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
 
   const trendData = trendDataReversed.reverse();
 
-  if (!materials || materials.length === 0 || trendData.length === 0) {
-    return (
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2">
-            <DollarSign size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900">Inventory Value Trend</h3>
-          </div>
-        </div>
-
-        <div className="py-8 text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#F97316]">
-            <Landmark size={24} />
-          </div>
-          <h4 className="font-extrabold text-sm text-slate-900">Not enough inventory history yet</h4>
-          <p className="text-xs text-slate-400 max-w-[280px] mx-auto">
-            Continue adding stock transactions to see inventory value trends over time.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-sm space-y-4">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-3">
+    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <DollarSign size={18} className="text-[#F97316]" />
-          <h3 className="font-extrabold text-sm text-slate-900">Inventory Value Trend</h3>
+          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Inventory Value Trend</h3>
         </div>
         <div className="text-right">
           <span className="text-[10px] font-bold text-slate-400 uppercase block">Current Stock Value</span>
-          <strong className="text-sm font-black text-slate-900">{fmt(currentValuation)}</strong>
+          <strong className="text-sm font-black text-slate-900 dark:text-white">{fmt(currentValuation)}</strong>
         </div>
       </div>
 
@@ -127,18 +107,31 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
           <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorValuation" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#0F172A" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#0F172A" stopOpacity={0} />
+                <stop offset="5%" stopColor={isDark ? "#F97316" : "#0F172A"} stopOpacity={0.35} />
+                <stop offset="95%" stopColor={isDark ? "#F97316" : "#0F172A"} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-            <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#334155" : "#E2E8F0"} />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#64748B" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#64748B" }} axisLine={false} tickLine={false} />
             <Tooltip
-              contentStyle={{ backgroundColor: "#0F172A", color: "#FFF", borderRadius: "12px", fontSize: "11px", border: "none" }}
+              contentStyle={{
+                backgroundColor: isDark ? "#0F172A" : "#0F172A",
+                color: "#FFF",
+                borderRadius: "12px",
+                fontSize: "11px",
+                border: isDark ? "1px solid #334155" : "none"
+              }}
               formatter={(val: any) => [fmt(Number(val)), "Inventory Value"]}
             />
-            <Area type="monotone" dataKey="value" stroke="#0F172A" strokeWidth={2.5} fillOpacity={1} fill="url(#colorValuation)" />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke={isDark ? "#F97316" : "#0F172A"}
+              strokeWidth={2.5}
+              fillOpacity={1}
+              fill="url(#colorValuation)"
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>

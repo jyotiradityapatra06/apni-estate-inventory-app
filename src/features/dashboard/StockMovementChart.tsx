@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
-import { ArrowUpRight, ArrowDownLeft, TrendingUp, PackagePlus, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, TrendingUp, PackagePlus } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import { useTheme } from "../../hooks/useTheme";
 import { hasPermission } from "../../utils/permissions";
 
 interface StockMovementChartProps {
@@ -12,6 +13,7 @@ interface StockMovementChartProps {
 export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movements = [] }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const canAddStock = hasPermission(user, "inventory:create");
 
   // Aggregate stock movements by date label
@@ -60,28 +62,28 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
 
   if (!movements || movements.length === 0 || chartData.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <TrendingUp size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900">Stock Movement Trend</h3>
+            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Stock Movement Trend</h3>
           </div>
         </div>
 
         <div className="py-8 text-center space-y-3">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#F97316]">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 dark:bg-orange-950/60 text-[#F97316]">
             <TrendingUp size={24} />
           </div>
           <div>
-            <h4 className="font-extrabold text-sm text-slate-900">No stock movement yet</h4>
-            <p className="text-xs text-slate-400 mt-1 max-w-[280px] mx-auto">
+            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">No stock movement yet</h4>
+            <p className="text-xs text-slate-400 dark:text-slate-400 mt-1 max-w-[280px] mx-auto">
               Stock in and stock out activity will appear here after your first inventory transaction.
             </p>
           </div>
           {canAddStock && (
             <button
               onClick={() => navigate("/materials")}
-              className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl bg-[#0F172A] hover:bg-slate-800 px-4 text-xs font-bold text-white cursor-pointer transition-colors"
+              className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl bg-[#0F172A] dark:bg-orange-600 hover:bg-slate-800 dark:hover:bg-orange-700 px-4 text-xs font-bold text-white cursor-pointer transition-colors"
             >
               <PackagePlus size={15} />
               <span>Add Stock</span>
@@ -93,19 +95,19 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-sm space-y-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-3">
+    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <TrendingUp size={18} className="text-[#F97316]" />
-          <h3 className="font-extrabold text-sm text-slate-900">Stock Movement Trend</h3>
+          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Stock Movement Trend</h3>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-lg border border-green-100">
+          <div className="flex items-center gap-1 text-[11px] font-bold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/50 px-2 py-0.5 rounded-lg border border-green-100 dark:border-green-900/50">
             <ArrowDownLeft size={13} />
             <span>In: {totalStockIn}</span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg border border-orange-100">
+          <div className="flex items-center gap-1 text-[11px] font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/50 px-2 py-0.5 rounded-lg border border-orange-100 dark:border-orange-900/50">
             <ArrowUpRight size={13} />
             <span>Out: {totalStockOut}</span>
           </div>
@@ -115,15 +117,21 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
       <div className="w-full min-h-[220px] h-56 pt-1">
         <ResponsiveContainer width="100%" height={220} minHeight={220}>
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-            <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? "#334155" : "#E2E8F0"} />
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#64748B" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#64748B" }} axisLine={false} tickLine={false} />
             <Tooltip
-              contentStyle={{ backgroundColor: "#0F172A", color: "#FFF", borderRadius: "12px", fontSize: "11px", border: "none" }}
+              contentStyle={{
+                backgroundColor: isDark ? "#0F172A" : "#0F172A",
+                color: "#FFF",
+                borderRadius: "12px",
+                fontSize: "11px",
+                border: isDark ? "1px solid #334155" : "none"
+              }}
               formatter={(val: any, name: any) => [`${val} units`, name === "stockIn" ? "Stock In (Received)" : "Stock Out (Dispatched)"]}
             />
             <Legend
-              wrapperStyle={{ paddingTop: "8px", fontSize: "11px", fontWeight: 700 }}
+              wrapperStyle={{ paddingTop: "8px", fontSize: "11px", fontWeight: 700, color: isDark ? "#CBD5E1" : "#0F172A" }}
               formatter={(value) => (value === "stockIn" ? "Stock In (Received)" : "Stock Out (Dispatched)")}
             />
             <Bar dataKey="stockIn" name="stockIn" fill="#16A34A" radius={[4, 4, 0, 0]} maxBarSize={32} />

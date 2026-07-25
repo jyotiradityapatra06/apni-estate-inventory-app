@@ -28,21 +28,21 @@ export function MobileQuickActionFab() {
         <div
           aria-hidden="true"
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-[55] bg-slate-950/45 backdrop-blur-xs md:hidden animate-fade-in"
+          className="fixed inset-0 z-[55] bg-slate-950/60 backdrop-blur-xs md:hidden animate-fade-in"
         />
       )}
 
       {/* Slide-up Action Sheet */}
       {open && (
-        <div className="fixed bottom-[96px] right-3 left-3 z-[60] max-w-[400px] mx-auto rounded-3xl border border-slate-200/80 bg-white p-4 shadow-2xl md:hidden animate-in slide-in-from-bottom-4 duration-200 space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2 px-1">
+        <div className="fixed bottom-[96px] right-3 left-3 z-[60] max-w-[400px] mx-auto rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xl md:hidden animate-in slide-in-from-bottom-4 duration-200 space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 px-1">
             <div>
-              <h3 className="text-sm font-black text-slate-900 tracking-tight">Supplier Quick Actions</h3>
-              <p className="text-[10px] font-semibold text-slate-400">Create records in 1-tap</p>
+              <h3 className="text-sm font-black text-slate-900 dark:text-white tracking-tight">Supplier Quick Actions</h3>
+              <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-400">Create records in 1-tap</p>
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-500 cursor-pointer"
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-pointer"
             >
               <X size={14} />
             </button>
@@ -53,13 +53,13 @@ export function MobileQuickActionFab() {
               <button
                 key={label}
                 onClick={() => go(path)}
-                className="flex min-h-[48px] w-full items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 px-3.5 py-2 text-left transition-all duration-150 hover:bg-slate-100 active:scale-[0.98] cursor-pointer"
+                className="flex min-h-[48px] w-full items-center justify-between rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2 text-left transition-all duration-150 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-[0.98] cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-[#F97316] border border-orange-100 shrink-0">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 dark:bg-orange-950/60 text-[#F97316] border border-orange-100 dark:border-orange-900/50 shrink-0">
                     <Icon size={18} />
                   </span>
-                  <span className="text-xs font-bold text-slate-900 leading-tight">
+                  <span className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight">
                     {label}
                   </span>
                 </div>
@@ -74,8 +74,8 @@ export function MobileQuickActionFab() {
       <button
         aria-label={open ? "Close quick actions" : "Open quick actions"}
         onClick={() => setOpen(!open)}
-        className={`fixed bottom-[80px] right-4 z-[65] flex h-14 w-14 items-center justify-center rounded-full bg-[#0F172A] text-white shadow-xl ring-4 ring-white md:hidden press-active cursor-pointer transition-transform duration-200 ${
-          open ? "rotate-45 bg-orange-600" : ""
+        className={`fixed bottom-[80px] right-4 z-[65] flex h-14 w-14 items-center justify-center rounded-full bg-[#0F172A] dark:bg-orange-600 text-white shadow-xl ring-4 ring-white dark:ring-slate-950 md:hidden press-active cursor-pointer transition-transform duration-200 ${
+          open ? "rotate-45 bg-orange-600 dark:bg-orange-700" : ""
         }`}
       >
         <Plus size={26} className="text-white stroke-[2.5]" />

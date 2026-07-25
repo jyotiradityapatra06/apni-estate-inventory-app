@@ -24,7 +24,7 @@ export function DashboardSummaryCards({ dashboard }: { dashboard: DashboardData 
     return (
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className="h-[110px] animate-pulse rounded-xl border border-slate-200 bg-white" />
+          <div key={index} className="h-[110px] animate-pulse rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900" />
         ))}
       </div>
     );
@@ -37,7 +37,13 @@ export function DashboardSummaryCards({ dashboard }: { dashboard: DashboardData 
       <StatCard label="Receivables" value={fmt(receivables)} helper="Pending from customers" icon={Landmark} />
       <StatCard label="Payables" value={fmt(payables)} helper="Due to suppliers" icon={Landmark} />
       <StatCard label="Stock Value" value={fmt(totalStockValue)} helper="Physical stock valuation" icon={Package} />
-      <StatCard label="Low Stock Items" value={low.length} helper="Items needing reorder" icon={ShieldAlert} className={low.length > 0 ? "border-amber-200 bg-amber-50/30" : ""} />
+      <StatCard
+        label="Low Stock Items"
+        value={low.length}
+        helper="Items needing reorder"
+        icon={ShieldAlert}
+        className={low.length > 0 ? "border-amber-200 dark:border-amber-900/50 bg-amber-50/30 dark:bg-amber-950/30" : ""}
+      />
     </div>
   );
 }

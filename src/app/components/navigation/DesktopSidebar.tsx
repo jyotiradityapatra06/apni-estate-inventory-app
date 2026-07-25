@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import { getDesktopNavigation, isNavigationItemActive, type NavigationGroup } from "../../../constants/navigation";
 import { useAuth } from "../../../hooks/useAuth";
 import { toast } from "sonner";
+import { ThemeToggle } from "../common/ThemeToggle";
 
 const groups: NavigationGroup[] = ["Dashboard", "Inventory", "Sales", "Purchase", "Finance", "Reports", "Management"];
 
@@ -104,7 +105,7 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
       </nav>
 
       {/* Footer Profile & Logout */}
-      <div className="border-t border-slate-800 p-3">
+      <div className="border-t border-slate-800 p-3 space-y-2">
         <div className="flex items-center gap-3 rounded-xl px-2 py-2 bg-slate-800/20">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F97316] text-xs font-black text-white">
             {initials}
@@ -116,16 +117,24 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
             </div>
           )}
           {!collapsed && (
-            <button 
-              onClick={signOut} 
-              aria-label="Logout" 
-              title="Logout" 
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer"
-            >
-              <LogOut size={16} />
-            </button>
+            <div className="flex items-center gap-1">
+              <ThemeToggle />
+              <button 
+                onClick={signOut} 
+                aria-label="Logout" 
+                title="Logout" 
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
           )}
         </div>
+        {collapsed && (
+          <div className="flex justify-center pt-1">
+            <ThemeToggle />
+          </div>
+        )}
       </div>
     </aside>
   );

@@ -5,18 +5,18 @@ import { AlertCircle, Inbox } from "lucide-react";
 export function LoadingSkeleton({ rows = 4 }: { rows?: number }) {
   return (
     <div className="space-y-4" role="status" aria-label="Loading">
-      <div className="h-28 animate-pulse rounded-xl border border-slate-200 bg-slate-50/50 p-4">
-        <div className="h-4 w-1/3 rounded bg-slate-200 mb-3" />
-        <div className="h-8 w-1/2 rounded bg-slate-200" />
+      <div className="h-28 animate-pulse rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4">
+        <div className="h-4 w-1/3 rounded bg-slate-200 dark:bg-slate-700 mb-3" />
+        <div className="h-8 w-1/2 rounded bg-slate-200 dark:bg-slate-700" />
       </div>
       <div className="space-y-2">
         {Array.from({ length: rows }).map((_, index) => (
-          <div key={index} className="h-16 animate-pulse rounded-xl border border-slate-100 bg-white p-4 flex items-center justify-between">
+          <div key={index} className="h-16 animate-pulse rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex items-center justify-between">
             <div className="space-y-2 w-2/3">
-              <div className="h-4 w-1/2 rounded bg-slate-200" />
-              <div className="h-3 w-1/3 rounded bg-slate-200" />
+              <div className="h-4 w-1/2 rounded bg-slate-200 dark:bg-slate-700" />
+              <div className="h-3 w-1/3 rounded bg-slate-200 dark:bg-slate-700" />
             </div>
-            <div className="h-8 w-20 rounded bg-slate-200" />
+            <div className="h-8 w-20 rounded bg-slate-200 dark:bg-slate-700" />
           </div>
         ))}
       </div>
@@ -36,12 +36,12 @@ export function EmptyState({
   icon?: LucideIcon;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center max-w-xl mx-auto my-4 shadow-sm">
-      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 border border-orange-100 shadow-sm">
+    <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-12 text-center max-w-xl mx-auto my-4 shadow-sm">
+      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-900/50 shadow-sm">
         <Icon size={28} />
       </span>
-      <h3 className="mt-5 text-lg font-bold text-slate-900 tracking-tight">{title}</h3>
-      <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500 leading-relaxed">{description}</p>
+      <h3 className="mt-5 text-lg font-bold text-slate-900 dark:text-white tracking-tight">{title}</h3>
+      <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{description}</p>
       {action && <div className="mt-6 flex justify-center">{action}</div>}
     </div>
   );
@@ -55,11 +55,11 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-red-100 bg-red-50/50 p-6 text-center max-w-xl mx-auto my-4">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+    <div className="rounded-2xl border border-red-100 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/30 p-6 text-center max-w-xl mx-auto my-4">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400">
         <AlertCircle size={24} />
       </div>
-      <p className="mt-4 text-sm font-semibold text-red-900">{message}</p>
+      <p className="mt-4 text-sm font-semibold text-red-900 dark:text-red-200">{message}</p>
       {onRetry && (
         <button
           onClick={onRetry}

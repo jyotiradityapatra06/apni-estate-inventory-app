@@ -3,14 +3,14 @@ import { Outlet, useLocation } from "react-router";
 import { DesktopSidebar } from "../components/navigation/DesktopSidebar";
 import { MobileBottomNavigation } from "../components/navigation/MobileBottomNavigation";
 import { AppHeader } from "../components/navigation/AppHeader";
-import { C } from "../../constants/colors";
 import { MobileQuickActionFab } from "../components/navigation/MobileQuickActionFab";
 import { MobileMoreSheet } from "../components/navigation/MobileMoreSheet";
+import { useTheme } from "../../hooks/useTheme";
 
 export const AppLayout = () => {
   const location = useLocation();
   const mainScrollRef = useRef<HTMLDivElement>(null);
-  const isDark = false;
+  const { isDark } = useTheme();
   const [moreOpen, setMoreOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -21,10 +21,9 @@ export const AppLayout = () => {
   return (
     <div
       style={{
-        background: isDark ? C.dark : C.bg,
         fontFamily: "'Plus Jakarta Sans', sans-serif",
       }}
-      className="h-[100dvh] w-full overflow-hidden relative"
+      className="h-[100dvh] w-full overflow-hidden relative bg-[#F8FAFC] dark:bg-[#020617] text-slate-900 dark:text-slate-100 transition-colors duration-200"
     >
       {/* Desktop / Tablet Left Sidebar */}
       <DesktopSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
@@ -56,4 +55,5 @@ export const AppLayout = () => {
     </div>
   );
 };
+
 export default AppLayout;
