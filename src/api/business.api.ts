@@ -3,6 +3,8 @@ import { apiClient } from "./apiClient";
 export interface BusinessUpdateInput {
   name?: string;
   gstNumber?: string;
+  state?: string;
+  stateCode?: string;
   phone?: string;
   address?: string;
   workerSeatLimit?: number;
@@ -15,6 +17,8 @@ export interface BusinessResponse {
     id: string;
     name: string;
     gstNumber?: string;
+    state?: string;
+    stateCode?: string;
     phone?: string;
     address?: string;
     createdAt: string;

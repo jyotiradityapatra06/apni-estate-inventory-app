@@ -27,6 +27,8 @@ export const ManagementPage = () => {
   const [showEditBusiness, setShowEditBusiness] = useState(false);
   const [bName, setBName] = useState("");
   const [bGst, setBGst] = useState("");
+  const [bState, setBState] = useState("");
+  const [bStateCode, setBStateCode] = useState("");
   const [bPhone, setBPhone] = useState("");
   const [bAddress, setBAddress] = useState("");
   const [bPrefix, setBPrefix] = useState(localStorage.getItem("invoice_prefix") || "INV-");
@@ -63,11 +65,17 @@ export const ManagementPage = () => {
 
   const handleEditBusinessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (bStateCode && !/^[0-9]{2}$/.test(bStateCode)) {
+      toast.error("GST State Code must be exactly 2 numeric digits (e.g., 27).");
+      return;
+    }
     setEditLoading(true);
     try {
       await businessApi.updateBusiness({
         name: bName,
         gstNumber: bGst,
+        state: bState,
+        stateCode: bStateCode,
         phone: bPhone,
         address: bAddress,
       });
@@ -188,6 +196,8 @@ export const ManagementPage = () => {
                       onClick={() => {
                         setBName(business?.name || "");
                         setBGst(business?.gstNumber || "");
+                        setBState(business?.state || "");
+                        setBStateCode(business?.stateCode || "");
                         setBPhone(business?.phone || "");
                         setBAddress(business?.address || "");
                         setBPrefix(localStorage.getItem("invoice_prefix") || "INV-");
@@ -209,6 +219,12 @@ export const ManagementPage = () => {
                   <div>
                     <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">GST Registration</span>
                     <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{business?.gstNumber || "Not Provided"}</span>
+                  </div>
+                  <div>
+                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">GST State / Code</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">
+                      {business?.state || "Unspecified"} {business?.stateCode ? `(${business.stateCode})` : ""}
+                    </span>
                   </div>
                   <div>
                     <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">Business Contact</span>
@@ -317,6 +333,32 @@ export const ManagementPage = () => {
                   style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
                   className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
+              </div>
+
+              <div className="flex gap-2">
+                <div className="flex flex-col gap-1 w-2/3">
+                  <label className="text-gray-500 text-[10px] uppercase">State Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Maharashtra"
+                    value={bState}
+                    onChange={(e) => setBState(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <div className="flex flex-col gap-1 w-1/3">
+                  <label className="text-gray-500 text-[10px] uppercase">State Code</label>
+                  <input
+                    type="text"
+                    maxLength={2}
+                    placeholder="e.g. 27"
+                    value={bStateCode}
+                    onChange={(e) => setBStateCode(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
               </div>
 
               <div className="flex flex-col gap-1">

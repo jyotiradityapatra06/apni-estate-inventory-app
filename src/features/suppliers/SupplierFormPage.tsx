@@ -14,6 +14,8 @@ const empty: SupplierInput = {
   alternatePhone: "",
   email: null,
   gstin: "",
+  state: "",
+  stateCode: "",
   panNumber: "",
   address: "",
   openingPayable: 0,
@@ -29,6 +31,7 @@ const cls =
 const phonePattern = /^(?:\+91[ -]?)?[6-9]\d{9}$/;
 const gstPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 const panPattern = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+const stateCodePattern = /^[0-9]{2}$/;
 
 export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
   const { id = "" } = useParams();
@@ -54,6 +57,8 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
             alternatePhone: x.alternatePhone || "",
             email: x.email || null,
             gstin: x.gstin || "",
+            state: x.state || "",
+            stateCode: x.stateCode || "",
             panNumber: x.panNumber || "",
             address: x.address || "",
             openingPayable: x.openingPayable,
@@ -94,6 +99,11 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
       return;
     }
 
+    if (form.stateCode && !stateCodePattern.test(form.stateCode)) {
+      setError("State Code must be exactly 2 numeric digits (e.g., 27).");
+      return;
+    }
+
     if (form.panNumber && !panPattern.test(form.panNumber)) {
       setError("Please enter a valid 10-character PAN number (e.g., ABCDE1234F).");
       return;
@@ -118,7 +128,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
     <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-28">
       <PageHeader
         title={mode === "create" ? "Add New Supplier" : "Edit Supplier Profile"}
-        description={mode === "create" ? "Add vendor contact, GSTIN, and credit terms." : "Update supplier contact and material catalog."}
+        description={mode === "create" ? "Add vendor contact, GSTIN, location, and credit terms." : "Update supplier contact, location, and material catalog."}
       />
 
       {error && (
@@ -128,7 +138,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
       )}
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
-        <SectionHeader title="Basic Information" description="Supplier name, business name, and primary contact." />
+        <SectionHeader title="Basic Information" description="Supplier name, business name, location, and primary contact." />
         <div className="grid gap-4 md:grid-cols-2">
           <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
             Supplier Name *
@@ -197,6 +207,26 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               placeholder="15-digit GSTIN (Optional)"
               value={form.gstin || ""}
               onChange={(e) => set("gstin", e.target.value.toUpperCase())}
+              className={cls}
+            />
+          </label>
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            State Name
+            <input
+              placeholder="e.g. Maharashtra"
+              value={form.state || ""}
+              onChange={(e) => set("state", e.target.value)}
+              className={cls}
+            />
+          </label>
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            GST State Code
+            <input
+              maxLength={2}
+              inputMode="numeric"
+              placeholder="2-digit numeric code (e.g. 27)"
+              value={form.stateCode || ""}
+              onChange={(e) => set("stateCode", e.target.value)}
               className={cls}
             />
           </label>

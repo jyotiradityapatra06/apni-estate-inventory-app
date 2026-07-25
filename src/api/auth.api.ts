@@ -31,6 +31,8 @@ export interface AuthResponse {
       id: string;
       name: string;
       gstNumber?: string;
+      state?: string;
+      stateCode?: string;
       phone?: string;
       address?: string;
     };
@@ -54,6 +56,8 @@ export interface MeResponse {
       id: string;
       name: string;
       gstNumber?: string;
+      state?: string;
+      stateCode?: string;
       phone?: string;
       address?: string;
     };

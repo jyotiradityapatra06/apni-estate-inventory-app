@@ -10,6 +10,8 @@ const empty: CustomerInput = {
   phone: "",
   email: "",
   gstin: "",
+  state: "",
+  stateCode: "",
   billingAddress: "",
   shippingAddress: "",
   creditLimit: 0,
@@ -22,6 +24,7 @@ const cls =
   "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 const phonePattern = /^(?:\+91[ -]?)?[6-9]\d{9}$/;
 const gstPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+const stateCodePattern = /^[0-9]{2}$/;
 
 export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
   const { id = "" } = useParams();
@@ -43,6 +46,8 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
             phone: c.phone,
             email: c.email || "",
             gstin: c.gstin || "",
+            state: c.state || "",
+            stateCode: c.stateCode || "",
             billingAddress: c.billingAddress || "",
             shippingAddress: c.shippingAddress || "",
             creditLimit: c.creditLimit,
@@ -74,6 +79,11 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
       return;
     }
 
+    if (form.stateCode && !stateCodePattern.test(form.stateCode)) {
+      setError("State Code must be exactly 2 numeric digits (e.g., 27).");
+      return;
+    }
+
     setSaving(true);
     try {
       const r = mode === "create" ? await customerApi.create(form) : await customerApi.update(id, form);
@@ -92,7 +102,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
     <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-28">
       <PageHeader
         title={mode === "create" ? "Add New Customer" : "Edit Customer Details"}
-        description={mode === "create" ? "Add contact, GSTIN, and credit threshold details." : "Update customer contact, address, and credit settings."}
+        description={mode === "create" ? "Add contact, GSTIN, location, and credit threshold details." : "Update customer contact, location, address, and credit settings."}
       />
 
       {error && (
@@ -102,7 +112,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
       )}
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
-        <SectionHeader title="Basic Information" description="Name, primary phone, email, and GSTIN." />
+        <SectionHeader title="Basic Information" description="Name, primary phone, email, GSTIN, and location details." />
         <div className="grid gap-4 md:grid-cols-2">
           <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
             Customer Name *
@@ -143,6 +153,26 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               placeholder="15-digit GSTIN (Optional)"
               value={form.gstin || ""}
               onChange={(e) => set("gstin", e.target.value.toUpperCase())}
+              className={cls}
+            />
+          </label>
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            State Name
+            <input
+              placeholder="e.g. Maharashtra"
+              value={form.state || ""}
+              onChange={(e) => set("state", e.target.value)}
+              className={cls}
+            />
+          </label>
+          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            GST State Code
+            <input
+              maxLength={2}
+              inputMode="numeric"
+              placeholder="2-digit numeric code (e.g. 27)"
+              value={form.stateCode || ""}
+              onChange={(e) => set("stateCode", e.target.value)}
               className={cls}
             />
           </label>

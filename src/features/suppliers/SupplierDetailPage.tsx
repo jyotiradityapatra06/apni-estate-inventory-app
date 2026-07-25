@@ -114,6 +114,11 @@ export function SupplierDetailPage() {
               </span>
             </Row>
           )}
+          {(data.state || data.stateCode) && (
+            <Row l="GST State / Location">
+              {data.state || "Unspecified"} {data.stateCode ? `(State Code: ${data.stateCode})` : ""}
+            </Row>
+          )}
           {data.panNumber && <Row l="PAN Number">{data.panNumber}</Row>}
           {data.paymentTerms && <Row l="Payment Terms">{data.paymentTerms}</Row>}
           {data.address && <Row l="Registered Address">{data.address}</Row>}

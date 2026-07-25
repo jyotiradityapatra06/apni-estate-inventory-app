@@ -116,6 +116,11 @@ export function CustomerDetailPage() {
             </Row>
           )}
           {data.gstin && <Row label="GST Number">{data.gstin}</Row>}
+          {(data.state || data.stateCode) && (
+            <Row label="GST State / Location">
+              {data.state || "Unspecified"} {data.stateCode ? `(State Code: ${data.stateCode})` : ""}
+            </Row>
+          )}
           {data.billingAddress && <Row label="Billing Address">{data.billingAddress}</Row>}
           {data.shippingAddress && <Row label="Delivery Address">{data.shippingAddress}</Row>}
           {data.notes && <Row label="Internal Notes">{data.notes}</Row>}
