@@ -1,5 +1,7 @@
 import { apiClient } from "./apiClient";
 
+export type DeliveryStatusType = "PENDING" | "ASSIGNED" | "DISPATCHED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED";
+
 export interface DeliveryInput {
   customerName: string;
   customerPhone?: string | null;
@@ -9,13 +11,22 @@ export interface DeliveryInput {
   unit: string;
   scheduledDate?: string | null;
   notes?: string | null;
-  status?: "PENDING" | "OUT_FOR_DELIVERY" | "DELIVERED";
+  status?: DeliveryStatusType;
   paymentStatus?: "PENDING" | "RECEIVED";
+  vehicleNumber?: string | null;
+  vehicleType?: string | null;
+  driverName?: string | null;
+  driverPhone?: string | null;
+  receiverName?: string | null;
+  proofOfDeliveryReference?: string | null;
+  deliveryNotes?: string | null;
+  cancellationReason?: string | null;
 }
 
 export interface DeliveryData {
   id: string;
   deliveryNumber: string;
+  challanNumber?: string | null;
   customerName: string;
   customerPhone?: string | null;
   deliveryAddress: string;
@@ -25,11 +36,23 @@ export interface DeliveryData {
   scheduledDate?: string | null;
   notes?: string | null;
   vehicleNumber?: string | null;
-  status: "PENDING" | "OUT_FOR_DELIVERY" | "DELIVERED";
+  vehicleType?: string | null;
+  driverName?: string | null;
+  driverPhone?: string | null;
+  receiverName?: string | null;
+  proofOfDeliveryReference?: string | null;
+  deliveryNotes?: string | null;
+  cancellationReason?: string | null;
+  status: DeliveryStatusType;
   paymentStatus: "PENDING" | "RECEIVED";
   businessId: string;
+  dispatchedAt?: string | null;
+  deliveredAt?: string | null;
   createdAt: string;
   updatedAt: string;
+  createdBy?: { id: string; name: string } | null;
+  dispatchedBy?: { id: string; name: string } | null;
+  completedBy?: { id: string; name: string } | null;
 }
 
 export interface DeliveryListResponse {

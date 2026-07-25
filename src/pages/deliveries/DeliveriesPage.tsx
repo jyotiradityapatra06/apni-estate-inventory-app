@@ -14,9 +14,12 @@ import { hasPermission, hasRole } from "../../utils/permissions";
 import { notificationApi } from "../../api/notification.api";
 import { deliveryApi } from "../../api/delivery.api";
 
+export type DeliveryStatusType = "PENDING" | "ASSIGNED" | "DISPATCHED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED";
+
 export interface LocalDelivery {
   id: string;
   deliveryNumber: string;
+  challanNumber?: string | null;
   customerName: string;
   customerPhone?: string | null;
   deliveryAddress: string;
@@ -25,15 +28,31 @@ export interface LocalDelivery {
   unit: string;
   scheduledDate?: string | null;
   notes?: string | null;
-  status: "PENDING" | "OUT_FOR_DELIVERY" | "DELIVERED";
+  vehicleNumber?: string | null;
+  vehicleType?: string | null;
+  driverName?: string | null;
+  driverPhone?: string | null;
+  receiverName?: string | null;
+  proofOfDeliveryReference?: string | null;
+  deliveryNotes?: string | null;
+  cancellationReason?: string | null;
+  status: DeliveryStatusType;
   paymentStatus: "PENDING" | "RECEIVED";
+  dispatchedAt?: string | null;
+  deliveredAt?: string | null;
   createdAt: string;
+  createdBy?: { id: string; name: string } | null;
+  dispatchedBy?: { id: string; name: string } | null;
+  completedBy?: { id: string; name: string } | null;
 }
 
 const statusMeta: Record<string, { label: string; bg: string; color: string; variant: "warning" | "success" | "danger" | "info" | "neutral" }> = {
   PENDING: { label: "Pending", bg: "#FEF3C7", color: "#D97706", variant: "warning" },
-  OUT_FOR_DELIVERY: { label: "Out for Delivery", bg: "#E0F2FE", color: "#0284C7", variant: "info" },
+  ASSIGNED: { label: "Assigned", bg: "#E0E7FF", color: "#4338CA", variant: "info" },
+  DISPATCHED: { label: "Dispatched", bg: "#E0F2FE", color: "#0369A1", variant: "info" },
+  OUT_FOR_DELIVERY: { label: "Out for Delivery", bg: "#DBEAFE", color: "#1D4ED8", variant: "info" },
   DELIVERED: { label: "Delivered", bg: "#D1FAE5", color: "#059669", variant: "success" },
+  CANCELLED: { label: "Cancelled", bg: "#FEE2E2", color: "#DC2626", variant: "danger" },
 };
 
 const payStatusMeta: Record<string, { label: string; bg: string; color: string; variant: "warning" | "success" | "danger" | "info" | "neutral" }> = {
@@ -76,6 +95,43 @@ export const DeliveriesPage = () => {
   const [editUnit, setEditUnit] = useState<string>("");
   const [editScheduledDate, setEditScheduledDate] = useState<string>("");
   const [editNotes, setEditNotes] = useState<string>("");
+  const [editVehicleNumber, setEditVehicleNumber] = useState<string>("");
+  const [editVehicleType, setEditVehicleType] = useState<string>("");
+  const [editDriverName, setEditDriverName] = useState<string>("");
+  const [editDriverPhone, setEditDriverPhone] = useState<string>("");
+  const [editReceiverName, setEditReceiverName] = useState<string>("");
+  const [editProofReference, setEditProofReference] = useState<string>("");
+  const [editDeliveryNotes, setEditDeliveryNotes] = useState<string>("");
+
+  const mapDeliveryData = (d: any): LocalDelivery => ({
+    id: d.id,
+    deliveryNumber: d.deliveryNumber,
+    challanNumber: d.challanNumber,
+    customerName: d.customerName,
+    customerPhone: d.customerPhone,
+    deliveryAddress: d.deliveryAddress,
+    materialName: d.materialName,
+    quantity: d.quantity,
+    unit: d.unit,
+    scheduledDate: d.scheduledDate,
+    notes: d.notes,
+    vehicleNumber: d.vehicleNumber,
+    vehicleType: d.vehicleType,
+    driverName: d.driverName,
+    driverPhone: d.driverPhone,
+    receiverName: d.receiverName,
+    proofOfDeliveryReference: d.proofOfDeliveryReference,
+    deliveryNotes: d.deliveryNotes,
+    cancellationReason: d.cancellationReason,
+    status: d.status,
+    paymentStatus: d.paymentStatus,
+    dispatchedAt: d.dispatchedAt,
+    deliveredAt: d.deliveredAt,
+    createdAt: d.createdAt,
+    createdBy: d.createdBy,
+    dispatchedBy: d.dispatchedBy,
+    completedBy: d.completedBy,
+  });
 
   // Fetch lists
   const { data: stockItemsData } = useGetInventory();
@@ -100,22 +156,7 @@ export const DeliveriesPage = () => {
     try {
       const res = await deliveryApi.getDeliveries();
       if (res.success && res.data) {
-        const mapped: LocalDelivery[] = res.data.map(d => ({
-          id: d.id,
-          deliveryNumber: d.deliveryNumber,
-          customerName: d.customerName,
-          customerPhone: d.customerPhone,
-          deliveryAddress: d.deliveryAddress,
-          materialName: d.materialName,
-          quantity: d.quantity,
-          unit: d.unit,
-          scheduledDate: d.scheduledDate,
-          notes: d.notes,
-          status: d.status,
-          paymentStatus: d.paymentStatus,
-          createdAt: d.createdAt,
-        }));
-        setDeliveries(mapped);
+        setDeliveries(res.data.map(mapDeliveryData));
       }
     } catch (err: any) {
       console.error("Failed to load deliveries", err);
@@ -189,23 +230,7 @@ export const DeliveriesPage = () => {
         const updatedRes = await deliveryApi.getDeliveries();
 
         if (updatedRes.success && updatedRes.data) {
-          const mapped: LocalDelivery[] = updatedRes.data.map((d) => ({
-            id: d.id,
-            deliveryNumber: d.deliveryNumber,
-            customerName: d.customerName,
-            customerPhone: d.customerPhone,
-            deliveryAddress: d.deliveryAddress,
-            materialName: d.materialName,
-            quantity: d.quantity,
-            unit: d.unit,
-            scheduledDate: d.scheduledDate,
-            notes: d.notes,
-            status: d.status,
-            paymentStatus: d.paymentStatus,
-            createdAt: d.createdAt,
-          }));
-
-          setDeliveries(mapped);
+          setDeliveries(updatedRes.data.map(mapDeliveryData));
           setSelectedId(res.data.id);
         }
 
@@ -254,6 +279,13 @@ export const DeliveriesPage = () => {
         unit: editUnit.trim(),
         scheduledDate: editScheduledDate || null,
         notes: editNotes || null,
+        vehicleNumber: editVehicleNumber || null,
+        vehicleType: editVehicleType || null,
+        driverName: editDriverName || null,
+        driverPhone: editDriverPhone || null,
+        receiverName: editReceiverName || null,
+        proofOfDeliveryReference: editProofReference || null,
+        deliveryNotes: editDeliveryNotes || null,
       });
 
       if (res.success && res.data) {
@@ -262,22 +294,7 @@ export const DeliveriesPage = () => {
         // Refresh list
         const updatedRes = await deliveryApi.getDeliveries();
         if (updatedRes.success && updatedRes.data) {
-          const mapped: LocalDelivery[] = updatedRes.data.map(d => ({
-            id: d.id,
-            deliveryNumber: d.deliveryNumber,
-            customerName: d.customerName,
-            customerPhone: d.customerPhone,
-            deliveryAddress: d.deliveryAddress,
-            materialName: d.materialName,
-            quantity: d.quantity,
-            unit: d.unit,
-            scheduledDate: d.scheduledDate,
-            notes: d.notes,
-            status: d.status,
-            paymentStatus: d.paymentStatus,
-            createdAt: d.createdAt,
-          }));
-          setDeliveries(mapped);
+          setDeliveries(updatedRes.data.map(mapDeliveryData));
         }
       }
     } catch (err: any) {
@@ -464,6 +481,13 @@ export const DeliveriesPage = () => {
     setEditUnit(d.unit);
     setEditScheduledDate(d.scheduledDate ? d.scheduledDate.substring(0, 10) : "");
     setEditNotes(d.notes || "");
+    setEditVehicleNumber(d.vehicleNumber || "");
+    setEditVehicleType(d.vehicleType || "");
+    setEditDriverName(d.driverName || "");
+    setEditDriverPhone(d.driverPhone || "");
+    setEditReceiverName(d.receiverName || "");
+    setEditProofReference(d.proofOfDeliveryReference || "");
+    setEditDeliveryNotes(d.deliveryNotes || "");
     setShowEdit(true);
   };
 
@@ -706,12 +730,57 @@ export const DeliveriesPage = () => {
                     </div>
                   </div>
 
-                  {active.notes && (
+                  {/* Dispatch Details Section */}
+                  <Divider />
+                  <div>
+                    <span style={{ color: C.muted }} className="block text-[10px] uppercase font-black tracking-wider mb-2">Dispatch & Logistics</span>
+                    <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">Assigned Driver</span>
+                        <strong className="text-slate-900 font-extrabold block">{active.driverName || "Unassigned"}</strong>
+                        {active.driverPhone && <span className="text-[11px] text-slate-500 font-semibold block">{active.driverPhone}</span>}
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">Vehicle Info</span>
+                        <strong className="text-slate-900 font-extrabold block">{active.vehicleNumber || "No Vehicle"}</strong>
+                        {active.vehicleType && <span className="text-[11px] text-slate-500 font-semibold block">{active.vehicleType}</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Delivery Timeline */}
+                  <Divider />
+                  <div>
+                    <span style={{ color: C.muted }} className="block text-[10px] uppercase font-black tracking-wider mb-2">Delivery Timeline</span>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between items-center bg-slate-50/70 p-2 rounded-lg border border-slate-100">
+                        <span className="font-bold text-slate-600">Created</span>
+                        <span className="font-extrabold text-slate-900">{new Date(active.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                      </div>
+                      {active.dispatchedAt && (
+                        <div className="flex justify-between items-center bg-blue-50/50 p-2 rounded-lg border border-blue-100">
+                          <span className="font-bold text-blue-800">Dispatched</span>
+                          <span className="font-extrabold text-blue-950">{new Date(active.dispatchedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                        </div>
+                      )}
+                      {active.deliveredAt && (
+                        <div className="flex justify-between items-center bg-emerald-50/50 p-2 rounded-lg border border-emerald-100">
+                          <span className="font-bold text-emerald-800">Delivered</span>
+                          <span className="font-extrabold text-emerald-950">{new Date(active.deliveredAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Completion / Proof Details if Delivered */}
+                  {(active.receiverName || active.proofOfDeliveryReference || active.deliveryNotes) && (
                     <>
                       <Divider />
-                      <div className="text-xs">
-                        <span style={{ color: C.muted }} className="block text-[10px] uppercase font-bold tracking-wider mb-0.5">Dispatch Note</span>
-                        <p style={{ color: C.ink }} className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 italic">{active.notes}</p>
+                      <div className="text-xs space-y-1 bg-emerald-50/40 p-3 rounded-xl border border-emerald-100">
+                        <span className="block text-[10px] font-black uppercase text-emerald-800 tracking-wider">Proof of Delivery / Completion</span>
+                        {active.receiverName && <p className="font-bold text-slate-800">Receiver: <span className="font-extrabold">{active.receiverName}</span></p>}
+                        {active.proofOfDeliveryReference && <p className="font-bold text-slate-800">POD Ref: <span className="font-extrabold">{active.proofOfDeliveryReference}</span></p>}
+                        {active.deliveryNotes && <p className="font-semibold text-slate-700 italic mt-1">"{active.deliveryNotes}"</p>}
                       </div>
                     </>
                   )}
@@ -729,8 +798,11 @@ export const DeliveriesPage = () => {
                             className="px-3 py-1.5 rounded-lg text-xs outline-none font-semibold cursor-pointer w-full"
                           >
                             <option value="PENDING">Pending</option>
+                            <option value="ASSIGNED">Assigned</option>
+                            <option value="DISPATCHED">Dispatched</option>
                             <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
                             <option value="DELIVERED">Delivered</option>
+                            <option value="CANCELLED">Cancelled</option>
                           </select>
                         </div>
                         <div className="flex flex-col gap-1.5">
@@ -837,8 +909,11 @@ export const DeliveriesPage = () => {
                       className="px-3 py-1.5 rounded-lg text-xs outline-none font-semibold cursor-pointer w-full"
                     >
                       <option value="PENDING">Pending</option>
+                      <option value="ASSIGNED">Assigned</option>
+                      <option value="DISPATCHED">Dispatched</option>
                       <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
                       <option value="DELIVERED">Delivered</option>
+                      <option value="CANCELLED">Cancelled</option>
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -1112,8 +1187,85 @@ export const DeliveriesPage = () => {
                 </div>
               </div>
 
+              <div className="border-t border-slate-100 pt-2 font-bold text-slate-700 text-[11px] uppercase">Driver & Vehicle Assignment</div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Driver Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Ramesh Singh"
+                    value={editDriverName}
+                    onChange={(e) => setEditDriverName(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Driver Phone</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. +91 98220 11111"
+                    value={editDriverPhone}
+                    onChange={(e) => setEditDriverPhone(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Vehicle Number</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. MH 12 AB 1234"
+                    value={editVehicleNumber}
+                    onChange={(e) => setEditVehicleNumber(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Vehicle Type</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 10-Ton Truck"
+                    value={editVehicleType}
+                    onChange={(e) => setEditVehicleType(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100 pt-2 font-bold text-slate-700 text-[11px] uppercase">Completion & Proof</div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">Receiver Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Site Supervisor Anand"
+                    value={editReceiverName}
+                    onChange={(e) => setEditReceiverName(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-500 text-[10px] uppercase">POD Reference</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. POD-88942"
+                    value={editProofReference}
+                    onChange={(e) => setEditProofReference(e.target.value)}
+                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
+                    className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Dispatch Note (Optional)</label>
+                <label className="text-gray-500 text-[10px] uppercase">Dispatch / Delivery Notes</label>
                 <textarea
                   placeholder="e.g. Gate clearance needed, ask for Vikram at warehouse"
                   value={editNotes}
