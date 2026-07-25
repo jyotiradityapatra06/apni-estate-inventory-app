@@ -13,6 +13,8 @@ model Business {
   gstNumber         String?
   phone             String?
   address           String?
+  state             String?
+  stateCode         String?
   workerSeatLimit   Int                @default(5)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
@@ -163,6 +165,8 @@ model Customer {
   gstin              String?
   billingAddress     String?
   shippingAddress    String?
+  state              String?
+  stateCode          String?
   creditLimit        Float             @default(0)
   openingBalance     Float             @default(0)
   outstandingBalance Float             @default(0)
@@ -195,6 +199,8 @@ model Supplier {
   email             String?
   gstin             String?
   address           String?
+  state             String?
+  stateCode         String?
   openingPayable    Float              @default(0)
   pendingPayments   Float              @default(0)
   notes             String?
@@ -381,6 +387,9 @@ model PurchaseOrder {
   subtotal             Decimal             @default(0)
   discountTotal        Decimal             @default(0)
   taxableTotal         Decimal             @default(0)
+  cgstTotal            Decimal             @default(0)
+  sgstTotal            Decimal             @default(0)
+  igstTotal            Decimal             @default(0)
   taxTotal             Decimal             @default(0)
   totalAmount          Decimal             @default(0)
   receivedAmount       Decimal             @default(0)
@@ -425,6 +434,12 @@ model PurchaseOrderItem {
   discountAmount     Decimal               @default(0)
   taxableAmount      Decimal
   gstRate            Decimal               @default(0)
+  cgstRate           Decimal               @default(0)
+  sgstRate           Decimal               @default(0)
+  igstRate           Decimal               @default(0)
+  cgstAmount         Decimal               @default(0)
+  sgstAmount         Decimal               @default(0)
+  igstAmount         Decimal               @default(0)
   taxAmount          Decimal               @default(0)
   lineTotal          Decimal
   createdAt          DateTime              @default(now())
@@ -564,6 +579,7 @@ model Delivery {
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
 
+  @@unique([businessId, challanNumber])
   @@index([businessId])
   @@index([customerId])
   @@index([salesOrderId])
@@ -573,7 +589,6 @@ model Delivery {
   @@index([businessId, status])
   @@index([businessId, scheduledDate])
   @@index([businessId, challanNumber])
-  @@unique([businessId, challanNumber])
 }
 
 model SalesOrder {
