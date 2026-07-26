@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowLeft, ArrowUpFromLine, Pencil, Landmark, Package, Boxes, Layers, Clock, AlertTriangle, ArrowLeftRight } from "lucide-react";
+import { ArrowLeft, Pencil, Landmark, Package, Boxes, Layers, Clock, AlertTriangle, ArrowLeftRight, Building2, Tag, Percent, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { godownApi } from "../../api/godown.api";
@@ -12,24 +12,29 @@ import { useAuth } from "../../hooks/useAuth";
 import type { Godown } from "../../types/godown.types";
 import { hasPermission } from "../../utils/permissions";
 import { StockMovementDialog } from "./StockMovementDialog";
-import { availableStock, godownAvailable, minimumStock, physicalStock, reservedStock, stockStatus } from "./stockCalculations";
+import { availableStock, stockStatus } from "./stockCalculations";
 import { fmt } from "../../utils/currency";
 
-const dateTime = (value: string) => new Date(value).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
-const friendly = (value?: string | null) => value ? value.replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase()) : "Stock adjustment";
+const dateTime = (value: string) =>
+  new Date(value).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
 export function MaterialDetailPage() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [material, setMaterial] = useState<InventoryItemData | null>(null);
   const [transactions, setTransactions] = useState<StockTransactionData[]>([]);
   const [godowns, setGodowns] = useState<Godown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [movement, setMovement] = useState<"IN" | "OUT" | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "timeline" | "transactions">("overview");
 
   const canUpdate = hasPermission(user, "inventory:update");
   const canIn = hasPermission(user, "stock:in");
@@ -42,13 +47,13 @@ export function MaterialDetailPage() {
       const [item, history, godownResponse] = await Promise.all([
         inventoryApi.getItem(id),
         inventoryApi.getTransactions(id),
-        godownApi.getAll()
+        godownApi.getAll(),
       ]);
       setMaterial(item.data);
       setTransactions(history.data ?? []);
       setGodowns(godownResponse.data.filter((row) => row.isActive));
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Could not load this material.");
+    } catch (err: any) {
+      setError(err instanceof Error ? err.message : "Could not load this material.");
     } finally {
       setLoading(false);
     }
@@ -58,312 +63,306 @@ export function MaterialDetailPage() {
     void load();
   }, [id]);
 
-  if (loading && !material) return <LoadingSkeleton rows={8}/>;
-  if (error || !material) return <ErrorState message={error || "Material not found."} onRetry={load}/>;
+  if (loading && !material) return <LoadingSkeleton rows={8} />;
+  if (error || !material) return <ErrorState message={error || "Material not found."} onRetry={load} />;
 
-  const info = [
-    ["Category", material.category],
-    ["Unit", material.unit],
-    ["SKU", material.sku],
-    ["Brand", material.brand],
-    ["HSN", material.hsnCode],
-    ["GST rate", material.taxRate == null ? null : `${material.taxRate}%`],
-    ["Purchase price", material.costPrice == null ? null : fmt(material.costPrice)],
-    ["Selling price", material.sellingPrice == null ? null : fmt(material.sellingPrice)],
-    ["Preferred supplier", material.defaultSupplier?.name]
-  ] as Array<[string, React.ReactNode]>;
-
-  // Calculations for summary metrics
-  const totalQty = availableStock(material);
+  const status = stockStatus(material);
+  const totalQty = material.quantity;
   const stockVal = totalQty * (material.costPrice || 0);
-  const locationText = material.godownStocks?.map(gs => gs.godown.name).join(", ") || "No warehouse";
-
-  const getTimelineEventTitle = (entry: StockTransactionData) => {
-    if (entry.type === "TRANSFER_IN" || entry.type === "TRANSFER_OUT") return "Transfer Completed";
-    if (entry.referenceType === "INVOICE") return "Sale Completed";
-    if (entry.type === "IN") return "Stock Added";
-    return "Adjustment Made";
-  };
 
   return (
-    <div className="min-w-0 space-y-6">
+    <div className="min-w-0 space-y-6 pb-12">
       {/* Back button */}
-      <button 
-        onClick={() => navigate("/materials")} 
-        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer"
+      <button
+        onClick={() => navigate("/materials")}
+        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer dark:text-slate-300 dark:hover:text-orange-400"
       >
-        <ArrowLeft size={14}/>
-        Back to Materials
+        <ArrowLeft size={14} />
+        Back to Material Master
       </button>
 
       {/* Header */}
-      <PageHeader 
-        title={material.materialName} 
-        description={`SKU: ${material.sku} &middot; Category: ${material.category}${material.brand ? ` &middot; Brand: ${material.brand}` : ""}`} 
+      <PageHeader
+        title={material.materialName}
+        description={`SKU: ${material.sku} • Category: ${material.category}`}
         actions={
           <div className="flex flex-wrap items-center gap-2.5">
-            <BusinessStatusBadge status={stockStatus(material)}/>
-            {canIn && (
-              <button 
-                onClick={() => setMovement("IN")} 
-                className="flex min-h-10 items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 px-4 text-xs font-extrabold text-white transition-colors shadow-sm cursor-pointer"
+            {canUpdate && (
+              <button
+                onClick={() => navigate(`/materials/${material.id}/edit`)}
+                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
-                <ArrowDownToLine size={15}/>
-                + Stock In
+                <Pencil size={15} />
+                Edit Material
+              </button>
+            )}
+            {canIn && (
+              <button
+                onClick={() => setMovement("IN")}
+                className="flex min-h-10 items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer dark:bg-emerald-600 dark:hover:bg-emerald-500"
+              >
+                Stock In
               </button>
             )}
             {canOut && (
-              <button 
-                onClick={() => setMovement("OUT")} 
-                className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-extrabold text-white transition-colors shadow-sm cursor-pointer"
+              <button
+                onClick={() => setMovement("OUT")}
+                className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer dark:bg-orange-600 dark:hover:bg-orange-500"
               >
-                <ArrowUpFromLine size={15}/>
-                - Stock Out
-              </button>
-            )}
-            {hasPermission(user, "godowns:transfer") && (
-              <button 
-                onClick={() => navigate(`/transfers/new?materialId=${material.id}`)} 
-                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-extrabold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-              >
-                <ArrowLeftRight size={15}/>
-                Transfer Stock
-              </button>
-            )}
-            {canUpdate && (
-              <button 
-                onClick={() => navigate(`/materials/${id}/edit`)} 
-                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
-              >
-                <Pencil size={15}/>
-                Edit Item
+                Stock Out / Adjust
               </button>
             )}
           </div>
         }
       />
 
-      {/* Summary Prominent StatCards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard 
-          label="Available Stock" 
-          value={<QuantityDisplay value={availableStock(material)} unit={material.unit}/>} 
-          helper={`Physical: ${physicalStock(material)} ${material.unit}`} 
-          icon={Package} 
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard
+          label="Current Total Stock"
+          value={`${totalQty.toLocaleString("en-IN")} ${material.unit}`}
+          icon={Boxes}
         />
-        <StatCard 
-          label="Total Stock Value" 
-          value={fmt(stockVal)} 
-          helper="Asset worth based on cost price" 
-          icon={Landmark} 
+        <StatCard
+          label="Total Stock Valuation"
+          value={fmt(stockVal)}
+          icon={Landmark}
         />
-        <StatCard 
-          label="Min Reorder Level" 
-          value={`${minimumStock(material)} ${material.unit}`} 
-          helper="Threshold for low stock alert" 
-          icon={AlertTriangle} 
-          className={availableStock(material) <= minimumStock(material) ? "border-amber-200 bg-amber-50/20" : ""}
+        <StatCard
+          label="Reorder Alert Level"
+          value={`${material.reorderLevel} ${material.unit}`}
+          icon={AlertTriangle}
         />
-        <StatCard 
-          label="Warehouse Storage" 
-          value={material.godownStocks?.length || 0} 
-          helper={locationText} 
-          icon={Boxes} 
+        <StatCard
+          label="Stock Status"
+          value={status.replaceAll("_", " ")}
+          icon={Package}
         />
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-slate-200">
-        <nav className="flex gap-6 -mb-px" aria-label="Tabs">
-          {(["overview", "timeline", "transactions"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-3.5 px-1 text-xs sm:text-sm font-extrabold border-b-2 uppercase tracking-wider cursor-pointer ${
-                activeTab === tab 
-                  ? "border-orange-500 text-orange-600" 
-                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
-              }`}
-            >
-              {tab === "timeline" ? "Stock Movement" : tab === "overview" ? "Overview & Warehouses" : "Transaction History"}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Tab Contents */}
-      {activeTab === "overview" && (
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Details Table */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2 space-y-4">
-            <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider border-b border-slate-100 pb-3">Material Specifications & Pricing</h3>
-            <dl className="grid gap-4 sm:grid-cols-2">
-              {info.filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => (
-                <div key={label} className="border-b border-slate-100 last:border-0 pb-2.5">
-                  <dt className="text-[11px] text-slate-500 font-extrabold uppercase tracking-wider">{label}</dt>
-                  <dd className="mt-1 text-sm font-extrabold text-slate-900">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          {/* Godowns list */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-            <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider border-b border-slate-100 pb-3">Warehouse Stock Breakdown</h3>
-            <div className="space-y-4">
-              {material.godownStocks?.map((row) => (
-                <div key={row.id} className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <span className="font-black text-sm text-slate-900">{row.godown.name}</span>
-                    <BusinessStatusBadge status={godownAvailable(row) <= 0 ? "OUT_OF_STOCK" : godownAvailable(row) <= minimumStock(material) ? "LOW_STOCK" : "IN_STOCK"}/>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div>
-                      <span className="text-[10px] uppercase font-black text-slate-400">Total</span>
-                      <strong className="block text-slate-900 text-sm font-black mt-0.5"><QuantityDisplay value={row.quantity} unit={material.unit}/></strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] uppercase font-black text-slate-400">Reserved</span>
-                      <strong className="block text-slate-900 text-sm font-black mt-0.5"><QuantityDisplay value={row.reservedQuantity ?? 0} unit={material.unit}/></strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] uppercase font-black text-slate-400">Available</span>
-                      <strong className="block text-green-700 text-sm font-black mt-0.5"><QuantityDisplay value={godownAvailable(row)} unit={material.unit}/></strong>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 pt-1">
-                    {canIn && (
-                      <button onClick={() => setMovement("IN")} className="flex-1 min-h-[34px] rounded-lg border border-slate-200 bg-white text-xs font-extrabold text-slate-700 hover:bg-slate-100 cursor-pointer">
-                        + Stock In
-                      </button>
-                    )}
-                    {canOut && (
-                      <button onClick={() => setMovement("OUT")} className="flex-1 min-h-[34px] rounded-lg border border-slate-200 bg-white text-xs font-extrabold text-slate-700 hover:bg-slate-100 cursor-pointer">
-                        - Stock Out
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {!material.godownStocks?.length && (
-                <EmptyState title="No godown balances" description="Add this material to a warehouse to record inventory." />
-              )}
+      {/* Section A: Basic Information & Section D: Pricing */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
+            <Package size={16} className="text-orange-500" />
+            Section A — Basic Material Master Specs
+          </h3>
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Material Name</span>
+              <strong className="text-slate-900 dark:text-slate-100">{material.materialName}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">SKU Code</span>
+              <strong className="text-slate-900 dark:text-slate-100 font-mono">{material.sku}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Category</span>
+              <strong className="text-slate-900 dark:text-slate-100">{material.category}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Unit</span>
+              <strong className="text-slate-900 dark:text-slate-100 uppercase">{material.unit}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">HSN Code</span>
+              <strong className="text-slate-900 dark:text-slate-100">{material.hsnCode || "—"}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">GST Rate</span>
+              <strong className="text-slate-900 dark:text-slate-100">
+                {material.taxRate !== undefined && material.taxRate !== null ? `${material.taxRate}%` : "—"}
+              </strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Reorder Level</span>
+              <strong className="text-slate-900 dark:text-slate-100">{material.reorderLevel} {material.unit}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Status</span>
+              <span
+                className={`inline-flex px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                  material.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-700"
+                }`}
+              >
+                {material.isActive ? "Active" : "Inactive"}
+              </span>
             </div>
           </div>
         </div>
-      )}
 
-      {activeTab === "timeline" && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm max-w-xl">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3 mb-4">Stock Movement Timeline</h3>
-          
-          <div className="relative border-l border-slate-100 pl-5 space-y-5">
-            {transactions.length > 0 ? (
-              transactions.map((entry) => {
-                const incoming = ["IN", "TRANSFER_IN"].includes(entry.type);
-                const title = getTimelineEventTitle(entry);
-                return (
-                  <div key={entry.id} className="relative text-xs">
-                    {/* Bullet marker */}
-                    <div className={`absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white ${incoming ? "border-green-600" : "border-orange-500"}`} />
-                    
-                    <div className="flex justify-between items-start gap-4">
-                      <div>
-                        <p className="font-bold text-slate-950">{title}</p>
-                        <p className="text-slate-500 mt-0.5">{entry.godown?.name || "Warehouse not selected"}</p>
-                        <p className="text-slate-400 text-[10px] mt-0.5">{dateTime(entry.createdAt)}</p>
-                      </div>
-                      <span className={`font-black ${incoming ? "text-green-700" : "text-slate-800"}`}>
-                        {incoming ? "+" : "−"}<QuantityDisplay value={entry.quantity} unit={material.unit}/>
-                      </span>
-                    </div>
-                    {entry.note && (
-                      <p className="mt-1 bg-slate-50 p-2 rounded-lg text-slate-500 text-[11px] font-medium italic">"{entry.note}"</p>
-                    )}
-                  </div>
-                );
-              })
-            ) : (
-              <EmptyState title="No movement logs" description="Vitals like sales, stock additions, and transfer logs will appear here." />
+        {/* Section D: Pricing & Valuation */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
+            <Landmark size={16} className="text-orange-500" />
+            Section D — Pricing & Inventory Valuation
+          </h3>
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-1 dark:border-slate-700 dark:bg-slate-800/60">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Cost Price (Purchase Rate)</span>
+              <strong className="text-slate-900 font-black text-base dark:text-slate-100">
+                {material.costPrice ? fmt(material.costPrice) : "Not Set"}
+              </strong>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-1 dark:border-slate-700 dark:bg-slate-800/60">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Selling Price (Invoice Rate)</span>
+              <strong className="text-slate-900 font-black text-base dark:text-slate-100">
+                {material.sellingPrice ? fmt(material.sellingPrice) : "Not Set"}
+              </strong>
+            </div>
+            <div className="col-span-2 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-1 dark:border-slate-700 dark:bg-slate-800/60">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Total Stock Valuation</span>
+              <strong className="text-orange-600 font-black text-lg dark:text-orange-400">
+                {fmt(stockVal)}
+              </strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section B: Stock Distribution & Section C: Supplier Information */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Section B: Stock Distribution */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3 text-xs">
+          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
+            <Layers size={16} className="text-orange-500" />
+            Section B — Godown / Warehouse Stock Distribution
+          </h3>
+          {material.godownStocks && material.godownStocks.length > 0 ? (
+            <div className="space-y-2.5">
+              {material.godownStocks.map((gs) => (
+                <div
+                  key={gs.id}
+                  className="flex items-center justify-between rounded-xl bg-slate-50 p-3 border border-slate-200/80 font-semibold dark:bg-slate-800 dark:border-slate-700"
+                >
+                  <span className="text-slate-800 font-extrabold dark:text-slate-200">{gs.godown.name}</span>
+                  <strong className="text-slate-950 font-black dark:text-slate-100">
+                    {gs.quantity.toLocaleString("en-IN")} {material.unit}
+                  </strong>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-slate-500 italic">Default Location: {material.location || "Main Warehouse"}</p>
+          )}
+        </div>
+
+        {/* Section C: Supplier Information */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3 text-xs">
+          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
+            <Building2 size={16} className="text-orange-500" />
+            Section C — Linked Supplier Information
+          </h3>
+          <div className="space-y-2">
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block">Preferred Default Supplier</span>
+              <strong className="text-slate-900 font-extrabold text-sm dark:text-slate-100">
+                {material.defaultSupplier?.name || "No default supplier designated"}
+              </strong>
+            </div>
+            {material.supplierMaterials && material.supplierMaterials.length > 0 && (
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1.5">Approved Suppliers List</span>
+                <div className="flex flex-wrap gap-2">
+                  {material.supplierMaterials.map((sm) => (
+                    <span
+                      key={sm.supplier.id}
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-bold dark:bg-slate-800 dark:text-slate-200"
+                    >
+                      {sm.supplier.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
-      )}
+      </div>
 
-      {activeTab === "transactions" && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Detailed Transactions</h3>
-          
-          {!transactions.length ? (
-            <EmptyState title="No transactions recorded" description="Stock transactions will appear here." />
-          ) : (
-            <>
-              {/* Mobile Transactions List */}
-              <div className="space-y-3 md:hidden">
-                {transactions.map((entry) => {
-                  const incoming = ["IN", "TRANSFER_IN"].includes(entry.type);
+      {/* Section E: Movement History Audit Log */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+        <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
+          <Clock size={16} className="text-orange-500" />
+          Section E — Complete Movement History Audit Trail ({transactions.length})
+        </h3>
+
+        {transactions.length === 0 ? (
+          <EmptyState
+            title="No Movement History"
+            description="No stock in, stock out, transfer, or adjustment transactions recorded yet for this material."
+          />
+        ) : (
+          <div className="hidden overflow-hidden rounded-xl border border-slate-200 md:block dark:border-slate-800">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
+                <tr>
+                  <th className="px-4 py-3 font-black uppercase">Date & Time</th>
+                  <th className="px-4 py-3 font-black uppercase">Type</th>
+                  <th className="px-4 py-3 font-black uppercase">Quantity</th>
+                  <th className="px-4 py-3 font-black uppercase">Godown</th>
+                  <th className="px-4 py-3 font-black uppercase">Reason / Ref</th>
+                  <th className="px-4 py-3 font-black uppercase">User</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((tx) => {
+                  const isIncrease = tx.type === "IN" || tx.type === "TRANSFER_IN";
                   return (
-                    <div key={entry.id} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 text-xs space-y-2">
-                      <div className="flex justify-between font-bold">
-                        <span>{incoming ? "Stock In" : "Stock Out"}</span>
-                        <span className={incoming ? "text-green-700" : "text-slate-800"}>
-                          {incoming ? "+" : "−"}<QuantityDisplay value={entry.quantity} unit={material.unit}/>
+                    <tr
+                      key={tx.id}
+                      className="border-b last:border-0 border-slate-100 hover:bg-slate-50/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50"
+                    >
+                      <td className="px-4 py-3 text-slate-500 font-semibold dark:text-slate-400">
+                        {dateTime(tx.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 font-extrabold uppercase">
+                        {tx.type}
+                      </td>
+                      <td className="px-4 py-3 font-black">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black ${
+                            isIncrease
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                              : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                          }`}
+                        >
+                          {isIncrease ? `+${tx.quantity}` : `-${tx.quantity}`} {material.unit}
                         </span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                        <div>Warehouse: <span className="text-slate-700">{entry.godown?.name || "—"}</span></div>
-                        <div>User: <span className="text-slate-700">{entry.user?.name || "—"}</span></div>
-                        <div className="col-span-2">Date: <span className="text-slate-700">{dateTime(entry.createdAt)}</span></div>
-                      </div>
-                    </div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 font-semibold">
+                        {tx.godown?.name || "Main Warehouse"}
+                      </td>
+                      <td className="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">
+                        {tx.reason?.replaceAll("_", " ") || tx.referenceType || "Adjustment"}
+                        {tx.note && <span className="text-[10px] text-slate-400 block">{tx.note}</span>}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400 font-semibold">
+                        {tx.user?.name || "User"}
+                      </td>
+                    </tr>
                   );
                 })}
-              </div>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
-              {/* Desktop Table View */}
-              <div className="hidden md:block overflow-hidden rounded-xl border border-slate-100">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 border-b">
-                    <tr>
-                      <th className="p-3 font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                      <th className="font-semibold text-slate-500 uppercase tracking-wider">Type</th>
-                      <th className="font-semibold text-slate-500 uppercase tracking-wider">Warehouse</th>
-                      <th className="font-semibold text-slate-500 uppercase tracking-wider">Quantity</th>
-                      <th className="font-semibold text-slate-500 uppercase tracking-wider">Reason / Notes</th>
-                      <th className="font-semibold text-slate-500 uppercase tracking-wider">User</th>
-                      <th className="font-semibold text-slate-500 uppercase tracking-wider">Reference</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((entry) => (
-                      <tr key={entry.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
-                        <td className="p-3 font-medium text-slate-900">{dateTime(entry.createdAt)}</td>
-                        <td className="font-bold text-slate-900">{["IN", "TRANSFER_IN"].includes(entry.type) ? "Stock In" : "Stock Out"}</td>
-                        <td className="text-slate-600 font-medium">{entry.godown?.name ?? "—"}</td>
-                        <td className="font-black text-slate-900"><QuantityDisplay value={entry.quantity} unit={material.unit}/></td>
-                        <td className="text-slate-500 font-medium italic">"{friendly(entry.reason || entry.note)}"</td>
-                        <td className="text-slate-600 font-semibold">{entry.user?.name ?? "—"}</td>
-                        <td className="text-slate-500 font-medium">{entry.referenceType ?? "—"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-        </div>
+      {/* Stock Movement Modal */}
+      {movement && (
+        <StockMovementDialog
+          type={movement}
+          material={material}
+          godowns={godowns}
+          onClose={() => setMovement(null)}
+          onSuccess={() => {
+            setMovement(null);
+            void load();
+          }}
+        />
       )}
-
-      <StockMovementDialog 
-        open={!!movement} 
-        type={movement ?? "IN"} 
-        materials={[material]} 
-        initialMaterial={material} 
-        godowns={godowns} 
-        onClose={() => setMovement(null)} 
-        onSuccess={load}
-      />
     </div>
   );
 }
+
 export default MaterialDetailPage;

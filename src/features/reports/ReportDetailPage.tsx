@@ -4,12 +4,13 @@ import { reportApi, type ReportResponse } from "../../api/report.api";
 import { PageHeader } from "../../app/components/common/PageHeader";
 import { fmt } from "../../utils/currency";
 import { reportConfigs, type ReportKey } from "./report.config";
-import { ArrowLeft, Printer, FileDown, Search, Filter, Calendar, Landmark } from "lucide-react";
-import { StatCard } from "../../app/components/common/Card";
+import { ArrowLeft, Printer, FileDown, ShieldCheck, AlertCircle, Building2, HelpCircle } from "lucide-react";
 import { ReportWarningBanner } from "../../components/reports/ReportWarningBanner";
 import { ReportMobileCard } from "../../components/reports/ReportMobileCard";
 import { ReportCharts } from "../../components/reports/ReportCharts";
-import { ReportFilterDrawer } from "../../components/reports/ReportFilterDrawer";
+import { ReportKpiSection } from "./components/ReportKpiSection";
+import { ReportFilterBar } from "./components/ReportFilterBar";
+import { ReportEmptyState } from "./components/ReportEmptyState";
 
 const local = (d: Date) => {
   const x = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -20,16 +21,30 @@ const month = () => {
   const d = new Date();
   return {
     from: local(new Date(d.getFullYear(), d.getMonth(), 1)),
-    to: local(d)
+    to: local(d),
   };
 };
 
-const human = (s: string) => s.replace(/([a-z])([A-Z])/g, "$1 $2").replaceAll("_", " ").replace(/^./, x => x.toUpperCase());
-const number = (v: unknown) => typeof v === "number" || !Number.isNaN(Number(v)) ? fmt(Number(v)) : String(v ?? "—");
+const human = (s: string) => s.replace(/([a-z])([A-Z])/g, "$1 $2").replaceAll("_", " ").replace(/^./, (x) => x.toUpperCase());
+const number = (v: unknown) => (typeof v === "number" || !Number.isNaN(Number(v)) ? fmt(Number(v)) : String(v ?? "—"));
 
-export function ReportDetailPage({ type }: { type: ReportKey }) {
-  const config = reportConfigs[type];
-  const initial = config.currentState ? { from: "", to: "" } : month();
+export function ReportDetailPage({ type }: { type: ReportKey | "itc-tracker" | "rcm" | "tds-tcs" }) {
+  const isCustomSpecial = type === "itc-tracker" || type === "rcm" || type === "tds-tcs";
+  const apiEndpoint = type === "itc-tracker" || type === "rcm" || type === "tds-tcs" ? "gst-summary" : type;
+  
+  const config = isCustomSpecial
+    ? {
+        title: type === "itc-tracker" ? "GST Inward Supply / ITC Tracker" : type === "rcm" ? "Reverse Charge Mechanism (RCM) Analytics" : "TDS / TCS Compliance Dashboard",
+        description: type === "itc-tracker"
+          ? "Input Tax Credit tracking on purchases and business expenses."
+          : type === "rcm"
+          ? "Reverse Charge Mechanism liability and supplier compliance tracking."
+          : "Tax Deducted at Source (TDS) & Tax Collected at Source (TCS) ledger analytics.",
+        source: undefined,
+      }
+    : reportConfigs[type as ReportKey];
+
+  const initial = !isCustomSpecial && (config as any).currentState ? { from: "", to: "" } : month();
   const navigate = useNavigate();
 
   const [from, setFrom] = useState(initial.from);
@@ -37,6 +52,11 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
   const [status, setStatus] = useState("");
   const [invoiceType, setInvoiceType] = useState("");
   const [paymentMode, setPaymentMode] = useState("");
+  const [materialId, setMaterialId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [supplierId, setSupplierId] = useState("");
+  const [godownId, setGodownId] = useState("");
+  const [hsnCode, setHsnCode] = useState("");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<ReportResponse>();
   const [loading, setLoading] = useState(true);
@@ -49,21 +69,26 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
     if (status) q.set("status", status);
     if (invoiceType) q.set("invoiceType", invoiceType);
     if (paymentMode) q.set("paymentMode", paymentMode);
+    if (materialId) q.set("materialId", materialId);
+    if (categoryId) q.set("categoryId", categoryId);
+    if (supplierId) q.set("supplierId", supplierId);
+    if (godownId) q.set("godownId", godownId);
     return q;
-  }, [from, to, status, invoiceType, paymentMode, page]);
+  }, [from, to, status, invoiceType, paymentMode, materialId, categoryId, supplierId, godownId, page]);
 
   const load = () => {
     setLoading(true);
     setError("");
-    reportApi.get(type, query.toString())
+    reportApi
+      .get(apiEndpoint, query.toString())
       .then(setData)
-      .catch(e => setError(e.message))
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     void load();
-  }, [type, query.toString()]);
+  }, [apiEndpoint, query.toString()]);
 
   const preset = (value: string) => {
     const d = new Date();
@@ -91,12 +116,17 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
   };
 
   const reset = () => {
-    const x = config.currentState ? { from: "", to: "" } : month();
+    const x = !isCustomSpecial && (config as any).currentState ? { from: "", to: "" } : month();
     setFrom(x.from);
     setTo(x.to);
     setStatus("");
     setInvoiceType("");
     setPaymentMode("");
+    setMaterialId("");
+    setCategoryId("");
+    setSupplierId("");
+    setGodownId("");
+    setHsnCode("");
     setPage(1);
   };
 
@@ -105,10 +135,10 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
     q.set("format", "csv");
     q.set("limit", "100");
     const base = import.meta.env.VITE_API_URL ?? "http://localhost:5000/api";
-    const response = await fetch(`${base}/reports/${type}?${q}`, {
+    const response = await fetch(`${base}/reports/${apiEndpoint}?${q}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token") || ""}`
-      }
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+      },
     });
     if (!response.ok) throw new Error("CSV export failed.");
     const blob = await response.blob();
@@ -120,38 +150,40 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
     URL.revokeObjectURL(url);
   };
 
-  const primitive = Object.entries(data?.summary || {}).filter(([, v]) => typeof v !== "object");
-  const nested = Object.entries(data?.summary || {}).filter(([, v]) => typeof v === "object");
-  const keys = data?.rows[0] ? Object.keys(data.rows[0]).filter(k => k !== "id" && typeof data.rows[0][k] !== "object").slice(0, 9) : [];
+  const keys = data?.rows[0]
+    ? Object.keys(data.rows[0])
+        .filter((k) => k !== "id" && typeof data.rows[0][k] !== "object")
+        .slice(0, 9)
+    : [];
 
   return (
     <div className="report-print-root space-y-6 pb-12">
-      {/* Back button */}
-      <button 
-        onClick={() => navigate("/reports")} 
-        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer report-actions"
+      {/* Back navigation button */}
+      <button
+        onClick={() => navigate("/reports")}
+        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer report-actions dark:text-slate-300 dark:hover:text-orange-400"
       >
-        <ArrowLeft size={14}/>
+        <ArrowLeft size={14} />
         Back to Reports
       </button>
 
       {/* Header */}
       <div className="report-actions">
-        <PageHeader 
-          title={config.title} 
-          description={config.description} 
+        <PageHeader
+          title={config.title}
+          description={config.description}
           actions={
             <div className="flex gap-2.5">
-              <button 
-                onClick={() => window.print()} 
-                className="flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors cursor-pointer"
+              <button
+                onClick={() => window.print()}
+                className="flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 <Printer size={14} className="mr-1.5" />
                 Print Report
               </button>
-              <button 
-                onClick={() => void download().catch(e => setError(e.message))} 
-                className="flex min-h-10 items-center justify-center rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white shadow-sm transition-colors cursor-pointer"
+              <button
+                onClick={() => void download().catch((e) => setError(e.message))}
+                className="flex min-h-10 items-center justify-center rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white shadow-2xs transition-colors cursor-pointer dark:bg-orange-600 dark:hover:bg-orange-500"
               >
                 <FileDown size={14} className="mr-1.5" />
                 Download CSV
@@ -161,72 +193,51 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
         />
       </div>
 
-      {/* Desktop Filters Bar (>=768px) */}
-      <div className="report-actions hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3 md:block">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
-            <Filter size={15} className="text-orange-500" />
-            Report Filters & Date Preset
-          </span>
-          <button 
-            onClick={reset} 
-            className="text-xs font-extrabold text-orange-600 hover:underline cursor-pointer"
-          >
-            Reset Filters
-          </button>
-        </div>
+      {/* 1. KPI SUMMARY SECTION */}
+      {data && (
+        <ReportKpiSection
+          type={type}
+          summary={data.summary}
+          breakdowns={data.breakdowns}
+        />
+      )}
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-          <select 
-            aria-label="Date preset" 
-            onChange={e => preset(e.target.value)} 
-            className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer"
-          >
-            <option value="">Custom Date Range</option>
-            <option value="today">Today</option>
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-            <option value="last-month">Last Month</option>
-            <option value="fy">Financial Year (Apr-Mar)</option>
-          </select>
-          <input aria-label="From date" type="date" value={from} onChange={e => { setFrom(e.target.value); setPage(1); }} className="h-11 rounded-xl border border-slate-200 px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
-          <input aria-label="To date" type="date" value={to} onChange={e => { setTo(e.target.value); setPage(1); }} className="h-11 rounded-xl border border-slate-200 px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
-          <input aria-label="Status filter" value={status} onChange={e => { setStatus(e.target.value.toUpperCase()); setPage(1); }} placeholder="Filter Status (e.g. PAID)" className="h-11 rounded-xl border border-slate-200 px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"/>
-          <select aria-label="Invoice type" value={invoiceType} onChange={e => { setInvoiceType(e.target.value); setPage(1); }} className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer">
-            <option value="">All Bill Types (GST & Non-GST)</option>
-            <option value="GST">GST Tax Invoice Only</option>
-            <option value="NON_GST">Non-GST Bill Only</option>
-          </select>
-          <button 
-            onClick={reset} 
-            className="h-11 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
-          >
-            Clear Filters
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Filter Drawer (<768px) */}
-      <ReportFilterDrawer
+      {/* 2. ADVANCED FILTER BAR */}
+      <ReportFilterBar
         from={from}
         to={to}
         status={status}
         invoiceType={invoiceType}
         paymentMode={paymentMode}
-        setFrom={setFrom}
-        setTo={setTo}
-        setStatus={setStatus}
-        setInvoiceType={setInvoiceType}
-        setPaymentMode={setPaymentMode}
+        materialId={materialId}
+        categoryId={categoryId}
+        supplierId={supplierId}
+        godownId={godownId}
+        hsnCode={hsnCode}
+        setFrom={(v) => { setFrom(v); setPage(1); }}
+        setTo={(v) => { setTo(v); setPage(1); }}
+        setStatus={(v) => { setStatus(v); setPage(1); }}
+        setInvoiceType={(v) => { setInvoiceType(v); setPage(1); }}
+        setPaymentMode={(v) => { setPaymentMode(v); setPage(1); }}
+        setMaterialId={(v) => { setMaterialId(v); setPage(1); }}
+        setCategoryId={(v) => { setCategoryId(v); setPage(1); }}
+        setSupplierId={(v) => { setSupplierId(v); setPage(1); }}
+        setGodownId={(v) => { setGodownId(v); setPage(1); }}
+        setHsnCode={(v) => { setHsnCode(v); setPage(1); }}
         preset={preset}
-        onApply={() => setPage(1)}
         onReset={reset}
+        onPrint={() => window.print()}
+        onExportCsv={() => void download().catch((e) => setError(e.message))}
       />
 
-      {error && <p className="rounded-xl bg-red-50 p-4 text-red-800 text-xs font-bold border border-red-200">{error}</p>}
+      {error && (
+        <p className="rounded-xl bg-red-50 p-4 text-red-800 text-xs font-bold border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900">
+          {error}
+        </p>
+      )}
 
       {loading ? (
-        <div className="h-56 animate-pulse rounded-2xl bg-slate-200" />
+        <div className="h-56 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800" />
       ) : data && (
         <div className="space-y-6">
           <ReportWarningBanner
@@ -234,114 +245,157 @@ export function ReportDetailPage({ type }: { type: ReportKey }) {
             warnings={data.metadata.warnings}
           />
 
-          {/* Metrics summary cards */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {primitive.map(([k, v]) => (
-              <StatCard 
-                key={k} 
-                label={human(k)} 
-                value={typeof v === "number" ? number(v) : String(v ?? "—")} 
-                icon={Landmark}
+          {/* 3. INTERACTIVE CHARTS / VISUAL ANALYTICS */}
+          <ReportCharts type={type} breakdowns={data.breakdowns} summary={data.summary} />
+
+          {/* Specialized Compliance Banners & Empty States */}
+          {type === "itc-tracker" && (
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-5 dark:border-blue-900/50 dark:bg-blue-950/30 space-y-2">
+                <div className="flex items-center gap-2 font-black text-xs text-blue-900 dark:text-blue-200 uppercase tracking-wider">
+                  <ShieldCheck size={16} className="text-blue-600" />
+                  Eligible ITC Summary
+                </div>
+                <p className="text-xs text-blue-800 dark:text-blue-300 font-semibold leading-relaxed">
+                  Input tax credit available from verified purchase orders and claimable business expenses.
+                </p>
+              </div>
+
+              <div className="md:col-span-2">
+                <ReportEmptyState
+                  title="Blocked & Utilised ITC Notice"
+                  description="Blocked ITC under Section 17(5) and GSTR-3B utilised ITC require direct GSTR-2B automated reconciliation."
+                  backendInfo="Blocked ITC tracking, GSTR-2B inward auto-population, and ITC ledger reconciliation require dedicated backend GST filing module integration."
+                  actionText="Reset Filters"
+                  onAction={reset}
+                  icon={AlertCircle}
+                />
+              </div>
+            </div>
+          )}
+
+          {type === "tds-tcs" && (
+            <div className="space-y-4">
+              <ReportEmptyState
+                title="TDS / TCS Compliance Ledger Required"
+                description="Tax Deducted at Source (Section 194C / 194Q) and Tax Collected at Source (Section 206C) tracking."
+                backendInfo="TDS/TCS tracking requires tax deduction ledger support and vendor PAN deduction threshold configuration in backend."
+                actionText="Reset Filters"
+                onAction={reset}
+                icon={Building2}
               />
-            ))}
-          </div>
+            </div>
+          )}
 
-          {/* Nested summaries */}
-          {nested.map(([k, v]) => (
-            <section key={k} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3 text-xs">
-              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider border-b pb-3">{human(k)}</h3>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {Object.entries(v as Record<string, unknown>).map(([a, b]) => (
-                  <div key={a} className="border-b last:border-0 pb-2 md:border-b-0 md:pb-0">
-                    <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block">{human(a)}</span>
-                    <strong className="text-slate-900 font-black text-sm mt-1 block">{number(b)}</strong>
-                  </div>
-                ))}
+          {type === "rcm" && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-5 dark:border-amber-900/50 dark:bg-amber-950/30 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-black text-amber-950 dark:text-amber-200 uppercase tracking-wider">
+                <AlertCircle size={16} className="text-amber-600" />
+                Pending Liability & RCM Compliance Alert
               </div>
-            </section>
-          ))}
+              <p className="text-xs font-semibold text-amber-900 dark:text-amber-300 leading-relaxed">
+                Reverse Charge Mechanism liabilities calculated for purchases from unregistered suppliers without GSTIN. Advanced RCM self-invoice generation requires explicit RCM flag configuration on purchase entries.
+              </p>
+            </div>
+          )}
 
-          {/* Analytics Visualizations */}
-          <ReportCharts type={type} breakdowns={data.breakdowns} />
-
-          {/* Breakdowns */}
+          {/* Breakdowns List */}
           {Object.entries(data.breakdowns).slice(0, 3).map(([name, items]) => items.length > 0 && (
-            <section key={name} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3 text-xs">
-              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider border-b pb-3">{human(name)}</h3>
+            <section key={name} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3 text-xs">
+              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider border-b pb-3 dark:text-slate-100 dark:border-slate-800">{human(name)}</h3>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {items.slice(0, 10).map(x => (
-                  <div key={x.name} className="flex justify-between items-center gap-3 rounded-xl bg-slate-50 p-3.5 border border-slate-200/80 font-semibold">
-                    <span className="text-slate-700 font-extrabold text-xs">{x.name}</span>
-                    <strong className="text-slate-950 font-black text-sm">{number(x.total)}</strong>
+                {items.slice(0, 10).map((x) => (
+                  <div key={x.name} className="flex justify-between items-center gap-3 rounded-xl bg-slate-50 p-3.5 border border-slate-200/80 font-semibold dark:bg-slate-800 dark:border-slate-700">
+                    <span className="text-slate-700 font-extrabold text-xs dark:text-slate-200">{x.name}</span>
+                    <strong className="text-slate-950 font-black text-sm dark:text-slate-100">{number(x.total)}</strong>
                   </div>
                 ))}
               </div>
             </section>
           ))}
 
-          {/* Detail Rows */}
+          {/* 4. DETAILED DATA TABLE / MOBILE CARDS */}
           {data.rows.length ? (
             <div className="space-y-4">
-              <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider">Detailed Itemized Report Logs</h3>
-              
+              <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">
+                Detailed Itemized Report Logs
+              </h3>
+
               {/* Desktop Table View (>=768px) */}
-              <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
+              <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-2xs dark:border-slate-800 dark:bg-slate-900">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
+                  <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
                     <tr>
-                      {keys.map(k => <th key={k} className="px-4 py-3.5 font-black text-[11px] text-slate-500 uppercase tracking-wider">{human(k)}</th>)}
+                      {keys.map((k) => (
+                        <th key={k} className="px-4 py-3.5 font-black text-[11px] uppercase tracking-wider">
+                          {human(k)}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
                     {data.rows.map((row, i) => (
-                      <tr key={String(row.id || i)} className="border-b last:border-0 border-slate-100 hover:bg-slate-50/60 transition-colors">
-                        {keys.map(k => <td key={k} className="px-4 py-3.5 text-slate-700 font-semibold">{String(row[k] ?? "—")}</td>)}
+                      <tr key={String(row.id || i)} className="border-b last:border-0 border-slate-100 hover:bg-slate-50/60 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50">
+                        {keys.map((k) => (
+                          <td key={k} className="px-4 py-3.5 text-slate-700 font-semibold dark:text-slate-300">
+                            {String(row[k] ?? "—")}
+                          </td>
+                        ))}
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* Mobile Reusable Card View (<768px) */}
+              {/* Mobile Card View (<768px) */}
               <div className="grid gap-3.5 md:hidden">
                 {data.rows.map((row, i) => (
                   <ReportMobileCard
                     key={String(row.id || i)}
-                    type={type}
+                    type={type === "itc-tracker" || type === "rcm" || type === "tds-tcs" ? "gst-summary" : type}
                     row={row}
-                    source={config.source}
+                    source={(config as any).source}
                   />
                 ))}
               </div>
 
+              {/* Pagination */}
               <div className="report-actions flex items-center justify-between pt-4">
-                <button 
-                  disabled={page <= 1} 
-                  onClick={() => setPage(x => x - 1)} 
-                  className="min-h-10 rounded-xl border px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                <button
+                  disabled={page <= 1}
+                  onClick={() => setPage((x) => x - 1)}
+                  className="min-h-10 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                 >
                   Previous
                 </button>
-                <span className="text-xs text-slate-500 font-medium">Page {page} of {data.pagination.pages}</span>
-                <button 
-                  disabled={page >= data.pagination.pages} 
-                  onClick={() => setPage(x => x + 1)} 
-                  className="min-h-10 rounded-xl border px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                <span className="text-xs text-slate-500 font-medium dark:text-slate-400">
+                  Page {page} of {data.pagination.pages}
+                </span>
+                <button
+                  disabled={page >= data.pagination.pages}
+                  onClick={() => setPage((x) => x + 1)}
+                  className="min-h-10 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                 >
                   Next
                 </button>
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed bg-white p-10 text-center text-slate-500 text-xs font-bold">
-              No report logs matching the chosen filter values.
-            </div>
+            <ReportEmptyState
+              title="No Log Records Found"
+              description="No itemized detail logs were returned matching your date range and filters."
+              actionText="Reset Filters"
+              onAction={reset}
+            />
           )}
-          
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Generated {new Date(data.metadata.generatedAt).toLocaleString("en-IN")}</p>
+
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider dark:text-slate-500">
+            Generated {new Date(data.metadata.generatedAt).toLocaleString("en-IN")}
+          </p>
         </div>
       )}
     </div>
   );
 }
+
 export default ReportDetailPage;

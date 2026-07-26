@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { Plus, Search, ShoppingBag, DollarSign, TrendingUp, Users, FileX2, CheckSquare, Clock, Filter } from "lucide-react";
+import { Plus, Search, ShoppingBag, DollarSign, TrendingUp, Users, FileX2, CheckSquare, Clock, Filter, FileCheck } from "lucide-react";
 import { purchaseApi } from "../../api/purchase.api";
 import { purchaseReturnApi } from "../../api/purchaseReturn.api";
 import { PageHeader } from "../../app/components/common/PageHeader";
@@ -153,10 +153,17 @@ export default function PurchaseOrdersPage() {
         description="Manage suppliers, purchase orders, goods receipt, and supplier payments" 
         actions={
           <div className="flex flex-wrap items-center gap-2.5">
+            <button 
+              onClick={() => navigate("/purchases/goods-receipts")} 
+              className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer dark:bg-orange-600 dark:hover:bg-orange-500"
+            >
+              <FileCheck size={15}/>
+              Goods Receipts (GRN)
+            </button>
             {hasPermission(user, "purchases:manage") && (
               <button 
                 onClick={() => navigate("/purchases/new")} 
-                className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white transition-colors shadow-sm cursor-pointer"
+                className="flex min-h-10 items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700"
               >
                 <Plus size={15}/>
                 Create Purchase Order

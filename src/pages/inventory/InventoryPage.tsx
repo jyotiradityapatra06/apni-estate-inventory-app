@@ -1,1 +1,1 @@
-export { StockListPage as InventoryPage, StockListPage as default } from "../../features/materials/StockListPage";
+export { StockOverviewPage as InventoryPage, StockOverviewPage as default } from "../../features/inventory/StockOverviewPage";

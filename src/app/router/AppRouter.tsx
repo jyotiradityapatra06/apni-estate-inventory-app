@@ -13,7 +13,9 @@ import { getHomePathForRole } from "../../utils/permissions";
 import RoleGuard from "./RoleGuard";
 
 const DashboardPage=lazy(()=>import("../../pages/dashboard/DashboardPage"));
-const InventoryPage=lazy(()=>import("../../pages/inventory/InventoryPage"));
+const StockOverviewPage=lazy(()=>import("../../features/inventory/StockOverviewPage"));
+const StockAdjustmentPage=lazy(()=>import("../../features/inventory/StockAdjustmentPage"));
+const MaterialListPage=lazy(()=>import("../../features/materials/MaterialListPage"));
 const DeliveriesPage=lazy(()=>import("../../pages/deliveries/DeliveriesPage"));
 const ManagementPage=lazy(()=>import("../../pages/management/ManagementPage"));
 const CustomersPage=lazy(()=>import("../../pages/customers/CustomersPage"));
@@ -32,6 +34,7 @@ const InvoicesPage=lazy(()=>import("../../pages/invoices/InvoicesPage"));
 const CreateInvoicePage=lazy(()=>import("../../pages/invoices/CreateInvoicePage"));
 const InvoiceDetailPage=lazy(()=>import("../../pages/invoices/InvoiceDetailPage"));
 const PurchaseOrdersPage=lazy(()=>import("../../pages/purchases/PurchaseOrdersPage"));
+const GoodsReceiptPage=lazy(()=>import("../../pages/purchases/GoodsReceiptPage"));
 const CreatePurchasePage=lazy(()=>import("../../pages/purchases/CreatePurchasePage"));
 const PurchaseDetailsPage=lazy(()=>import("../../pages/purchases/PurchaseDetailsPage"));
 const PurchaseHistoryPage=lazy(()=>import("../../pages/purchases/PurchaseHistoryPage"));
@@ -59,6 +62,9 @@ const ExpenseReportPage=lazy(()=>import("../../pages/reports/ExpenseReportPage")
 const GstSummaryReportPage=lazy(()=>import("../../pages/reports/GstSummaryReportPage"));
 const ProfitLossReportPage=lazy(()=>import("../../pages/reports/ProfitLossReportPage"));
 const BusinessOverviewReportPage=lazy(()=>import("../../pages/reports/BusinessOverviewReportPage"));
+const ItcTrackerReportPage=lazy(()=>import("../../pages/reports/ItcTrackerReportPage"));
+const RcmReportPage=lazy(()=>import("../../pages/reports/RcmReportPage"));
+const TdsTcsReportPage=lazy(()=>import("../../pages/reports/TdsTcsReportPage"));
 const MaterialDetailPage=lazy(()=>import("../../features/materials/MaterialDetailPage").then(m=>({default:m.MaterialDetailPage})));
 const MaterialFormPage=lazy(()=>import("../../features/materials/MaterialFormPage").then(m=>({default:m.MaterialFormPage})));
 const CustomerDetailPage=lazy(()=>import("../../features/customers/CustomerDetailPage").then(m=>({default:m.CustomerDetailPage})));
@@ -120,19 +126,21 @@ export const AppRouter = () => {
                 <Route path="/purchase-returns/new" element={<CreatePurchaseReturnPage />} />
               </Route>
               <Route element={<PermissionGuard permission="sales:manage" />}><Route path="/sales-orders/new" element={<CreateSalesOrderPage />} /><Route path="/invoices/new" element={<CreateInvoicePage />} /></Route>
-              <Route element={<PermissionGuard permission="purchases:view" />}><Route path="/purchases" element={<PurchaseOrdersPage />} /><Route path="/purchases/:id" element={<PurchaseDetailsPage />} /><Route path="/purchase-history" element={<PurchaseHistoryPage />} /></Route>
+              <Route element={<PermissionGuard permission="purchases:view" />}><Route path="/purchases" element={<PurchaseOrdersPage />} /><Route path="/purchases/goods-receipts" element={<GoodsReceiptPage />} /><Route path="/purchases/:id" element={<PurchaseDetailsPage />} /><Route path="/purchase-history" element={<PurchaseHistoryPage />} /></Route>
               <Route element={<PermissionGuard permission="purchases:manage" />}><Route path="/purchases/new" element={<CreatePurchasePage />} /></Route>
               <Route element={<PermissionGuard permission="financials:view" />}><Route path="/financials/receivables" element={<ReceivablesPage/>}/><Route path="/financials/payables" element={<PayablesPage/>}/><Route path="/financials/ledger" element={<LedgerPage/>}/><Route path="/financials/payments" element={<PaymentHistoryPage/>}/><Route path="/financials/customers/:id" element={<CustomerCreditPage/>}/><Route path="/payments" element={<PaymentsPage/>}/><Route path="/payments/new" element={<CreatePaymentPage/>}/><Route path="/payments/:id" element={<PaymentDetailPage/>}/><Route path="/payments/:id/receipt" element={<PaymentReceiptPage/>}/></Route>
               <Route element={<PermissionGuard permission="expenses:view" />}><Route path="/expenses" element={<ExpensesPage/>}/><Route path="/expenses/:id" element={<ExpenseDetailsPage/>}/><Route path="/expense-categories" element={<ExpenseCategoriesPage/>}/></Route>
               <Route element={<PermissionGuard permission="expenses:manage" />}><Route path="/expenses/new" element={<ExpenseFormPage mode="create"/>}/><Route path="/expenses/:id/edit" element={<ExpenseFormPage mode="edit"/>}/></Route>
               <Route element={<PermissionGuard permission="reports:operational" />}><Route path="/reports" element={<ReportsPage/>}/><Route path="/reports/sales" element={<SalesReportPage/>}/><Route path="/reports/purchases" element={<PurchaseReportPage/>}/><Route path="/reports/inventory" element={<InventoryReportPage/>}/><Route path="/reports/expenses" element={<ExpenseReportPage/>}/></Route>
-              <Route element={<PermissionGuard permission="reports:financial" />}><Route path="/reports/overview" element={<BusinessOverviewReportPage/>}/><Route path="/reports/stock-valuation" element={<StockValuationReportPage/>}/><Route path="/reports/customer-outstanding" element={<CustomerOutstandingReportPage/>}/><Route path="/reports/supplier-outstanding" element={<SupplierOutstandingReportPage/>}/><Route path="/reports/gst" element={<GstSummaryReportPage/>}/><Route path="/reports/profit-loss" element={<ProfitLossReportPage/>}/></Route>
+              <Route element={<PermissionGuard permission="reports:financial" />}><Route path="/reports/overview" element={<BusinessOverviewReportPage/>}/><Route path="/reports/stock-valuation" element={<StockValuationReportPage/>}/><Route path="/reports/customer-outstanding" element={<CustomerOutstandingReportPage/>}/><Route path="/reports/supplier-outstanding" element={<SupplierOutstandingReportPage/>}/><Route path="/reports/gst" element={<GstSummaryReportPage/>}/><Route path="/reports/itc-tracker" element={<ItcTrackerReportPage/>}/><Route path="/reports/rcm" element={<RcmReportPage/>}/><Route path="/reports/tds-tcs" element={<TdsTcsReportPage/>}/><Route path="/reports/profit-loss" element={<ProfitLossReportPage/>}/></Route>
               
               <Route element={<PermissionGuard permission="inventory:view" />}>
-                <Route path="/inventory" element={<InventoryPage />} />
-                <Route path="/materials" element={<InventoryPage />} />
+                <Route path="/inventory" element={<StockOverviewPage />} />
+                <Route path="/inventory/overview" element={<StockOverviewPage />} />
+                <Route path="/materials" element={<MaterialListPage />} />
                 <Route path="/materials/:id" element={<MaterialDetailPage />} />
                 <Route path="/inventory/:id" element={<MaterialDetailPage />} />
+                <Route path="/inventory/stock-adjustments" element={<StockAdjustmentPage />} />
               </Route>
               <Route element={<PermissionGuard permission="inventory:create" />}>
                 <Route path="/materials/new" element={<MaterialFormPage mode="create" />} />

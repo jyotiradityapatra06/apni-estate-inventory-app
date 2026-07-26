@@ -131,11 +131,11 @@ export default function PurchaseDetailsPage() {
             )}
             {manage && ["SENT", "PARTIALLY_RECEIVED"].includes(order.status) && (
               <button 
-                onClick={() => setReceiving(true)} 
-                className="flex min-h-10 items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 px-4 text-xs font-bold text-white shadow-sm cursor-pointer transition-colors"
+                onClick={() => navigate(`/purchases/goods-receipts?poId=${order.id}`)} 
+                className="flex min-h-10 items-center justify-center rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white shadow-2xs cursor-pointer transition-colors dark:bg-orange-600 dark:hover:bg-orange-500"
               >
                 <Package size={14} className="mr-1.5" />
-                Receive Stock
+                Record Goods Receipt (GRN)
               </button>
             )}
             {canCancel && (
@@ -198,35 +198,91 @@ export default function PurchaseDetailsPage() {
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
         <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Ordered Materials</h3>
         <div className="space-y-4">
-          {order.items.map(i => (
-            <article key={i.id} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs">
-              <div>
-                <span className="font-bold text-slate-900 text-sm block">{i.materialName}</span>
-                <span className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{i.godown.name} &middot; {i.sku}</span>
-              </div>
-              
-              <div className="flex gap-6">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Ordered</span>
-                  <strong className="text-slate-950 block mt-0.5">{formatQuantity(i.quantity, i.unit)}</strong>
+          {order.items.map(i => {
+            const percent = Math.min(100, Math.round((Number(i.receivedQuantity || 0) / Math.max(1, Number(i.quantity))) * 100));
+            const remaining = Math.max(0, Number(i.quantity) - Number(i.receivedQuantity));
+            return (
+              <article key={i.id} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-3 text-xs dark:border-slate-800 dark:bg-slate-800/40">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <span className="font-bold text-slate-900 text-sm block dark:text-slate-100">{i.materialName}</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{i.godown.name} &middot; {i.sku}</span>
+                  </div>
+                  
+                  <div className="flex gap-6">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Ordered</span>
+                      <strong className="text-slate-950 block mt-0.5 dark:text-slate-100">{formatQuantity(i.quantity, i.unit)}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Received</span>
+                      <strong className="text-emerald-700 block mt-0.5 dark:text-emerald-400">{formatQuantity(i.receivedQuantity, i.unit)}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Remaining</span>
+                      <strong className="text-rose-600 block mt-0.5 dark:text-rose-400">{formatQuantity(remaining, i.unit)}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Line Total</span>
+                      <strong className="text-slate-950 block mt-0.5 dark:text-slate-100">{fmt(i.lineTotal)}</strong>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Received</span>
-                  <strong className="text-green-700 block mt-0.5">{formatQuantity(i.receivedQuantity, i.unit)}</strong>
+
+                {/* Receiving Progress Bar */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                    <span>Item Receiving Progress ({percent}%)</span>
+                    <span>{i.receivedQuantity} / {i.quantity} {i.unit}</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                    <div
+                      className={`h-full transition-all ${
+                        percent >= 100
+                          ? "bg-emerald-500"
+                          : percent > 0
+                          ? "bg-orange-500"
+                          : "bg-slate-300 dark:bg-slate-600"
+                      }`}
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Remaining</span>
-                  <strong className="text-red-600 block mt-0.5">{formatQuantity(Math.max(0, Number(i.quantity) - Number(i.receivedQuantity)), i.unit)}</strong>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Line Total</span>
-                  <strong className="text-slate-950 block mt-0.5">{fmt(i.lineTotal)}</strong>
-                </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </section>
+
+      {/* GRN Receipt History Section */}
+      {order.receipts && order.receipts.length > 0 && (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3 dark:text-slate-100 dark:border-slate-800">
+            Goods Receipt Notes (GRN) Audit History ({order.receipts.length})
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {order.receipts.map((r) => (
+              <div
+                key={r.id}
+                className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-2 dark:border-slate-700 dark:bg-slate-800/60 text-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-slate-900 font-mono dark:text-slate-100">
+                    {r.receiptNumber}
+                  </span>
+                  <strong className="text-slate-900 font-black dark:text-slate-100">
+                    {fmt(r.totalAmount)}
+                  </strong>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                  <span>Date: {new Date(r.receiptDate).toLocaleDateString("en-IN")}</span>
+                  <span>Items: {r.items?.length || "Multiple"}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Financials totals */}
       <section className="ml-auto max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-2 text-xs font-semibold text-slate-500">

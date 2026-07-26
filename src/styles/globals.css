@@ -6,10 +6,13 @@
   .invoice-print-root { position: absolute; inset: 0; width: 100%; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
   .invoice-order-link { color: black !important; text-decoration: none !important; }
 }
+
 @media print {
   .report-print-root, .report-print-root * { visibility: visible; }
-  .report-actions, aside, header, nav { display: none !important; }
-  .report-print-root { padding: 0 !important; }
-  .report-print-root table { display: table !important; width: 100%; }
+  .report-actions, aside, header, nav, button { display: none !important; }
+  .report-print-root { position: absolute; top: 0; left: 0; width: 100%; padding: 0 !important; margin: 0 !important; border: 0 !important; box-shadow: none !important; }
+  .report-print-root table { display: table !important; width: 100%; border-collapse: collapse; }
+  .report-print-root th, .report-print-root td { border: 1px solid #cbd5e1 !important; padding: 6px 8px !important; }
+  .report-print-root .recharts-responsive-container { width: 100% !important; page-break-inside: avoid; }
   body { background: white !important; color: black !important; }
 }
