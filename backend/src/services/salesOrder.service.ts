@@ -20,11 +20,12 @@ export const getAll = async (businessId: string, rawQuery: unknown) => {
   if (query.status) where.status = query.status.toUpperCase();
   if (query.customerId) where.customerId = query.customerId;
   if (query.search) {
-    const q = query.search.trim();
+    const search = query.search.trim();
+
     where.OR = [
-      { orderNumber: { contains: q, mode: "insensitive" } },
-      { customerName: { contains: q, mode: "insensitive" } },
-      { customerPhone: { contains: q, mode: "insensitive" } },
+      { orderNumber: { contains: search } },
+      { customerName: { contains: search } },
+      { customerPhone: { contains: search } },
     ];
   }
   return prisma.salesOrder.findMany({ where, include: detailInclude, orderBy: { orderDate: "desc" } });
