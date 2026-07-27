@@ -348,12 +348,15 @@ export default function DashboardPage() {
             <div className="relative border-l border-slate-100 pl-4 space-y-5">
               {dashboard.activity.loading ? (
                 Array.from({ length: 3 }).map((_, i) => <div key={i} className="animate-pulse h-14 bg-slate-100 rounded-xl" />)
+              ) : dashboard.activity.data.length === 0 ? (
+                <div className="py-6 text-center">
+                  <p className="text-xs font-bold text-slate-700">No activity yet.</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                    Create sales orders, purchases, payments and invoices to see business activity here.
+                  </p>
+                </div>
               ) : (
-                (dashboard.activity.data.length > 0 ? dashboard.activity.data : [
-                  { id: "m-1", title: "Sales Invoice Confirmed", message: "Invoice #1024 generated for ABC Construction", createdAt: new Date(Date.now() - 1200000).toISOString() },
-                  { id: "m-2", title: "Goods Receipt Completed", message: "Pune Godown received 500 bags of Cement from ACC Cement", createdAt: new Date(Date.now() - 3600000).toISOString() },
-                  { id: "m-3", title: "Supplier Payment Logged", message: "₹1,20,000 paid to ACC Cement via Bank Transfer", createdAt: new Date(Date.now() - 7200000).toISOString() }
-                ]).slice(0, 7).map((act) => (
+                dashboard.activity.data.slice(0, 7).map((act) => (
                   <div key={act.id} className="relative text-xs">
                     {/* Bullet marker */}
                     <div className="absolute -left-[21.5px] top-1 h-2.5 w-2.5 rounded-full border bg-white border-orange-500" />

@@ -21,8 +21,7 @@ import {
   CornerUpLeft,
   ArrowLeftRight,
   SlidersHorizontal,
-  DollarSign,
-  Truck
+  DollarSign
 } from "lucide-react";
 import type { User } from "../context/AuthContext";
 import { hasPermission, hasRole } from "../utils/permissions";
@@ -92,11 +91,6 @@ export const getVisibleNavigation = (user: User | null) => navigationItems.filte
 export const getDesktopNavigation = (user: User | null) => getVisibleNavigation(user);
 
 export const getMobileNavigation = (user: User | null): NavigationItem[] => {
-  if (user?.role?.toUpperCase() === "DRIVER") {
-    return [
-      { id: "driver-trips", label: "My Trips", path: "/driver/trips", icon: Truck, group: "Dashboard" },
-    ];
-  }
   const navs: NavigationItem[] = [
     { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: Home, group: "Dashboard" },
     { id: "inventory", label: "Inventory", path: "/materials", icon: Package, group: "Inventory" },

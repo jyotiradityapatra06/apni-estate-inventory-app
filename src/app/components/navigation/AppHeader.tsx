@@ -128,36 +128,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
       setIsLoadingNotifications(true);
       setNotificationError("");
       const response = await notificationApi.getNotifications();
-      let list = response.data ?? [];
-      if (list.length === 0) {
-        list = [
-          {
-            id: "demo-1",
-            title: "Stock Alert",
-            message: "Cement OPC 53 stock is running low (Current: 45 bags, Min safety limit: 100 bags)",
-            isRead: false,
-            businessId: "demo",
-            createdAt: new Date(Date.now() - 3600000).toISOString()
-          },
-          {
-            id: "demo-2",
-            title: "Payment Reminder",
-            message: "ABC Construction has ₹50,000 pending beyond 30-day terms for Invoice #1024",
-            isRead: false,
-            businessId: "demo",
-            createdAt: new Date(Date.now() - 7200000).toISOString()
-          },
-          {
-            id: "demo-3",
-            title: "Purchase Update",
-            message: "PO #102 from ACC Cement has been fully received into Pune Godown successfully",
-            isRead: true,
-            businessId: "demo",
-            createdAt: new Date(Date.now() - 14400000).toISOString()
-          }
-        ];
-      }
-      setNotifications(list);
+      setNotifications(response.data ?? []);
     } catch (error) {
       console.error("Failed to load notifications:", error);
       setNotificationError("Could not load notifications. Please try again.");

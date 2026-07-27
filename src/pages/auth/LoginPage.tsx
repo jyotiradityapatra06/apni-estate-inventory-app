@@ -18,7 +18,7 @@ export const LoginPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [demoLoadingRole, setDemoLoadingRole] = useState<"OWNER" | "MANAGER" | "STAFF" | "DRIVER" | null>(null);
+  const [demoLoadingRole, setDemoLoadingRole] = useState<"OWNER" | "MANAGER" | "STAFF" | null>(null);
 
   useEffect(() => {
     if (sessionStorage.getItem("session_expired_toast") === "true") {
@@ -61,7 +61,7 @@ export const LoginPage = () => {
     }
   };
 
-  const handleDemoLogin = async (role: "OWNER" | "MANAGER" | "STAFF" | "DRIVER") => {
+  const handleDemoLogin = async (role: "OWNER" | "MANAGER" | "STAFF") => {
     if (loading || demoLoadingRole) return;
     setDemoLoadingRole(role);
     setLoading(true);
@@ -71,7 +71,6 @@ export const LoginPage = () => {
       OWNER: { email: "owner@apniestate.com", password: "password" },
       MANAGER: { email: "manager@apniestate.com", password: "password" },
       STAFF: { email: "staff@apniestate.com", password: "password" },
-      DRIVER: { email: "driver@apniestate.com", password: "password" },
     };
 
     try {
@@ -281,8 +280,8 @@ export const LoginPage = () => {
                 Choose a role to explore the application.
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {(["OWNER", "MANAGER", "STAFF", "DRIVER"] as const).map((role) => {
+            <div className="grid grid-cols-3 gap-2">
+              {(["OWNER", "MANAGER", "STAFF"] as const).map((role) => {
                 const isSelectedLoading = demoLoadingRole === role;
                 return (
                   <button
