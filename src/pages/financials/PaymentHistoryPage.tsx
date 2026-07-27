@@ -255,8 +255,8 @@ export default function PaymentHistoryPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-slate-500 font-medium">{x.type} &middot; Reference: {x.reference || "N/A"} &middot; Mode: {x.paymentMode}</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{new Date(x.date).toLocaleDateString("en-IN")} &middot; Logged by {x.createdBy?.name || "System"}</p>
+                    <p className="text-slate-500 font-medium">{x.type} · Reference: {x.reference || "N/A"} · Mode: {x.paymentMode}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{new Date(x.date).toLocaleDateString("en-IN")} · Logged by {x.createdBy?.name || "System"}</p>
                   </div>
                   <div className="text-right space-y-2">
                     <strong className={`block text-base font-black ${x.status === "REVERSED" ? "text-slate-400 line-through" : incoming ? "text-green-700" : "text-slate-950"}`}>

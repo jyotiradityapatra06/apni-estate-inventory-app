@@ -351,8 +351,10 @@ export function MaterialDetailPage() {
       {/* Stock Movement Modal */}
       {movement && (
         <StockMovementDialog
+          open={Boolean(movement)}
           type={movement}
-          material={material}
+          materials={[material]}
+          initialMaterial={material}
           godowns={godowns}
           onClose={() => setMovement(null)}
           onSuccess={() => {

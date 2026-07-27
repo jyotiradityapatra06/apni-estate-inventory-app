@@ -18,6 +18,8 @@ export interface Business {
   gstNumber?: string;
   phone?: string;
   address?: string;
+  state?: string;
+  stateCode?: string;
   workerSeatLimit?: number;
 }
 

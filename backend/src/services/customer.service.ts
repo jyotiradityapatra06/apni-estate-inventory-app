@@ -5,10 +5,15 @@ import { nextDocumentNumber } from "./numberSequence.service";
 
 export const getAll = (businessId: string, filters: { search?: string; active?: string }) => {
   const where: any = { businessId };
-  if (filters.search) where.OR = [
-    { name: { contains: filters.search } }, { phone: { contains: filters.search } },
-    { gstin: { contains: filters.search } }, { customerCode: { contains: filters.search } },
-  ];
+  if (filters.search) {
+    const q = filters.search.trim();
+    where.OR = [
+      { name: { contains: q, mode: "insensitive" } },
+      { phone: { contains: q, mode: "insensitive" } },
+      { gstin: { contains: q, mode: "insensitive" } },
+      { customerCode: { contains: q, mode: "insensitive" } },
+    ];
+  }
   if (filters.active !== undefined) where.isActive = filters.active === "true";
   return prisma.customer.findMany({ where, orderBy: { name: "asc" } });
 };

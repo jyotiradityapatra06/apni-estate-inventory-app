@@ -74,6 +74,7 @@ export default function CreateInvoicePage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     setError("");
     if (!order || !lines.length) return setError("Please select an eligible Sales Order.");
 
@@ -82,6 +83,20 @@ export default function CreateInvoicePage() {
       const remaining = Number(item.quantity) - Number(item.invoicedQuantity || 0);
       if (Number(line.quantity) <= 0 || Number(line.quantity) > remaining)
         return setError(`Invoice quantity for ${item.materialName} must be between 0 and ${remaining} ${item.unit}.`);
+    }
+
+    if (type === "GST") {
+      for (const line of lines) {
+        const item = order.items.find((x) => x.id === line.id)!;
+        const hasHsn = Boolean(item.hsnCode && item.hsnCode.trim().length > 0);
+        const hasGst = item.gstRate !== null && item.gstRate !== undefined;
+        if (!hasHsn || !hasGst) {
+          const msg = "Cannot create GST invoice. GST/HSN configuration missing for selected material.";
+          setError(msg);
+          toast.error(msg);
+          return;
+        }
+      }
     }
 
     setSaving(true);

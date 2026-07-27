@@ -39,11 +39,15 @@ export default function CreatePaymentPage() {
   const available = invoices.filter((x) => !form.customerId || x.customerId === form.customerId);
   const selected = invoices.find((x) => x.id === form.invoiceId);
 
+  const [saving, setSaving] = useState(false);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     if (selected && Number(form.amount) > Number(selected.balanceDue)) {
       return toast.error("Payment amount cannot exceed remaining invoice balance.");
     }
+    setSaving(true);
     try {
       const body = {
         ...form,
@@ -52,9 +56,12 @@ export default function CreatePaymentPage() {
       };
       const r = await paymentApi.create(body);
       toast.success("Payment recorded successfully");
+      window.dispatchEvent(new Event("notifications:refresh"));
       nav(`/payments/${r.data.id}`);
     } catch (e: any) {
       toast.error(e.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -202,8 +209,8 @@ export default function CreatePaymentPage() {
         >
           Cancel
         </button>
-        <button className="min-h-[48px] flex-[2] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs sm:text-sm font-extrabold text-white cursor-pointer shadow-xs md:flex-none md:px-8">
-          Record Payment
+        <button disabled={saving} className="min-h-[48px] flex-[2] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs sm:text-sm font-extrabold text-white cursor-pointer shadow-xs md:flex-none md:px-8 disabled:opacity-60">
+          {saving ? "Recording..." : "Record Payment"}
         </button>
       </div>
     </form>

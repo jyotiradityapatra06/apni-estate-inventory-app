@@ -210,7 +210,7 @@ export default function ExpensesPage() {
                 <div className="flex justify-between items-start gap-3">
                   <div>
                     <span className="font-bold text-slate-900 text-sm">{x.category.name}</span>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{x.expenseNumber} &middot; {x.payee || "No payee"}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{x.expenseNumber} · {x.payee || "No payee"}</p>
                   </div>
                   <BusinessStatusBadge status={x.paymentStatus}/>
                 </div>

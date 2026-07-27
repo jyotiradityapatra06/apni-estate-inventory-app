@@ -62,7 +62,7 @@ export function SalesOrderFormPage() {
 
   const summary = useMemo(() => calculateOrder(items, taxMode), [items, taxMode]);
 
-  const newOrderAmount = summary.totalAmount;
+  const newOrderAmount = summary.total;
   const currentOutstanding = customer?.outstandingBalance || 0;
   const creditLimit = customer?.creditLimit || 0;
   const totalExposure = currentOutstanding + newOrderAmount;
@@ -89,6 +89,17 @@ export function SalesOrderFormPage() {
       keys.add(key);
       const a = available(line);
       if (Number(line.quantity) > a.value) return `Only ${a.value} ${a.material?.unit || "units"} are available in ${a.balance?.godown.name || "the selected Godown"}.`;
+    }
+
+    if (taxMode === "GST") {
+      for (const line of items) {
+        const m = materials.find(x => x.id === line.inventoryItemId);
+        const hasHsn = Boolean(m?.hsnCode && m.hsnCode.trim().length > 0);
+        const hasGst = m?.taxRate !== null && m?.taxRate !== undefined;
+        if (!hasHsn || !hasGst) {
+          return "Cannot create GST invoice. GST/HSN configuration missing for selected material.";
+        }
+      }
     }
 
     if (isCreditBlocked && !overrideCreditLimit) {
@@ -121,10 +132,13 @@ export function SalesOrderFormPage() {
   });
 
   const save = async (confirm: boolean) => {
+    if (saving) return;
     const message = validate();
     if (message) {
       setError(message);
+      toast.error(message);
       setReview(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     setSaving(true);
@@ -134,16 +148,19 @@ export function SalesOrderFormPage() {
       if (confirm) {
         setConfirming(true);
         try {
-          await salesOrderApi.confirm(created.data.id);
+          await salesOrderApi.confirm(created.data.id, overrideCreditLimit);
           toast.success("Order confirmed and stock reserved");
-          window.dispatchEvent(new Event("notifications:refresh"));
         } catch (e) {
           toast.error(`Draft saved, but confirmation failed: ${e instanceof Error ? e.message : "Please retry from the order."}`);
         }
       }
+      window.dispatchEvent(new Event("sales-orders:refresh"));
+      window.dispatchEvent(new Event("notifications:refresh"));
       nav(`/sales-orders/${created.data.id}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Sales Order could not be saved.");
+      const msg = e instanceof Error ? e.message : "Sales Order could not be saved.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
       setConfirming(false);

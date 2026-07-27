@@ -97,6 +97,7 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
       return;
     }
 
+    if (saving) return;
     setSaving(true);
     const body: any = {
       materialName: form.materialName.trim(),
@@ -124,6 +125,8 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
     try {
       const response = mode === "create" ? await inventoryApi.createItem(body) : await inventoryApi.updateItem(id, body);
       toast.success(mode === "create" ? "Material added" : "Material updated");
+      window.dispatchEvent(new Event("inventory:refresh"));
+      window.dispatchEvent(new Event("notifications:refresh"));
       navigate(`/materials/${response.data.id}`, { replace: true });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Material could not be saved.");

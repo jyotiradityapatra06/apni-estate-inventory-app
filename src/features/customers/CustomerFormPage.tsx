@@ -88,10 +88,13 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
       return;
     }
 
+    if (saving) return;
     setSaving(true);
     try {
       const r = mode === "create" ? await customerApi.create(form) : await customerApi.update(id, form);
       toast.success(mode === "create" ? "Customer added successfully" : "Customer updated successfully");
+      window.dispatchEvent(new Event("customers:refresh"));
+      window.dispatchEvent(new Event("notifications:refresh"));
       nav(`/customers/${r.data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Customer could not be saved.");

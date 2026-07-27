@@ -175,8 +175,13 @@ export function MaterialListPage() {
           <EmptyState
             title="No materials available"
             description="No material item definitions found matching your search or filters."
-            actionText={canCreate ? "Add Material" : undefined}
-            onAction={canCreate ? () => navigate("/materials/new") : undefined}
+            action={
+              canCreate ? (
+                <button onClick={() => navigate("/materials/new")} className="min-h-10 rounded-xl bg-orange-600 px-4 text-xs font-bold text-white cursor-pointer">
+                  Add Material
+                </button>
+              ) : undefined
+            }
           />
         ) : (
           <>

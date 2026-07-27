@@ -6,7 +6,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <AppRouter />
-      <Toaster closeButton position="top-right" />
+      <Toaster closeButton position="bottom-right" expand={false} richColors />
     </ThemeProvider>
   );
 }

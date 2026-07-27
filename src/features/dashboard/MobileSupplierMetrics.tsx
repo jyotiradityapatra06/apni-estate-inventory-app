@@ -104,9 +104,25 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
   const trendSeries = Object.values(chartDataMap).reverse();
   const hasChartData = trendSeries.length > 0 && (totalSales > 0 || totalPurchases > 0);
 
-  // Time of day greeting
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+
+  const isLoading = dashboard.inventory.loading || dashboard.invoices.loading || dashboard.purchases.loading;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-5 md:hidden pb-16">
+        <div className="h-24 animate-pulse rounded-2xl bg-slate-900" />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="h-28 animate-pulse rounded-2xl bg-slate-200" />
+          <div className="h-28 animate-pulse rounded-2xl bg-slate-200" />
+          <div className="h-28 animate-pulse rounded-2xl bg-slate-200" />
+          <div className="h-28 animate-pulse rounded-2xl bg-slate-200" />
+        </div>
+        <div className="h-44 animate-pulse rounded-2xl bg-slate-200" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-7 md:hidden pb-16">

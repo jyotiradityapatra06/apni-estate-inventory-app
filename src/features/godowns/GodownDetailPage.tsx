@@ -183,7 +183,7 @@ export function GodownDetailPage() {
                 </b>
               </div>
               <p className="text-[11px] text-slate-500 font-medium">
-                Physical {b.quantity} &middot; Reserved {b.reservedQuantity} &middot; Min {b.inventoryItem.minimumStockLevel || 0}
+                Physical {b.quantity} · Reserved {b.reservedQuantity} · Min {b.inventoryItem.minimumStockLevel || 0}
               </p>
               <div className="pt-1">
                 <BusinessStatusBadge status={state(b)} />
@@ -206,7 +206,7 @@ export function GodownDetailPage() {
                   <b className="text-slate-900 font-bold uppercase tracking-wide">{x.type.replaceAll("_", " ")}</b>
                   <p className="text-slate-600 font-medium mt-0.5">{x.inventoryItem?.materialName}</p>
                   <p className="text-[10px] text-slate-400 font-medium mt-1">
-                    {x.reason || "Warehouse transaction"} &middot; {new Date(x.createdAt).toLocaleString("en-IN")}
+                    {x.reason || "Warehouse transaction"} · {new Date(x.createdAt).toLocaleString("en-IN")}
                   </p>
                 </div>
                 <b className={`font-black text-sm ${incoming ? "text-green-700" : "text-slate-800"}`}>

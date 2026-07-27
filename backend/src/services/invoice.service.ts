@@ -63,6 +63,16 @@ export const create = async (businessId: string, userId: string, input: unknown)
     };
   }), data.roundToRupee);
 
+  if (invoiceType === "GST") {
+    for (const item of selectedItems) {
+      const hasHsn = Boolean(item.hsnCode && item.hsnCode.trim().length > 0);
+      const hasGst = item.gstRate !== null && item.gstRate !== undefined;
+      if (!hasHsn || !hasGst) {
+        throw new ApiError(400, "Cannot create GST invoice. GST/HSN configuration missing for selected material.");
+      }
+    }
+  }
+
   return prisma.$transaction(async (tx) => {
     const invoiceNumber = await nextDocumentNumber(tx, businessId, "INVOICE", "INV");
     return tx.invoice.create({

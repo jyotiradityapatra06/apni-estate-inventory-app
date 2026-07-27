@@ -129,9 +129,9 @@ export default function LinkedDeliveryDetailPage() {
           </div>
           <p className="mt-1 text-xs font-semibold text-slate-500 flex flex-wrap items-center gap-2">
             <span>Customer: <strong className="text-slate-800">{d.customerName}</strong></span>
-            <span>&middot;</span>
+            <span>·</span>
             <span>Order: <strong className="font-mono text-slate-800">{d.salesOrder?.orderNumber}</strong></span>
-            <span>&middot;</span>
+            <span>·</span>
             {d.vehicleNumber ? (
               <span className="text-green-700 font-bold flex items-center gap-1">
                 <Truck size={13} />

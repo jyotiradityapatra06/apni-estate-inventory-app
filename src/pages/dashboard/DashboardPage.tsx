@@ -113,7 +113,7 @@ export default function DashboardPage() {
             {greeting}, {user?.name || "Owner"} 👋
           </h1>
           <p className="text-xs sm:text-sm font-semibold text-slate-500 mt-1">
-            Role: <span className="font-bold text-slate-700">{user?.role}</span> &middot; {todayDate}
+            Role: <span className="font-bold text-slate-700">{user?.role}</span> · {todayDate}
           </p>
         </div>
         <div>

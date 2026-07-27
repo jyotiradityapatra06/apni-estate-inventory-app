@@ -218,7 +218,7 @@ export default function InvoiceDetailPage() {
               </div>
               <p className="text-slate-500">
                 {formatQuantity(i.quantity, i.unit)} &times; {fmt(i.rate)}
-                {gst ? ` &middot; GST ${i.gstRate}%` : ""}
+                {gst ? ` · GST ${i.gstRate}%` : ""}
               </p>
             </div>
           ))}

@@ -393,7 +393,7 @@ export function StockOverviewPage() {
                       <span className="text-[10px] text-slate-400 block">{item.category}</span>
                     </td>
                     <td className="px-4 py-3.5 font-black text-slate-900 dark:text-slate-100">
-                      <QuantityDisplay quantity={item.quantity} unit={item.unit} />
+                      <QuantityDisplay value={item.quantity} unit={item.unit} />
                     </td>
                     <td className="px-4 py-3.5 font-bold text-slate-700 dark:text-slate-300">
                       {fmt(value)}
@@ -446,7 +446,7 @@ export function StockOverviewPage() {
                 <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
                   <div>
                     <span className="text-[10px] uppercase text-slate-400 block font-bold">Quantity</span>
-                    <QuantityDisplay quantity={item.quantity} unit={item.unit} />
+                    <QuantityDisplay value={item.quantity} unit={item.unit} />
                   </div>
                   <div>
                     <span className="text-[10px] uppercase text-slate-400 block font-bold">Stock Value</span>

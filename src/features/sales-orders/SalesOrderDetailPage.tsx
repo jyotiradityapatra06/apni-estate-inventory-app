@@ -64,7 +64,7 @@ export function SalesOrderDetailPage() {
       {/* Header */}
       <PageHeader 
         title={data.orderNumber} 
-        description={`${data.customerName} &middot; ${new Date(data.orderDate).toLocaleDateString("en-IN")}`} 
+        description={`${data.customerName} · ${new Date(data.orderDate).toLocaleDateString("en-IN")}`} 
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <button 
@@ -171,7 +171,7 @@ export function SalesOrderDetailPage() {
               <Link to={`/materials/${x.inventoryItemId}`} className="font-bold text-slate-900 hover:text-orange-600 transition-colors">
                 {x.materialName}
               </Link>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{x.godown.name} &middot; {x.sku}</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{x.godown.name} · {x.sku}</p>
               
               <div className="grid grid-cols-2 gap-2 text-[11px] pt-2 border-t border-slate-100">
                 <Info label="Ordered">{formatQuantity(x.quantity, x.unit)}</Info>
@@ -205,7 +205,7 @@ export function SalesOrderDetailPage() {
             {data.invoices?.map(x => (
               <div key={x.id} className="flex justify-between items-center bg-slate-50 p-2 rounded-xl">
                 <span className="font-bold text-slate-800">Invoice: {x.invoiceNumber}</span>
-                <span className="font-semibold text-slate-500">{x.status} &middot; {fmt(x.totalAmount)}</span>
+                <span className="font-semibold text-slate-500">{x.status} · {fmt(x.totalAmount)}</span>
               </div>
             ))}
             {data.deliveries?.map(x => (

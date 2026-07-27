@@ -19,10 +19,14 @@ export const getAll = async (businessId: string, rawQuery: unknown) => {
   const where: Prisma.SalesOrderWhereInput = { businessId };
   if (query.status) where.status = query.status.toUpperCase();
   if (query.customerId) where.customerId = query.customerId;
-  if (query.search) where.OR = [
-    { orderNumber: { contains: query.search } },
-    { customerName: { contains: query.search } },
-  ];
+  if (query.search) {
+    const q = query.search.trim();
+    where.OR = [
+      { orderNumber: { contains: q, mode: "insensitive" } },
+      { customerName: { contains: q, mode: "insensitive" } },
+      { customerPhone: { contains: q, mode: "insensitive" } },
+    ];
+  }
   return prisma.salesOrder.findMany({ where, include: detailInclude, orderBy: { orderDate: "desc" } });
 };
 
@@ -63,6 +67,18 @@ export const create = async (businessId: string, userId: string, input: unknown)
       sellerStateCode, placeOfSupplyCode,
     };
   }), data.roundToRupee);
+
+  if (data.taxMode === "GST") {
+    for (const item of data.items) {
+      const material = materialMap.get(item.inventoryItemId)!;
+      const hasHsn = Boolean(material.hsnCode && material.hsnCode.trim().length > 0);
+      const effectiveGst = item.gstRate ?? material.taxRate;
+      const hasGst = effectiveGst !== null && effectiveGst !== undefined;
+      if (!hasHsn || !hasGst) {
+        throw new ApiError(400, "Cannot create GST invoice. GST/HSN configuration missing for selected material.");
+      }
+    }
+  }
 
   // Credit Validation Check
   const newOrderAmount = Number(calculation.totalAmount);

@@ -211,7 +211,7 @@ export default function PurchaseReturnsPage() {
                   <BusinessStatusBadge status={x.status} />
                 </div>
                 <p className="text-xs text-slate-500 font-medium">
-                  {new Date(x.returnDate).toLocaleDateString("en-IN")} &middot; PO: {x.purchaseOrder?.purchaseOrderNumber || "—"}
+                  {new Date(x.returnDate).toLocaleDateString("en-IN")} · PO: {x.purchaseOrder?.purchaseOrderNumber || "—"}
                 </p>
                 <div className="border-t pt-3 flex justify-between items-center border-slate-100">
                   <strong className="text-base font-black text-slate-950">{fmt(x.totalAmount)}</strong>

@@ -47,14 +47,23 @@ export function SalesOrderListPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+    const onRefresh = () => load();
+    window.addEventListener("sales-orders:refresh", onRefresh);
+    window.addEventListener("notifications:refresh", onRefresh);
+    return () => {
+      window.removeEventListener("sales-orders:refresh", onRefresh);
+      window.removeEventListener("notifications:refresh", onRefresh);
+    };
+  }, []);
 
   const visible = useMemo(() => {
     return data.filter((o) => {
-      const q = search.toLowerCase();
+      const q = search.trim().toLowerCase();
       const d = o.orderDate.slice(0, 10);
       return (
-        (!q || [o.orderNumber, o.customerName, o.customerPhone].some((v) => v?.toLowerCase().includes(q))) &&
+        (!q || [o.orderNumber, o.customerName, o.customerPhone, o.status].some((v) => v?.toLowerCase().includes(q))) &&
         (status === "ALL" || o.status === status) &&
         (!from || d >= from) &&
         (!to || d <= to)

@@ -260,7 +260,7 @@ export function CustomerListPage() {
                       <Link to={`/customers/${c.id}`} className="font-black text-slate-900 text-base leading-tight block hover:text-orange-600">
                         {c.name}
                       </Link>
-                      <p className="text-xs text-slate-500 font-bold mt-0.5">{c.customerCode} &middot; {c.phone}</p>
+                      <p className="text-xs text-slate-500 font-bold mt-0.5">{c.customerCode} · {c.phone}</p>
                       {c.gstin && <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-0.5">GSTIN: {c.gstin}</p>}
                     </div>
                     {canUpdate && (

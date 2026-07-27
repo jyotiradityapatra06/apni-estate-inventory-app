@@ -85,4 +85,14 @@ export const cacheService = {
       await clearCacheForNamespace(bId, uId);
     }
   },
+
+  async invalidateResourceCache(resourceType?: string): Promise<void> {
+    const ns = getSessionNamespace();
+    if (!ns) return;
+    try {
+      await clearCacheForNamespace(ns.businessId, ns.userId);
+    } catch (err) {
+      console.warn("[CacheService] Failed to invalidate resource cache:", err);
+    }
+  },
 };

@@ -63,6 +63,7 @@ export function PurchaseForm() {
   };
 
   const save = async (send: boolean) => {
+    if (busy) return;
     setError("");
     if (!supplierId || items.some(x => !x.inventoryItemId || !x.godownId || Number(x.quantity) <= 0 || Number(x.rate) < 0)) {
       return setError("Choose a supplier and complete every Material line.");
@@ -83,6 +84,7 @@ export function PurchaseForm() {
       });
       if (send) await purchaseApi.send(r.data.id);
       toast.success(send ? "Purchase Order sent" : "Draft Purchase Order saved");
+      window.dispatchEvent(new Event("notifications:refresh"));
       nav(`/purchases/${r.data.id}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Purchase Order could not be saved.");

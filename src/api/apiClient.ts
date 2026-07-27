@@ -71,11 +71,18 @@ export async function apiClient<T = unknown>(
     result = null;
   }
 
-  if (response.ok && isGetRequest && result) {
-    // Asynchronously update IndexedDB cache for whitelisted GET endpoints
-    cacheService.setCachedResponse(path, result).catch((err) => {
-      console.warn("[CacheService] Background cache save warning:", err);
-    });
+  if (response.ok) {
+    if (isGetRequest && result) {
+      // Asynchronously update IndexedDB cache for whitelisted GET endpoints
+      cacheService.setCachedResponse(path, result).catch((err) => {
+        console.warn("[CacheService] Background cache save warning:", err);
+      });
+    } else if (!isGetRequest) {
+      // Invalidate cache on mutations to ensure UI data synchronization
+      cacheService.invalidateResourceCache().catch((err) => {
+        console.warn("[CacheService] Cache invalidation warning:", err);
+      });
+    }
   }
 
   if (!response.ok) {

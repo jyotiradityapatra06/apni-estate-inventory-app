@@ -109,11 +109,14 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
       return;
     }
 
+    if (saving) return;
     setSaving(true);
     try {
       const payload = { ...form, email: form.email || null };
       const r = mode === "create" ? await supplierApi.create(payload) : await supplierApi.update(id, payload);
       toast.success(mode === "create" ? "Supplier added successfully" : "Supplier updated successfully");
+      window.dispatchEvent(new Event("suppliers:refresh"));
+      window.dispatchEvent(new Event("notifications:refresh"));
       nav(`/suppliers/${r.data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Supplier could not be saved.");

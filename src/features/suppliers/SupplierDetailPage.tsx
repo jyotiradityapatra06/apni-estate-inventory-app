@@ -125,9 +125,9 @@ export function SupplierDetailPage() {
           {data.suppliedMaterials?.length > 0 && (
             <Row l="Materials Supplied">
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {data.suppliedMaterials.map((m) => (
-                  <span key={m} className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
-                    {m}
+                {data.suppliedMaterials.map((m: any) => (
+                  <span key={m.inventoryItem?.id || m.id} className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
+                    {m.inventoryItem?.materialName || m.materialName || "Material"}
                   </span>
                 ))}
               </div>

@@ -27,10 +27,13 @@ export const getAll = async (
 ) => {
   const whereClause: any = { businessId };
   if (filters.search) {
+    const q = filters.search.trim();
     whereClause.OR = [
-      { materialName: { contains: filters.search } },
-      { sku: { contains: filters.search } },
-      { brand: { contains: filters.search } },
+      { materialName: { contains: q, mode: "insensitive" } },
+      { sku: { contains: q, mode: "insensitive" } },
+      { brand: { contains: q, mode: "insensitive" } },
+      { category: { contains: q, mode: "insensitive" } },
+      { hsnCode: { contains: q, mode: "insensitive" } },
     ];
   }
   if (filters.category && filters.category !== "All") whereClause.category = filters.category;

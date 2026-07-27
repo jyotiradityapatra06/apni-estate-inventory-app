@@ -109,7 +109,7 @@ export default function PurchaseDetailsPage() {
       {/* Header */}
       <PageHeader 
         title={order.purchaseOrderNumber} 
-        description={`${order.supplierName} &middot; ${new Date(order.orderDate).toLocaleDateString("en-IN")}`} 
+        description={`${order.supplierName} · ${new Date(order.orderDate).toLocaleDateString("en-IN")}`} 
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <button 
@@ -206,7 +206,7 @@ export default function PurchaseDetailsPage() {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
                     <span className="font-bold text-slate-900 text-sm block dark:text-slate-100">{i.materialName}</span>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{i.godown.name} &middot; {i.sku}</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{i.godown.name} · {i.sku}</span>
                   </div>
                   
                   <div className="flex gap-6">
@@ -322,7 +322,7 @@ export default function PurchaseDetailsPage() {
               <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 border-b py-2.5 last:border-0">
                 <div>
                   <span className={`font-bold text-slate-800 ${p.status === "REVERSED" ? "text-slate-400 line-through" : ""}`}>
-                    {p.paymentNumber} &middot; {p.paymentMode}
+                    {p.paymentNumber} · {p.paymentMode}
                   </span>
                   {p.status === "REVERSED" && (
                     <small className="block text-red-700 mt-1">Reversed: {p.reversalReason}</small>

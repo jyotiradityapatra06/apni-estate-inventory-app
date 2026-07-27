@@ -270,7 +270,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
             )}
           </div>
           <p className="text-[10px] font-bold text-slate-400 truncate mt-0.5">
-            {title} &middot; Supplier ERP
+            {title} · Supplier ERP
           </p>
         </div>
       </div>
