@@ -8,4 +8,6 @@ router.get("/:id", protect, requirePermission("sales:view"), controller.getById)
 router.post("/", protect, requirePermission("sales:manage"), controller.create);
 router.post("/:id/issue", protect, requirePermission("sales:manage"), controller.issue);
 router.post("/:id/cancel", protect, requirePermission("sales:manage"), controller.cancel);
+router.post("/:id/share", protect, requirePermission("sales:view"), controller.share);
+router.get("/customer/:customerId/shares", protect, requirePermission("sales:view"), controller.getSharesByCustomer);
 export default router;

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Mail, Phone, Plus, DollarSign, Pencil, UserCheck, AlertTriangle, Receipt, Printer, Eye, Calendar, FilePlus, MessageCircle, IndianRupee, BookOpen, ShoppingCart } from "lucide-react";
 import { customerApi } from "../../api/customer.api";
 import paymentApi from "../../api/payment.api";
+import invoiceApi from "../../api/invoice.api";
 import { PageHeader, SectionHeader } from "../../app/components/common/PageHeader";
 import { StatCard } from "../../app/components/common/Card";
 import { BusinessStatusBadge } from "../../app/components/common/BusinessStatusBadge";
@@ -18,7 +19,9 @@ export function CustomerDetailPage() {
   const { user } = useAuth();
   const [data, setData] = useState<(Customer & { transactionHistory?: unknown[] }) | null>(null);
   const [payments, setPayments] = useState<any[]>([]);
+  const [shares, setShares] = useState<any[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(true);
+  const [loadingShares, setLoadingShares] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -35,6 +38,15 @@ export function CustomerDetailPage() {
         setLoadingPayments(false);
       })
       .catch(() => setLoadingPayments(false));
+
+    setLoadingShares(true);
+    invoiceApi
+      .getSharesByCustomer(id)
+      .then((r) => {
+        setShares(r.data || []);
+        setLoadingShares(false);
+      })
+      .catch(() => setLoadingShares(false));
   }, [id]);
 
   const handleWhatsAppShare = () => {
@@ -312,6 +324,48 @@ Thank you for your business.`;
                         <Printer size={12} /> Receipt
                       </Link>
                     </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {/* Recent Invoice Activity Card */}
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
+        <SectionHeader title="Recent Invoice Activity" description="Tracking WhatsApp invoice delivery and communication log." />
+
+        {loadingShares ? (
+          <div className="h-24 animate-pulse rounded-xl bg-muted" />
+        ) : shares.length === 0 ? (
+          <div className="py-6 text-center space-y-1 text-muted-foreground">
+            <p className="font-bold text-sm text-foreground">No recent invoice activity</p>
+            <p className="text-xs text-muted-foreground">Invoices shared via WhatsApp will appear here.</p>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-border">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-muted text-muted-foreground border-b border-border font-bold uppercase tracking-wider">
+                <tr>
+                  <th className="p-3">Invoice Number</th>
+                  <th className="p-3">Shared Date</th>
+                  <th className="p-3">Channel</th>
+                  <th className="p-3">Recipient Phone</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-semibold text-foreground">
+                {shares.map((s) => (
+                  <tr key={s.id} className="hover:bg-muted/60 transition-colors">
+                    <td className="p-3 font-bold text-foreground">{s.invoice?.invoiceNumber || "Invoice"}</td>
+                    <td className="p-3 text-muted-foreground">{new Date(s.createdAt).toLocaleDateString("en-IN")}</td>
+                    <td className="p-3">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-800 border border-emerald-200">
+                        <MessageCircle size={11} className="text-emerald-600" />
+                        {s.channel}
+                      </span>
+                    </td>
+                    <td className="p-3 text-muted-foreground">{s.phone || data.phone || "—"}</td>
                   </tr>
                 ))}
               </tbody>

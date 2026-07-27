@@ -84,6 +84,7 @@ model User {
   completedPurchaseReturns PurchaseReturn[]   @relation("PurchaseReturnCompletedBy")
   cancelledPurchaseReturns PurchaseReturn[]   @relation("PurchaseReturnCancelledBy")
   cancelledExpenses        Expense[]          @relation("ExpenseCancelledBy")
+  createdInvoiceShares     InvoiceShare[]     @relation("InvoiceShareCreatedBy")
 
   @@index([businessId])
 }
@@ -718,8 +719,10 @@ model Invoice {
   items             InvoiceItem[]
   deliveries        Delivery[]
   payments          CustomerPayment[]
+  shares            InvoiceShare[]
   issuedAt          DateTime?
   cancelledAt       DateTime?
+  publicToken       String?           @unique
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   SalesReturn       SalesReturn[]
@@ -729,6 +732,7 @@ model Invoice {
   @@index([businessId, status])
   @@index([customerId])
   @@index([salesOrderId])
+  @@index([publicToken])
 }
 
 model InvoiceItem {
@@ -1040,4 +1044,18 @@ model PurchaseReturnItem {
   @@index([inventoryItemId])
   @@index([godownId])
   @@index([purchaseOrderItemId])
+}
+
+model InvoiceShare {
+  id            String   @id @default(uuid())
+  invoiceId     String
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  channel       String   @default("WHATSAPP")
+  phone         String?
+  messageStatus String?
+  sharedById    String?
+  sharedBy      User?    @relation("InvoiceShareCreatedBy", fields: [sharedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+
+  @@index([invoiceId])
 }

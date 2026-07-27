@@ -59,14 +59,13 @@ export function createWhatsAppLink(phone?: string | null, message?: string | nul
 }
 
 /**
- * Formats a professional invoice message for WhatsApp sharing with safe fallbacks.
+ * Formats a professional invoice message for WhatsApp sharing with public invoice URL and safe fallbacks.
  */
 export function formatInvoiceWhatsAppMessage({
   customerName,
   businessName,
   invoiceNumber,
   totalAmount,
-  balanceDue,
   invoiceLink,
 }: InvoiceWhatsAppMessageOptions): string {
   const name = customerName?.trim() || "Customer";
@@ -77,26 +76,16 @@ export function formatInvoiceWhatsAppMessage({
     ? totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })
     : (totalAmount != null && String(totalAmount).trim() !== "" ? String(totalAmount) : "0");
 
-  const balance = typeof balanceDue === "number"
-    ? balanceDue.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })
-    : (balanceDue != null && String(balanceDue).trim() !== "" ? String(balanceDue) : "0");
-
-  const link = invoiceLink?.trim() || "Not available";
+  const link = invoiceLink?.trim() || window.location.href;
 
   return `Hello ${name},
 
-Your invoice from ${business} is ready.
-
-Invoice No:
-${invNo}
+Your GST Invoice ${invNo} from ${business} is ready.
 
 Invoice Amount:
 ₹${total}
 
-Pending Amount:
-₹${balance}
-
-You can view your invoice here:
+Download Invoice:
 ${link}
 
 Thank you for your business.`;

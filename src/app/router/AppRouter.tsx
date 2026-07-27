@@ -77,6 +77,7 @@ const TransferListPage=lazy(()=>import("../../features/transfers/TransferListPag
 const TransferFormPage=lazy(()=>import("../../features/transfers/TransferFormPage").then(m=>({default:m.TransferFormPage})));
 const TransferDetailPage=lazy(()=>import("../../features/transfers/TransferDetailPage").then(m=>({default:m.TransferDetailPage})));
 const DriverTripsPage=lazy(()=>import("../../pages/driver/DriverTripsPage"));
+const PublicInvoicePage = lazy(() => import("../../pages/invoices/PublicInvoicePage"));
 const RouteLoading=()=> <div className="space-y-3" role="status" aria-label="Loading page"><div className="h-8 w-48 animate-pulse rounded bg-slate-200"/><div className="h-32 animate-pulse rounded-xl bg-slate-200"/><div className="h-32 animate-pulse rounded-xl bg-slate-200"/></div>;
 
 const HomeRedirect = () => {
@@ -89,8 +90,9 @@ export const AppRouter = () => {
     <AuthProvider>
       <BrowserRouter>
         <Suspense fallback={<RouteLoading/>}><Routes>
-          {/* Public Route */}
+          {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/i/:token" element={<PublicInvoicePage />} />
           <Route path="/unauthorized" element={<AccessDeniedPage />} />
 
           {/* Protected Routes */}

@@ -24,6 +24,7 @@ import expenseCategoryRoutes from "./routes/expenseCategory.routes";
 import reportRoutes from "./routes/report.routes";
 import salesReturnRoutes from "./routes/salesReturn.routes";
 import purchaseReturnRoutes from "./routes/purchaseReturn.routes";
+import publicInvoiceRoutes from "./routes/publicInvoice.routes";
 import { notFound } from "./middleware/notFound.middleware";
 import { errorHandler } from "./middleware/error.middleware";
 import { env } from "./config/env";
@@ -52,6 +53,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // API Routes
+app.use("/api/public/invoices", publicInvoiceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api/inventory", inventoryRoutes);

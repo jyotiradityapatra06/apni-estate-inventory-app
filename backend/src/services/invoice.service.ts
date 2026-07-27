@@ -6,6 +6,7 @@ import { calculateInvoice } from "./invoiceCalculation.service";
 import { stateCodeFromGstin } from "./gstCalculation.service";
 import { nextDocumentNumber } from "./numberSequence.service";
 import { postLedgerEntry } from "./ledger.service";
+import { generatePublicToken } from "../utils/token";
 
 const detailInclude = {
   customer: { select: { id: true, customerCode: true, name: true, phone: true } },
@@ -149,7 +150,8 @@ export const issue = async (businessId: string, id: string) => prisma.$transacti
   });
   await tx.salesOrder.update({ where: { id: order.id }, data: { status: allInvoiced ? "INVOICED" : "PARTIALLY_INVOICED" } });
   await tx.customer.update({ where: { id: invoice.customerId }, data: { outstandingBalance: { increment: Number(invoice.totalAmount.toString()) } } });
-  await tx.invoice.update({ where: { id }, data: { status: "ISSUED", issuedAt: new Date() } });
+  const publicToken = invoice.publicToken || generatePublicToken();
+  await tx.invoice.update({ where: { id }, data: { status: "ISSUED", issuedAt: new Date(), publicToken } });
   await postLedgerEntry(tx,{businessId,partyType:"CUSTOMER",partyId:invoice.customerId,transactionType:"SALES_INVOICE",referenceType:"INVOICE",referenceId:invoice.id,amount:invoice.totalAmount,debitAmount:invoice.totalAmount,creditAmount:0,description:`Invoice ${invoice.invoiceNumber} issued`,transactionDate:invoice.invoiceDate,createdById:invoice.createdById,idempotencyKey:`INVOICE_ISSUED:${invoice.id}`});
   return tx.invoice.findUniqueOrThrow({ where: { id }, include: detailInclude });
 });
@@ -174,3 +176,45 @@ export const cancel = async (businessId: string, id: string) => prisma.$transact
   }
   return tx.invoice.update({ where: { id }, data: { status: "CANCELLED", cancelledAt: new Date(), balanceDue: 0 }, include: detailInclude });
 });
+
+export const share = async (businessId: string, id: string, userId: string, phone?: string) => {
+  const invoice = await prisma.invoice.findFirst({ where: { id, businessId } });
+  if (!invoice) throw new ApiError(404, "Invoice not found.");
+
+  let publicToken = invoice.publicToken;
+  if (!publicToken) {
+    publicToken = generatePublicToken();
+    await prisma.invoice.update({ where: { id }, data: { publicToken } });
+  }
+
+  const recipientPhone = phone || invoice.customerPhone || null;
+  await prisma.invoiceShare.create({
+    data: {
+      invoiceId: invoice.id,
+      channel: "WHATSAPP",
+      phone: recipientPhone,
+      sharedById: userId,
+    },
+  });
+
+  return {
+    publicToken,
+    publicUrl: `/i/${publicToken}`,
+  };
+};
+
+export const getSharesByCustomer = async (businessId: string, customerId: string) => {
+  return prisma.invoiceShare.findMany({
+    where: {
+      invoice: {
+        customerId,
+        businessId,
+      },
+    },
+    include: {
+      invoice: { select: { invoiceNumber: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+};

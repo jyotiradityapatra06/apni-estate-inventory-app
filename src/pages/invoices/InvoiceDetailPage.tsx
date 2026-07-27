@@ -53,7 +53,7 @@ export default function InvoiceDetailPage() {
     }
   };
 
-  const handleWhatsAppShare = () => {
+  const handleWhatsAppShare = async () => {
     if (!x) return;
     const phone = x.customerPhone || x.customer?.phone;
     const normalizedPhone = normalizeWhatsAppNumber(phone);
@@ -63,26 +63,34 @@ export default function InvoiceDetailPage() {
       return;
     }
 
-    const message = formatInvoiceWhatsAppMessage({
-      customerName: x.customerName || x.customer?.name,
-      businessName: x.businessName,
-      invoiceNumber: x.invoiceNumber,
-      totalAmount: x.totalAmount,
-      balanceDue: x.balanceDue,
-      invoiceLink: window.location.href,
-    });
+    try {
+      const shareRes = await invoiceApi.share(x.id, phone || undefined);
+      const publicInvoiceURL = `${window.location.origin}${shareRes.data.publicUrl}`;
 
-    const link = createWhatsAppLink(phone, message);
-    if (!link) {
-      toast.error("Customer phone number is missing. Please update customer details.");
-      return;
-    }
+      const message = formatInvoiceWhatsAppMessage({
+        customerName: x.customerName || x.customer?.name,
+        businessName: x.businessName,
+        invoiceNumber: x.invoiceNumber,
+        totalAmount: x.totalAmount,
+        balanceDue: x.balanceDue,
+        invoiceLink: publicInvoiceURL,
+      });
 
-    const whatsappWindow = window.open("", "_blank");
-    if (whatsappWindow) {
-      whatsappWindow.location.href = link;
-    } else {
-      window.location.href = link;
+      const link = createWhatsAppLink(phone, message);
+      if (!link) {
+        toast.error("Customer phone number is missing. Please update customer details.");
+        return;
+      }
+
+      const whatsappWindow = window.open("", "_blank");
+      if (whatsappWindow) {
+        whatsappWindow.location.href = link;
+      } else {
+        window.location.href = link;
+      }
+      toast.success("Invoice shared on WhatsApp");
+    } catch {
+      toast.error("Unable to generate WhatsApp share link. Please try again.");
     }
   };
 
