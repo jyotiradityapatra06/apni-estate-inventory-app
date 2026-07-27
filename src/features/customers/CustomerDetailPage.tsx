@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
-import { Mail, Phone, Plus, DollarSign, Pencil, UserCheck, AlertTriangle, Receipt, Printer, Eye, Calendar, FilePlus, MessageCircle, IndianRupee, BookOpen } from "lucide-react";
+import { Mail, Phone, Plus, DollarSign, Pencil, UserCheck, AlertTriangle, Receipt, Printer, Eye, Calendar, FilePlus, MessageCircle, IndianRupee, BookOpen, ShoppingCart } from "lucide-react";
 import { customerApi } from "../../api/customer.api";
 import paymentApi from "../../api/payment.api";
 import { PageHeader, SectionHeader } from "../../app/components/common/PageHeader";
@@ -130,11 +130,48 @@ Thank you for your business.`;
         )}
       </div>
 
+      {/* Sales Workflow Guidance Card */}
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+          <span className="font-black text-muted-foreground uppercase tracking-wider text-[11px]">
+            Sales Workflow
+          </span>
+          <div className="flex items-center gap-2 font-bold text-foreground overflow-x-auto pb-1 sm:pb-0">
+            <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">
+              Sales Order
+            </span>
+            <span className="text-muted-foreground font-mono">→</span>
+            <span className="px-2.5 py-1 rounded-lg bg-orange-50 text-orange-800 border border-orange-200">
+              Invoice
+            </span>
+            <span className="text-muted-foreground font-mono">→</span>
+            <span className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-800 border border-purple-200">
+              Delivery
+            </span>
+            <span className="text-muted-foreground font-mono">→</span>
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
+              Payment
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Quick Actions Section */}
       <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
-        <SectionHeader title="Quick Actions" description="Fast CRM shortcuts for invoices, receipts, WhatsApp communication, and ledger details." />
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5 pt-1">
-          {/* Create Invoice */}
+        <SectionHeader title="Quick Actions" description="Fast CRM shortcuts for sales orders, invoices, receipts, WhatsApp communication, and ledger details." />
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6 pt-1">
+          {/* 1. Create Sales Order */}
+          {hasPermission(user, "sales:manage") && (
+            <Link
+              to={`/sales-orders/new?customerId=${data.id}`}
+              className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50/60 px-3 py-2.5 text-xs font-extrabold text-amber-900 hover:bg-amber-100/80 transition-colors shadow-xs"
+            >
+              <ShoppingCart size={16} className="text-amber-600 shrink-0" />
+              Create Sales Order
+            </Link>
+          )}
+
+          {/* 2. Create Invoice */}
           {hasPermission(user, "sales:manage") && (
             <Link
               to={`/invoices/new?customerId=${data.id}`}
@@ -145,7 +182,7 @@ Thank you for your business.`;
             </Link>
           )}
 
-          {/* WhatsApp Bill */}
+          {/* 3. WhatsApp Bill */}
           <button
             onClick={handleWhatsAppShare}
             className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-2.5 text-xs font-extrabold text-emerald-800 hover:bg-emerald-100/80 transition-colors shadow-xs cursor-pointer"
@@ -154,7 +191,7 @@ Thank you for your business.`;
             WhatsApp Bill
           </button>
 
-          {/* Receive Payment */}
+          {/* 4. Receive Payment */}
           {hasPermission(user, "financials:manage") && (
             <Link
               to={`/payments/new?customerId=${data.id}`}
@@ -165,7 +202,7 @@ Thank you for your business.`;
             </Link>
           )}
 
-          {/* View Ledger */}
+          {/* 5. View Ledger */}
           {hasPermission(user, "financials:view") && (
             <Link
               to={`/financials/ledger?customerId=${data.id}`}
@@ -176,7 +213,7 @@ Thank you for your business.`;
             </Link>
           )}
 
-          {/* Call Customer */}
+          {/* 6. Call Customer */}
           {data.phone && (
             <a
               href={`tel:${data.phone}`}
