@@ -61,10 +61,6 @@ export default function DashboardPage() {
   });
 
   const lowStock = lowStockItems(dashboard.inventory.data);
-  const outOfStock = dashboard.inventory.data.filter(item => item.quantity <= 0);
-  const godownsCount = Array.from(
-    new Set(dashboard.inventory.data.flatMap(item => item.godownStocks?.map(gs => gs.godown.id) || []))
-  ).length;
 
   // Financial values
   const totalSales = dashboard.invoices.data.reduce((sum, item) => sum + Number(item.totalAmount), 0);
@@ -103,285 +99,285 @@ export default function DashboardPage() {
 
       {/* 2. Desktop Command Center (>= 768px) */}
       <div className="hidden md:block space-y-8 pb-16">
-      {/* 1. Top Welcome Section */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b pb-5">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-orange-600">
-            {business?.name || "APNI ESTATE"} command center
-          </p>
-          <h1 className="text-2xl font-black text-foreground tracking-tight mt-1 md:text-3xl">
-            {greeting}, {user?.name || "Owner"} 👋
-          </h1>
-          <p className="text-xs sm:text-sm font-semibold text-muted-foreground mt-1">
-            Role: <span className="font-bold text-muted-foreground">{user?.role}</span> · {todayDate}
-          </p>
-        </div>
-        <div>
-          <button
-            onClick={refresh}
-            className="flex min-h-[42px] items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-xs sm:text-sm font-extrabold text-muted-foreground shadow-sm hover:bg-muted cursor-pointer active:scale-95 transition-transform"
-          >
-            <RefreshCw size={16} className={dashboard.inventory.loading ? "animate-spin text-orange-500" : ""} />
-            Sync Dashboard
-          </button>
-        </div>
-      </div>
-
-      {/* Setup Progress Widget */}
-      {!setupDismissed && doneCount < 4 && (
-        <div className="rounded-2xl border border-orange-200 bg-orange-50/20 p-5 shadow-sm space-y-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-extrabold text-foreground text-sm sm:text-base">Welcome to APNI ESTATE &mdash; Complete your business setup 🚀</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 font-medium">Follow this step-by-step checklist to configure your construction material ERP.</p>
-            </div>
-            <button 
-              onClick={dismissSetup} 
-              className="text-muted-foreground hover:text-muted-foreground text-xs font-bold uppercase tracking-wider cursor-pointer"
+        {/* 1. Top Welcome Section */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-border pb-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-orange-600">
+              {business?.name || "APNI ESTATE"} command center
+            </p>
+            <h1 className="text-2xl md:text-3xl lg:text-[34px] font-bold text-foreground tracking-tight mt-1">
+              {greeting}, {user?.name || "Owner"} 👋
+            </h1>
+            <p className="text-sm text-muted-foreground leading-relaxed mt-1">
+              Role: <span className="font-semibold text-foreground">{user?.role}</span> · {todayDate}
+            </p>
+          </div>
+          <div>
+            <button
+              onClick={refresh}
+              className="flex min-h-[42px] items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-muted cursor-pointer active:scale-95 transition-transform"
             >
-              Skip guide
+              <RefreshCw size={16} className={dashboard.inventory.loading ? "animate-spin text-orange-500" : ""} />
+              Sync Dashboard
             </button>
           </div>
+        </div>
 
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs sm:text-sm font-bold text-muted-foreground">
-              <span>Setup Progress ({doneCount} of {setupSteps.length} complete)</span>
-              <span>{progressPercent}%</span>
-            </div>
-            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-orange-500 rounded-full transition-all duration-500" 
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4 pt-2">
-            {setupSteps.map((step, idx) => (
-              <Link 
-                key={idx} 
-                to={step.path}
-                className={`rounded-xl border p-3 block text-left text-xs sm:text-sm transition-colors ${
-                  step.done 
-                    ? "bg-green-50/50 border-green-200 text-green-800 animate-fade-in" 
-                    : "bg-card hover:bg-muted border-border text-muted-foreground"
-                }`}
+        {/* Setup Progress Widget */}
+        {!setupDismissed && doneCount < 4 && (
+          <div className="rounded-2xl border border-orange-200/80 bg-orange-50/20 dark:bg-orange-950/20 p-5 shadow-sm space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-semibold text-foreground text-base sm:text-lg">Welcome to APNI ESTATE &mdash; Complete your business setup 🚀</h3>
+                <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">Follow this step-by-step checklist to configure your construction material ERP.</p>
+              </div>
+              <button 
+                onClick={dismissSetup} 
+                className="text-muted-foreground hover:text-foreground text-xs font-semibold uppercase tracking-wider cursor-pointer"
               >
-                <div className="flex items-center justify-between font-extrabold">
-                  <span>{idx + 1}. {step.label}</span>
-                  <span className={step.done ? "text-green-600 font-extrabold" : "text-slate-300"}>
-                    {step.done ? "✓" : "○"}
-                  </span>
-                </div>
-                <p className="text-[11px] text-muted-foreground mt-1 font-semibold">
-                  {step.done ? "Completed successfully" : "Click to set up"}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 2. Quick Action Section */}
-      <DashboardQuickActions />
-
-      {/* 3. Business Overview Cards */}
-      <section className="space-y-3.5">
-        <h2 className="text-xs font-black tracking-wider text-muted-foreground uppercase">Financial Health</h2>
-        <DashboardSummaryCards dashboard={dashboard} />
-      </section>
-
-      {/* Desktop side-by-side or stacked grid layout */}
-      <div className="grid gap-8 lg:grid-cols-3">
-        
-        {/* Left/Middle Column (Inventory & Operations) */}
-        <div className="space-y-8 lg:col-span-2">
-          
-          {/* 4. Inventory Health Breakdown Chart */}
-          <InventoryHealthChart materials={dashboard.inventory.data} />
-
-          {/* 4b. Stock Movement Trend Chart */}
-          <StockMovementChart movements={dashboard.movements.data || []} />
-
-          {/* 4c. Top Material Availability Chart */}
-          <MaterialAvailabilityChart materials={dashboard.inventory.data} />
-
-          {/* 4d. Inventory Value Trend Chart */}
-          <InventoryValueTrendChart materials={dashboard.inventory.data} movements={dashboard.movements.data || []} />
-
-          {/* 6. Financial Summary (Cash Flow) */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-center justify-between border-b pb-3 mb-4">
-              <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Cash Flow Overview</h3>
-              <span className="text-xs text-muted-foreground font-semibold">Real-time balances</span>
+                Skip guide
+              </button>
             </div>
-            
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-xs mb-1 font-semibold">
-                  <span className="text-muted-foreground">Money Received</span>
-                  <span className="text-green-700 font-bold">{fmt(moneyReceived)}</span>
-                </div>
-                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-green-600 rounded-full" 
-                    style={{ width: `${totalSales ? Math.min(100, (moneyReceived / totalSales) * 100) : 0}%` }}
-                  />
-                </div>
-              </div>
 
-              <div>
-                <div className="flex justify-between text-xs mb-1 font-semibold">
-                  <span className="text-muted-foreground">Money Pending (Receivables)</span>
-                  <span className="text-orange-600 font-bold">{fmt(totalReceivables)}</span>
-                </div>
-                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-orange-500 rounded-full" 
-                    style={{ width: `${totalSales ? Math.min(100, (totalReceivables / totalSales) * 100) : 0}%` }}
-                  />
-                </div>
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-sm font-medium text-muted-foreground">
+                <span>Setup Progress ({doneCount} of {setupSteps.length} complete)</span>
+                <span>{progressPercent}%</span>
               </div>
-
-              <div>
-                <div className="flex justify-between text-xs mb-1 font-semibold">
-                  <span className="text-muted-foreground">Supplier Payments Due (Payables)</span>
-                  <span className="text-foreground font-bold">{fmt(payablesDue)}</span>
-                </div>
-                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-slate-900 rounded-full" 
-                    style={{ width: `${totalPurchases ? Math.min(100, (payablesDue / totalPurchases) * 100) : 0}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 5. Sales & Purchase Activity */}
-          <div className="grid gap-6 md:grid-cols-2">
-            
-            {/* Recent Sales */}
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <div className="flex items-center justify-between border-b pb-3 mb-3">
-                <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Recent Sales</h3>
-                <Link to="/sales-orders" className="text-xs font-semibold text-orange-600 hover:underline">View All</Link>
-              </div>
-
-              <div className="divide-y">
-                {loadingActivity ? (
-                  Array.from({ length: 3 }).map((_, i) => <div key={i} className="py-3 animate-pulse h-12 bg-muted rounded-lg mt-1" />)
-                ) : recentSales.length > 0 ? (
-                  recentSales.map((sale) => (
-                    <div key={sale.id} className="py-3 flex justify-between items-center text-xs">
-                      <div>
-                        <Link to={`/sales-orders/${sale.id}`} className="font-bold text-foreground hover:text-orange-600">
-                          {sale.orderNumber}
-                        </Link>
-                        <p className="text-muted-foreground mt-0.5">{sale.customerName}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(sale.orderDate).toLocaleDateString("en-IN")}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-foreground">{fmt(sale.totalAmount)}</p>
-                        <span className="inline-block mt-1 scale-90 origin-right">
-                          <BusinessStatusBadge status={sale.status} />
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="py-4 text-center text-muted-foreground text-xs">No recent sales records.</p>
-                )}
+              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-orange-500 rounded-full transition-all duration-500" 
+                  style={{ width: `${progressPercent}%` }}
+                />
               </div>
             </div>
 
-            {/* Recent Purchases */}
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <div className="flex items-center justify-between border-b pb-3 mb-3">
-                <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Recent Purchases</h3>
-                <Link to="/purchases" className="text-xs font-semibold text-orange-600 hover:underline">View All</Link>
-              </div>
-
-              <div className="divide-y">
-                {loadingActivity ? (
-                  Array.from({ length: 3 }).map((_, i) => <div key={i} className="py-3 animate-pulse h-12 bg-muted rounded-lg mt-1" />)
-                ) : recentPurchases.length > 0 ? (
-                  recentPurchases.map((pur) => (
-                    <div key={pur.id} className="py-3 flex justify-between items-center text-xs">
-                      <div>
-                        <Link to={`/purchases/${pur.id}`} className="font-bold text-foreground hover:text-orange-600">
-                          {pur.purchaseOrderNumber}
-                        </Link>
-                        <p className="text-muted-foreground mt-0.5">{pur.supplierName}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(pur.orderDate).toLocaleDateString("en-IN")}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-foreground">{fmt(pur.totalAmount)}</p>
-                        <span className="inline-block mt-1 scale-90 origin-right">
-                          <BusinessStatusBadge status={pur.status} />
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="py-4 text-center text-muted-foreground text-xs">No recent purchases records.</p>
-                )}
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* Right Column (Operational Activity & Notifications) */}
-        <div className="space-y-6">
-          
-          {/* 7. Recent Activity Timeline */}
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-center justify-between border-b pb-3 mb-4">
-              <div className="flex items-center gap-2">
-                <Bell size={16} className="text-orange-600" />
-                <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Recent Activity Log</h3>
-              </div>
-            </div>
-
-            <div className="relative border-l border-border pl-4 space-y-5">
-              {dashboard.activity.loading ? (
-                Array.from({ length: 3 }).map((_, i) => <div key={i} className="animate-pulse h-14 bg-muted rounded-xl" />)
-              ) : dashboard.activity.error ? (
-                <div className="py-6 text-center">
-                  <p className="text-xs font-bold text-red-700">Could not load recent activity.</p>
-                  <button onClick={dashboard.refresh} className="mt-2 min-h-10 rounded-lg border px-4 text-xs font-bold text-muted-foreground">
-                    Retry
-                  </button>
-                </div>
-              ) : dashboard.activity.data.length === 0 ? (
-                <div className="py-6 text-center">
-                  <p className="text-xs font-bold text-muted-foreground">No activity yet.</p>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    Create sales orders, purchases, payments and invoices to see business activity here.
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4 pt-2">
+              {setupSteps.map((step, idx) => (
+                <Link 
+                  key={idx} 
+                  to={step.path}
+                  className={`rounded-xl border p-3 block text-left text-xs sm:text-sm transition-colors ${
+                    step.done 
+                      ? "bg-green-50/50 border-green-200 text-green-800 dark:bg-green-950/30 dark:border-green-800 dark:text-green-300 animate-fade-in" 
+                      : "bg-card hover:bg-muted border-border text-muted-foreground"
+                  }`}
+                >
+                  <div className="flex items-center justify-between font-semibold">
+                    <span>{idx + 1}. {step.label}</span>
+                    <span className={step.done ? "text-green-600 dark:text-green-400 font-bold" : "text-muted-foreground"}>
+                      {step.done ? "✓" : "○"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 leading-normal">
+                    {step.done ? "Completed successfully" : "Click to set up"}
                   </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 2. Quick Action Section */}
+        <DashboardQuickActions />
+
+        {/* 3. Business Overview Cards */}
+        <section className="space-y-3.5">
+          <h2 className="text-lg md:text-xl lg:text-[22px] font-semibold text-foreground mb-3">Financial Health</h2>
+          <DashboardSummaryCards dashboard={dashboard} />
+        </section>
+
+        {/* Desktop side-by-side or stacked grid layout */}
+        <div className="grid gap-8 lg:grid-cols-3">
+          
+          {/* Left/Middle Column (Inventory & Operations) */}
+          <div className="space-y-8 lg:col-span-2">
+            
+            {/* 4. Inventory Health Breakdown Chart */}
+            <InventoryHealthChart materials={dashboard.inventory.data} />
+
+            {/* 4b. Stock Movement Trend Chart */}
+            <StockMovementChart movements={dashboard.movements.data || []} />
+
+            {/* 4c. Top Material Availability Chart */}
+            <MaterialAvailabilityChart materials={dashboard.inventory.data} />
+
+            {/* 4d. Inventory Value Trend Chart */}
+            <InventoryValueTrendChart materials={dashboard.inventory.data} movements={dashboard.movements.data || []} />
+
+            {/* 6. Financial Summary (Cash Flow) */}
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
+                <h3 className="font-semibold text-foreground text-lg">Cash Flow Overview</h3>
+                <span className="text-sm text-muted-foreground font-medium">Real-time balances</span>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-1.5 font-medium">
+                    <span className="text-muted-foreground">Money Received</span>
+                    <span className="text-green-700 dark:text-green-400 font-bold">{fmt(moneyReceived)}</span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-green-600 rounded-full" 
+                      style={{ width: `${totalSales ? Math.min(100, (moneyReceived / totalSales) * 100) : 0}%` }}
+                    />
+                  </div>
                 </div>
-              ) : (
-                dashboard.activity.data.slice(0, 7).map((act) => (
-                  <div key={act.id} className="relative text-xs">
-                    {/* Bullet marker */}
-                    <div className="absolute -left-[21.5px] top-1 h-2.5 w-2.5 rounded-full border bg-card border-orange-500" />
-                    
-                    <p className="font-bold text-foreground">{act.title}</p>
-                    <p className="text-muted-foreground mt-0.5">{act.message}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1 font-medium">
-                      {new Date(act.createdAt).toLocaleString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true })}
+
+                <div>
+                  <div className="flex justify-between text-sm mb-1.5 font-medium">
+                    <span className="text-muted-foreground">Money Pending (Receivables)</span>
+                    <span className="text-orange-600 dark:text-orange-400 font-bold">{fmt(totalReceivables)}</span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-orange-500 rounded-full" 
+                      style={{ width: `${totalSales ? Math.min(100, (totalReceivables / totalSales) * 100) : 0}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-1.5 font-medium">
+                    <span className="text-muted-foreground">Supplier Payments Due (Payables)</span>
+                    <span className="text-foreground font-bold">{fmt(payablesDue)}</span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-slate-900 dark:bg-slate-100 rounded-full" 
+                      style={{ width: `${totalPurchases ? Math.min(100, (payablesDue / totalPurchases) * 100) : 0}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Sales & Purchase Activity */}
+            <div className="grid gap-6 md:grid-cols-2">
+              
+              {/* Recent Sales */}
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+                <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
+                  <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider">Recent Sales</h3>
+                  <Link to="/sales-orders" className="text-xs font-semibold text-orange-600 hover:underline">View All</Link>
+                </div>
+
+                <div className="divide-y divide-border/60">
+                  {loadingActivity ? (
+                    Array.from({ length: 3 }).map((_, i) => <div key={i} className="py-3 animate-pulse h-12 bg-muted rounded-lg mt-1" />)
+                  ) : recentSales.length > 0 ? (
+                    recentSales.map((sale) => (
+                      <div key={sale.id} className="py-3 flex justify-between items-center text-xs">
+                        <div>
+                          <Link to={`/sales-orders/${sale.id}`} className="font-bold text-foreground hover:text-orange-600">
+                            {sale.orderNumber}
+                          </Link>
+                          <p className="text-muted-foreground mt-0.5">{sale.customerName}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(sale.orderDate).toLocaleDateString("en-IN")}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-foreground">{fmt(sale.totalAmount)}</p>
+                          <span className="inline-block mt-1 scale-90 origin-right">
+                            <BusinessStatusBadge status={sale.status} />
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="py-4 text-center text-muted-foreground text-xs">No recent sales records.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Recent Purchases */}
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+                <div className="flex items-center justify-between border-b border-border pb-3 mb-3">
+                  <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider">Recent Purchases</h3>
+                  <Link to="/purchases" className="text-xs font-semibold text-orange-600 hover:underline">View All</Link>
+                </div>
+
+                <div className="divide-y divide-border/60">
+                  {loadingActivity ? (
+                    Array.from({ length: 3 }).map((_, i) => <div key={i} className="py-3 animate-pulse h-12 bg-muted rounded-lg mt-1" />)
+                  ) : recentPurchases.length > 0 ? (
+                    recentPurchases.map((pur) => (
+                      <div key={pur.id} className="py-3 flex justify-between items-center text-xs">
+                        <div>
+                          <Link to={`/purchases/${pur.id}`} className="font-bold text-foreground hover:text-orange-600">
+                            {pur.purchaseOrderNumber}
+                          </Link>
+                          <p className="text-muted-foreground mt-0.5">{pur.supplierName}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(pur.orderDate).toLocaleDateString("en-IN")}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-foreground">{fmt(pur.totalAmount)}</p>
+                          <span className="inline-block mt-1 scale-90 origin-right">
+                            <BusinessStatusBadge status={pur.status} />
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="py-4 text-center text-muted-foreground text-xs">No recent purchases records.</p>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Right Column (Operational Activity & Notifications) */}
+          <div className="space-y-6">
+            
+            {/* 7. Recent Activity Timeline */}
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <Bell size={16} className="text-orange-600" />
+                  <h3 className="font-semibold text-foreground text-sm uppercase tracking-wider">Recent Activity Log</h3>
+                </div>
+              </div>
+
+              <div className="relative border-l border-border pl-4 space-y-5">
+                {dashboard.activity.loading ? (
+                  Array.from({ length: 3 }).map((_, i) => <div key={i} className="animate-pulse h-14 bg-muted rounded-xl" />)
+                ) : dashboard.activity.error ? (
+                  <div className="py-6 text-center">
+                    <p className="text-xs font-bold text-red-700">Could not load recent activity.</p>
+                    <button onClick={dashboard.refresh} className="mt-2 min-h-10 rounded-lg border border-border px-4 text-xs font-bold text-muted-foreground">
+                      Retry
+                    </button>
+                  </div>
+                ) : dashboard.activity.data.length === 0 ? (
+                  <div className="py-6 text-center">
+                    <p className="text-xs font-bold text-muted-foreground">No activity yet.</p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      Create sales orders, purchases, payments and invoices to see business activity here.
                     </p>
                   </div>
-                ))
-              )}
+                ) : (
+                  dashboard.activity.data.slice(0, 7).map((act) => (
+                    <div key={act.id} className="relative text-xs">
+                      {/* Bullet marker */}
+                      <div className="absolute -left-[21.5px] top-1 h-2.5 w-2.5 rounded-full border bg-card border-orange-500" />
+                      
+                      <p className="font-bold text-foreground">{act.title}</p>
+                      <p className="text-muted-foreground mt-0.5">{act.message}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1 font-medium">
+                        {new Date(act.createdAt).toLocaleString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true })}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
+
           </div>
 
         </div>
-
-      </div>
       </div>
     </>
   );

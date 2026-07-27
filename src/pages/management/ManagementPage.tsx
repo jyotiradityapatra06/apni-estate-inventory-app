@@ -102,62 +102,49 @@ export const ManagementPage = () => {
     : "RK";
 
   return (
-    <div className="flex flex-col gap-0 pb-4 min-h-screen">
-      {/* Mobile Page Header */}
-      <div style={{ background: C.blue }} className="mx-4 mt-3 rounded-xl px-5 py-5 md:hidden text-white shadow-sm">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-white/60 text-[10px] uppercase tracking-wider font-bold">Management</div>
-            <div className="text-xl font-bold leading-tight mt-1 text-white">Business Settings</div>
-          </div>
-          <button 
+    <div className="flex flex-col gap-6 pb-8 min-h-screen">
+      {/* Page Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-border pb-5">
+        <div>
+          <h1 className="text-2xl md:text-3xl lg:text-[34px] font-bold text-foreground tracking-tight">
+            Management & Settings
+          </h1>
+          <p className="text-sm text-muted-foreground leading-relaxed mt-1">
+            Configure your business profile, invoice formats, financial settings, and staff credentials.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
             onClick={handleLogout}
-            className="w-10 h-10 rounded-lg flex items-center justify-center bg-card/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50/50 dark:bg-red-950/30 text-red-600 dark:text-red-400 cursor-pointer text-sm font-semibold hover:bg-red-100/60 transition-colors"
           >
-            <LogOut size={18} className="text-white" />
+            <LogOut size={16} />
+            <span>Logout</span>
           </button>
         </div>
       </div>
 
-      <div className="px-1 md:px-0 py-4 flex flex-col gap-4 flex-1">
-        {/* Desktop Toolbar */}
-        <div className="hidden md:flex items-center justify-between gap-4 mb-2">
-          <div>
-            <h1 style={{ color: C.ink }} className="text-lg font-bold">Management</h1>
-            <p style={{ color: C.muted }} className="text-xs">Configure your business profile, staff members, and personal credentials.</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            style={{ border: `1.5px solid ${C.error}30`, color: C.error }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg cursor-pointer text-xs font-semibold hover:bg-red-50"
-          >
-            <LogOut size={14} />
-            <span>Logout</span>
-          </button>
-        </div>
-
+      <div className="flex flex-col gap-6 flex-1">
         {/* Tab Controls */}
         {canManageTeam && (
-          <div className="flex gap-2 border-b border-[rgba(20,18,14,0.06)] pb-2 mb-2">
+          <div className="flex gap-2 border-b border-border pb-2">
             <button
               onClick={() => setActiveTab("profile")}
-              style={{
-                color: activeTab === "profile" ? C.blue : C.muted,
-                borderBottom: activeTab === "profile" ? `2.5px solid ${C.blue}` : "none",
-                fontWeight: activeTab === "profile" ? 700 : 500
-              }}
-              className="px-4 py-2 text-xs md:text-sm transition-all cursor-pointer rounded-t-lg hover:bg-black/[0.01]"
+              className={`px-5 py-2.5 text-sm font-semibold transition-all cursor-pointer rounded-t-xl ${
+                activeTab === "profile"
+                  ? "border-b-2 border-orange-500 text-orange-600 dark:text-orange-400 bg-orange-50/40 dark:bg-orange-950/20"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              Profile & Account
+              Business & Account Profile
             </button>
             <button
               onClick={() => setActiveTab("team")}
-              style={{
-                color: activeTab === "team" ? C.blue : C.muted,
-                borderBottom: activeTab === "team" ? `2.5px solid ${C.blue}` : "none",
-                fontWeight: activeTab === "team" ? 700 : 500
-              }}
-              className="px-4 py-2 text-xs md:text-sm transition-all cursor-pointer rounded-t-lg hover:bg-black/[0.01]"
+              className={`px-5 py-2.5 text-sm font-semibold transition-all cursor-pointer rounded-t-xl ${
+                activeTab === "team"
+                  ? "border-b-2 border-orange-500 text-orange-600 dark:text-orange-400 bg-orange-50/40 dark:bg-orange-950/20"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
               Team Directory
             </button>
@@ -166,132 +153,125 @@ export const ManagementPage = () => {
 
         {/* Render Tab Content */}
         {activeTab === "profile" || !canManageTeam ? (
-          <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
-            {/* Header info */}
-            <div className="flex items-center gap-4 bg-card border border-[rgba(20,18,14,0.1)] rounded-xl p-5 shadow-sm">
-              <div style={{ background: "rgba(42,76,214,0.08)" }} className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0">
-                <span style={{ color: C.blue }} className="text-lg font-bold">{initials}</span>
+          <div className="space-y-6 w-full">
+            {/* Header info card */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card border border-border rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl font-bold text-orange-600 dark:text-orange-400">{initials}</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">{user?.name || "Owner User"}</h3>
+                  <p className="text-sm text-muted-foreground mt-0.5">{user?.role} · {user?.email}</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 style={{ color: C.ink }} className="text-base font-bold truncate">{user?.name || "Ramesh Kumar"}</h3>
-                <div style={{ color: C.muted }} className="text-xs mt-0.5">{user?.role} · {user?.email}</div>
-              </div>
-              <div className="text-right hidden sm:block">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Business Unit</span>
-                <div style={{ color: C.ink }} className="text-xs font-bold truncate max-w-[150px]">{business?.name || "Shri Krishna Traders"}</div>
+
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-border pt-3 sm:pt-0">
+                <div className="text-left sm:text-right">
+                  <span className="text-xs uppercase font-semibold tracking-wider text-muted-foreground">Connected Business</span>
+                  <div className="text-sm font-bold text-foreground truncate max-w-[220px]">{business?.name || "Shri Krishna Traders"}</div>
+                </div>
+                {canEditBusiness && (
+                  <button
+                    onClick={() => {
+                      setBName(business?.name || "");
+                      setBGst(business?.gstNumber || "");
+                      setBState(business?.state || "");
+                      setBStateCode(business?.stateCode || "");
+                      setBPhone(business?.phone || "");
+                      setBAddress(business?.address || "");
+                      setBPrefix(localStorage.getItem("invoice_prefix") || "INV-");
+                      setBNext(localStorage.getItem("invoice_next") || "1001");
+                      setBFy(localStorage.getItem("fy_active") || "FY 2026 - 2027");
+                      setShowEditBusiness(true);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-orange-500 text-white hover:bg-orange-600 shadow-sm transition-colors cursor-pointer"
+                  >
+                    Edit Profile
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Business Profile Details Card */}
-            <div>
-              <SectionLabel>Business Profile</SectionLabel>
-              <Card className="p-5 flex flex-col gap-4">
-                <div className="flex justify-between items-start">
+            {/* 2-Column Responsive Grid */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Business Profile Details Card */}
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-5">
+                <div className="flex justify-between items-start border-b border-border pb-4">
                   <div>
-                    <h3 style={{ color: C.ink }} className="text-sm font-bold">{business?.name || "No Business Connected"}</h3>
-                    <p style={{ color: C.muted }} className="text-[11px] mt-0.5">Physical and trade identification details.</p>
+                    <h2 className="text-lg md:text-xl font-semibold text-foreground">Business Information</h2>
+                    <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">Physical operating and GST tax details.</p>
                   </div>
-                  {canEditBusiness && (
-                    <button
-                      onClick={() => {
-                        setBName(business?.name || "");
-                        setBGst(business?.gstNumber || "");
-                        setBState(business?.state || "");
-                        setBStateCode(business?.stateCode || "");
-                        setBPhone(business?.phone || "");
-                        setBAddress(business?.address || "");
-                        setBPrefix(localStorage.getItem("invoice_prefix") || "INV-");
-                        setBNext(localStorage.getItem("invoice_next") || "1001");
-                        setBFy(localStorage.getItem("fy_active") || "FY 2026 - 2027");
-                        setShowEditBusiness(true);
-                      }}
-                      style={{ color: C.blue, border: `1.5px solid ${C.blue}20` }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-50 cursor-pointer"
-                    >
-                      Edit Profile
-                    </button>
-                  )}
                 </div>
 
-                <Divider />
-
-                <div className="grid grid-cols-2 gap-4 text-xs font-medium">
+                <div className="grid grid-cols-2 gap-5">
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">GST Registration</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{business?.gstNumber || "Not Provided"}</span>
+                    <span className="block text-xs font-medium text-muted-foreground mb-1">Business Name</span>
+                    <span className="text-sm font-bold text-foreground">{business?.name || "Not Provided"}</span>
                   </div>
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">GST State / Code</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">
+                    <span className="block text-xs font-medium text-muted-foreground mb-1">GST Registration No.</span>
+                    <span className="text-sm font-bold text-foreground font-mono">{business?.gstNumber || "Not Provided"}</span>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-medium text-muted-foreground mb-1">GST State / State Code</span>
+                    <span className="text-sm font-bold text-foreground">
                       {business?.state || "Unspecified"} {business?.stateCode ? `(${business.stateCode})` : ""}
                     </span>
                   </div>
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">Business Contact</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{business?.phone || "Not Provided"}</span>
+                    <span className="block text-xs font-medium text-muted-foreground mb-1">Business Contact Phone</span>
+                    <span className="text-sm font-bold text-foreground">{business?.phone || "Not Provided"}</span>
                   </div>
                   <div className="col-span-2">
-                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">Operating Address</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{business?.address || "Not Provided"}</span>
+                    <span className="block text-xs font-medium text-muted-foreground mb-1">Operating Address</span>
+                    <span className="text-sm font-bold text-foreground leading-relaxed">{business?.address || "Not Provided"}</span>
                   </div>
                 </div>
 
-                <Divider />
-
-                <div className="grid grid-cols-2 gap-4 text-xs font-medium pt-2">
+                <div className="border-t border-border pt-4 grid grid-cols-2 gap-5">
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">Invoice Prefix / Format</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{localStorage.getItem("invoice_prefix") || "INV-"} (Next: {localStorage.getItem("invoice_next") || "1001"})</span>
+                    <span className="block text-xs font-medium text-muted-foreground mb-1">Invoice Prefix & Start No.</span>
+                    <span className="text-sm font-bold text-foreground">{localStorage.getItem("invoice_prefix") || "INV-"} (Next: {localStorage.getItem("invoice_next") || "1001"})</span>
                   </div>
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">Active Financial Year</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{localStorage.getItem("fy_active") || "FY 2026 - 2027"}</span>
+                    <span className="block text-xs font-medium text-muted-foreground mb-1">Active Financial Year</span>
+                    <span className="text-sm font-bold text-foreground">{localStorage.getItem("fy_active") || "FY 2026 - 2027"}</span>
                   </div>
                 </div>
-              </Card>
+              </div>
+
+              {/* Personal Account & Security Card */}
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-5">
+                <div className="border-b border-border pb-4">
+                  <h2 className="text-lg md:text-xl font-semibold text-foreground">Account & Access Settings</h2>
+                  <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">System credentials and assigned staff role.</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center py-2 border-b border-border/60">
+                    <span className="text-xs font-medium text-muted-foreground">User ID</span>
+                    <span className="text-sm font-bold text-foreground font-mono">{user?.id}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-border/60">
+                    <span className="text-xs font-medium text-muted-foreground">Staff Member Name</span>
+                    <span className="text-sm font-bold text-foreground">{user?.name}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-border/60">
+                    <span className="text-xs font-medium text-muted-foreground">Email Address</span>
+                    <span className="text-sm font-bold text-foreground">{user?.email}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-xs font-medium text-muted-foreground">Assigned Role</span>
+                    <span className="font-bold uppercase tracking-wider text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 px-3 py-1 rounded-full">
+                      {user?.role}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Account Details */}
-            <div>
-              <SectionLabel>Account Settings</SectionLabel>
-              <Card className="p-5 flex flex-col gap-3 text-sm font-medium">
-                <div className="flex justify-between py-1">
-                  <span style={{ color: C.muted }}>User Identifier</span>
-                  <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{user?.id}</span>
-                </div>
-                <Divider />
-                <div className="flex justify-between py-1">
-                  <span style={{ color: C.muted }}>Staff Name</span>
-                  <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{user?.name}</span>
-                </div>
-                <Divider />
-                <div className="flex justify-between py-1">
-                  <span style={{ color: C.muted }}>Email Address</span>
-                  <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{user?.email}</span>
-                </div>
-                <Divider />
-                <div className="flex justify-between py-1">
-                  <span style={{ color: C.muted }}>System Permissions</span>
-                  <span style={{ color: C.blue }} className="font-bold uppercase tracking-wider text-xs bg-blue-50 px-2.5 py-1 rounded font-bold">
-                    {user?.role}
-                  </span>
-                </div>
-              </Card>
-            </div>
-
-            {/* Mobile Sign Out Button */}
-            <div className="md:hidden mt-2">
-              <button
-                onClick={handleLogout}
-                style={{ border: `1.5px solid ${C.error}30`, background: "#FEF2F2" }}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl cursor-pointer hover:bg-red-100/50"
-              >
-                <LogOut size={16} color={C.error} />
-                <span style={{ color: C.error }} className="text-xs font-bold">Sign Out from Device</span>
-              </button>
-            </div>
-            
-            <div style={{ color: C.muted }} className="text-center text-[10px] mt-4">Apni Estate v2.5.0 · Clean Build</div>
+            <div className="text-center text-xs text-muted-foreground pt-4">APNI ESTATE ERP v3.1.4 · Enterprise Build</div>
           </div>
         ) : (
           <div className="w-full">
@@ -301,118 +281,110 @@ export const ManagementPage = () => {
         )}
       </div>
 
+
       {/* Edit Business Profile Dialog */}
       {showEditBusiness && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm" style={{ zIndex: 100 }}>
-          <div style={{ background: C.white, borderRadius: 16 }} className="w-full max-w-sm p-5 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <span style={{ color: C.ink }} className="text-base font-bold">Edit Business Profile</span>
-              <button onClick={() => setShowEditBusiness(false)} className="text-muted-foreground hover:text-muted-foreground text-lg font-bold cursor-pointer">×</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md p-6 flex flex-col gap-5 rounded-2xl bg-card border border-border shadow-xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-lg font-semibold text-foreground">Edit Business Profile</h3>
+              <button onClick={() => setShowEditBusiness(false)} className="text-muted-foreground hover:text-foreground text-xl font-bold cursor-pointer">×</button>
             </div>
-            <form onSubmit={handleEditBusinessSubmit} className="flex flex-col gap-3.5 text-xs font-medium">
-              <div className="flex flex-col gap-1">
-                <label className="text-muted-foreground text-[10px] uppercase">Business Name</label>
+            <form onSubmit={handleEditBusinessSubmit} className="flex flex-col gap-4 text-xs font-medium">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Business Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Shri Krishna Traders"
                   value={bName}
                   onChange={(e) => setBName(e.target.value)}
-                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                  className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-muted-foreground text-[10px] uppercase">GSTIN (Registration No.)</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">GSTIN (Registration No.)</label>
                 <input
                   type="text"
                   placeholder="e.g. 27AABFR5987M1ZP"
                   value={bGst}
                   onChange={(e) => setBGst(e.target.value)}
-                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                  className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm font-mono outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                 />
               </div>
 
-              <div className="flex gap-2">
-                <div className="flex flex-col gap-1 w-2/3">
-                  <label className="text-muted-foreground text-[10px] uppercase">State Name</label>
+              <div className="flex gap-3">
+                <div className="flex flex-col gap-1.5 w-2/3">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">State Name</label>
                   <input
                     type="text"
                     placeholder="e.g. Maharashtra"
                     value={bState}
                     onChange={(e) => setBState(e.target.value)}
-                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                   />
                 </div>
-                <div className="flex flex-col gap-1 w-1/3">
-                  <label className="text-muted-foreground text-[10px] uppercase">State Code</label>
+                <div className="flex flex-col gap-1.5 w-1/3">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">State Code</label>
                   <input
                     type="text"
                     maxLength={2}
                     placeholder="e.g. 27"
                     value={bStateCode}
                     onChange={(e) => setBStateCode(e.target.value)}
-                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                    className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm font-mono outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-muted-foreground text-[10px] uppercase">Business Phone</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Business Phone</label>
                 <input
                   type="text"
                   placeholder="e.g. +91 98765 00001"
                   value={bPhone}
                   onChange={(e) => setBPhone(e.target.value)}
-                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                  className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-muted-foreground text-[10px] uppercase">Office Address</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Office Address</label>
                 <textarea
                   placeholder="e.g. Plot 14, Bhosari MIDC, Pune 411026"
                   value={bAddress}
                   onChange={(e) => setBAddress(e.target.value)}
-                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                  className="w-full px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 resize-none h-16"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none h-18"
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-muted-foreground text-[10px] uppercase">Invoice Settings (Prefix & Start No.)</label>
-                <div className="flex gap-2">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Invoice Settings (Prefix & Start No.)</label>
+                <div className="flex gap-3">
                   <input
                     type="text"
                     placeholder="e.g. INV-"
                     value={bPrefix}
                     onChange={(e) => setBPrefix(e.target.value)}
-                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                    className="w-1/2 px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-1/2 px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                   />
                   <input
                     type="text"
                     placeholder="e.g. 1001"
                     value={bNext}
                     onChange={(e) => setBNext(e.target.value)}
-                    style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                    className="w-1/2 px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-1/2 px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-muted-foreground text-[10px] uppercase">Financial Year</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Financial Year</label>
                 <select
                   value={bFy}
                   onChange={(e) => setBFy(e.target.value)}
-                  style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.ink }}
-                  className="w-full px-3 py-2.5 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                 >
                   <option>FY 2025 - 2026</option>
                   <option>FY 2026 - 2027</option>
@@ -423,8 +395,7 @@ export const ManagementPage = () => {
               <button
                 type="submit"
                 disabled={editLoading}
-                style={{ background: C.blue }}
-                className="w-full mt-2 h-11 rounded-lg text-white font-bold cursor-pointer hover:opacity-95 disabled:opacity-50"
+                className="w-full mt-2 h-11 rounded-xl bg-orange-500 text-white font-bold text-sm cursor-pointer hover:bg-orange-600 disabled:opacity-50 transition-colors shadow-sm"
               >
                 {editLoading ? "Saving Changes..." : "Save Business Profile"}
               </button>
@@ -436,3 +407,4 @@ export const ManagementPage = () => {
   );
 };
 export default ManagementPage;
+

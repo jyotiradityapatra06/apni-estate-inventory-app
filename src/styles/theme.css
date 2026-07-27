@@ -415,4 +415,79 @@
   .dark ::-webkit-scrollbar-thumb:hover {
     background: #475569;
   }
+
+  /* Enterprise SaaS Typography Hierarchy Utility Classes */
+  .heading-page {
+    font-size: 1.5rem; /* 24px mobile */
+    font-weight: 700;
+    color: var(--foreground);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+  @media (min-width: 768px) {
+    .heading-page {
+      font-size: 1.875rem; /* 30px tablet */
+    }
+  }
+  @media (min-width: 1024px) {
+    .heading-page {
+      font-size: 2.25rem; /* 36px desktop */
+    }
+  }
+
+  .heading-section {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600;
+    color: var(--foreground);
+    line-height: 1.35;
+    margin-bottom: 0.75rem;
+  }
+  @media (min-width: 1024px) {
+    .heading-section {
+      font-size: 1.375rem; /* 22px */
+    }
+  }
+
+  .card-title-text {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    color: var(--muted-foreground);
+    line-height: 1.4;
+  }
+  @media (min-width: 768px) {
+    .card-title-text {
+      font-size: 0.9375rem; /* 15px */
+    }
+  }
+
+  .primary-value-text {
+    font-size: 1.75rem; /* 28px */
+    font-weight: 700;
+    color: var(--foreground);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  @media (min-width: 768px) {
+    .primary-value-text {
+      font-size: 2.25rem; /* 36px */
+    }
+  }
+
+  .label-text {
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+  @media (min-width: 768px) {
+    .label-text {
+      font-size: 0.875rem; /* 14px */
+    }
+  }
+
+  .description-text {
+    font-size: 0.875rem; /* 14px */
+    color: var(--muted-foreground);
+    line-height: 1.6;
+  }
 }
+

@@ -1,5 +1,4 @@
 import React from "react";
-import { C } from "../../../constants/colors";
 
 export interface SectionLabelProps {
   children: React.ReactNode;
@@ -9,7 +8,8 @@ export interface SectionLabelProps {
 
 export const SectionLabel = ({ children, action, onAction }: SectionLabelProps) => (
   <div className="flex items-center justify-between mb-3">
-    <span style={{ color: C.muted }} className="text-[11px] font-semibold uppercase tracking-wider">{children}</span>
-    {action && <button onClick={onAction} style={{ color: C.blue }} className="text-xs font-semibold">{action}</button>}
+    <h3 className="text-base md:text-lg font-semibold text-foreground tracking-tight">{children}</h3>
+    {action && <button onClick={onAction} className="text-xs font-semibold text-orange-600 hover:text-orange-700 hover:underline cursor-pointer">{action}</button>}
   </div>
 );
+

@@ -37,8 +37,8 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
           <div className="flex items-center gap-3">
             <img src="/brand/apni-estate-logo.jpeg" alt="APNI ESTATE" className="h-9 w-9 rounded-lg bg-card object-cover" />
             <div>
-              <p className="text-sm font-black tracking-wide text-white">APNI ESTATE</p>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Inventory ERP</p>
+              <p className="text-sm font-extrabold tracking-wide text-white">APNI ESTATE</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Inventory ERP</p>
             </div>
           </div>
         )}
@@ -49,7 +49,8 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
         {/* Toggle Collapse Button */}
         <button 
           onClick={onToggle}
-          className="absolute -right-3 top-6 flex h-6 w-6 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-300 hover:text-white cursor-pointer shadow-md"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="absolute -right-3 top-6 flex h-6 w-6 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-300 hover:text-white cursor-pointer shadow-md transition-colors"
         >
           {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
         </button>
@@ -58,25 +59,25 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
       {/* Business context selection */}
       {!collapsed && (
         <div className="px-3 pt-4">
-          <div className="rounded-xl bg-slate-800/40 border border-slate-800/60 px-3 py-2.5">
-            <p className="text-[11px] uppercase font-bold text-muted-foreground tracking-wider">Current Shop / Business</p>
+          <div className="rounded-xl bg-slate-800/50 border border-slate-800 px-3 py-2.5">
+            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Current Business</p>
             <p className="mt-0.5 truncate text-xs font-bold text-slate-100">{business?.name || "APNI ESTATE Store"}</p>
           </div>
         </div>
       )}
 
       {/* Main Navigation Items */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5" aria-label="Main navigation" style={{ scrollbarWidth: "none" }}>
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-4" aria-label="Main navigation" style={{ scrollbarWidth: "none" }}>
         {groups.map((group) => {
           const grouped = items.filter((item) => item.group === group);
           if (!grouped.length) return null;
           
           return (
-            <section key={group} className="space-y-1.5">
+            <section key={group} className="space-y-1">
               {!collapsed && (
-                <h2 className="px-3 pb-1 text-xs font-black uppercase tracking-wider text-muted-foreground">{group}</h2>
+                <h2 className="px-3 pb-1 text-[11px] font-bold uppercase tracking-widest text-slate-400">{group}</h2>
               )}
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {grouped.map((item) => {
                   const Icon = item.icon;
                   const active = isNavigationItemActive(item, location.pathname);
@@ -87,13 +88,13 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
                       onClick={() => navigate(item.path)}
                       aria-current={active ? "page" : undefined}
                       title={collapsed ? item.label : undefined}
-                      className={`flex min-h-[42px] w-full items-center gap-3 rounded-lg px-3.5 text-left text-xs sm:text-[13px] font-bold transition-all duration-200 cursor-pointer ${
+                      className={`flex min-h-[40px] w-full items-center gap-3 rounded-lg px-3 text-left text-[13px] font-semibold transition-all duration-150 cursor-pointer ${
                         active 
-                          ? "bg-[#F97316] text-white shadow-sm font-extrabold" 
-                          : "text-slate-200 hover:bg-slate-800/70 hover:text-white"
+                          ? "bg-orange-500 text-white shadow-sm font-bold" 
+                          : "text-slate-300 hover:bg-slate-800/80 hover:text-white"
                       }`}
                     >
-                      <Icon size={18} className={active ? "text-white" : "text-slate-300"} />
+                      <Icon size={18} className={`shrink-0 ${active ? "text-white" : "text-slate-400"}`} />
                       {!collapsed && <span className="truncate">{item.label}</span>}
                     </button>
                   );
@@ -106,14 +107,14 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
 
       {/* Footer Profile & Logout */}
       <div className="border-t border-slate-800 p-3 space-y-2">
-        <div className="flex items-center gap-3 rounded-xl px-2 py-2 bg-slate-800/20">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F97316] text-xs font-black text-white">
+        <div className="flex items-center gap-3 rounded-xl px-2 py-2 bg-slate-800/40 border border-slate-800/80">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-extrabold text-white">
             {initials}
           </span>
           {!collapsed && (
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs sm:text-sm font-extrabold text-white">{user?.name}</p>
-              <p className="text-[11px] text-muted-foreground font-bold uppercase">{user?.role}</p>
+              <p className="truncate text-xs font-bold text-white">{user?.name}</p>
+              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{user?.role}</p>
             </div>
           )}
           {!collapsed && (
@@ -123,7 +124,7 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
                 onClick={signOut} 
                 aria-label="Logout" 
                 title="Logout" 
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-slate-800 hover:text-white cursor-pointer"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer transition-colors"
               >
                 <LogOut size={16} />
               </button>
@@ -141,3 +142,4 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
 }
 
 export default DesktopSidebar;
+
