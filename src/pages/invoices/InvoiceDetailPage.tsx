@@ -8,9 +8,10 @@ import { useAuth } from "../../hooks/useAuth";
 import { hasPermission } from "../../utils/permissions";
 import { fmt, formatQuantity } from "../../utils/currency";
 import type { Invoice } from "../../features/invoices/invoice.types";
-import { ArrowLeft, Printer, FileCheck, Ban, CreditCard, Landmark, DollarSign, MessageCircle } from "lucide-react";
+import { ArrowLeft, Printer, FileCheck, Ban, CreditCard, Landmark, DollarSign, MessageCircle, Download } from "lucide-react";
 import { normalizeWhatsAppNumber, createWhatsAppLink, formatInvoiceWhatsAppMessage } from "../../utils/whatsapp";
 import { ProfessionalInvoice } from "../../features/invoices/components/ProfessionalInvoice";
+import { generateInvoicePDF } from "../../utils/pdfGenerator";
 
 export default function InvoiceDetailPage() {
   const { id = "" } = useParams();
@@ -22,6 +23,7 @@ export default function InvoiceDetailPage() {
   const [error, setError] = useState("");
   const [action, setAction] = useState<"issue" | "cancel" | null>(null);
   const [busy, setBusy] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   const load = () => invoiceApi.getById(id).then(r => setX(r.data)).catch(e => setError(e.message));
 
@@ -84,6 +86,19 @@ export default function InvoiceDetailPage() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!x || generatingPdf) return;
+    setGeneratingPdf(true);
+    try {
+      await generateInvoicePDF(x);
+      toast.success("Invoice PDF downloaded");
+    } catch (e) {
+      toast.error("Unable to generate invoice PDF. Please try again.");
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
   if (error) return <div className="rounded-xl bg-red-50 p-5 text-red-800">{error}<button onClick={load} className="ml-3 font-bold">Retry</button></div>;
   if (!x) return <div className="h-64 animate-pulse rounded-xl bg-slate-200" role="status" aria-label="Loading bill" />;
 
@@ -115,6 +130,14 @@ export default function InvoiceDetailPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          <button 
+            disabled={generatingPdf}
+            onClick={handleDownloadPDF} 
+            className="flex min-h-11 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-4 text-xs font-black text-orange-900 hover:bg-orange-100 cursor-pointer transition-colors shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download size={15} className="mr-1.5 text-orange-600" />
+            {generatingPdf ? "Generating PDF..." : "Download PDF"}
+          </button>
           <button 
             onClick={() => window.print()} 
             className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-card px-4 text-xs font-black text-muted-foreground hover:bg-muted cursor-pointer transition-colors shadow-xs"
