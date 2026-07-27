@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import { financialApi } from "../../api/financial.api";
 import { PageHeader } from "../../app/components/common/PageHeader";
 import { LedgerTable } from "../../features/financials/LedgerTable";
@@ -6,8 +7,12 @@ import { fmt } from "../../utils/currency";
 import { ArrowDownLeft, ArrowUpRight, BookOpen } from "lucide-react";
 
 export default function LedgerPage() {
+  const [searchParams] = useSearchParams();
+  const customerId = searchParams.get("customerId") || "";
+  const initialParty = searchParams.get("partyType") || (customerId ? "CUSTOMER" : "");
+
   const [data, setData] = useState<any[]>([]);
-  const [party, setParty] = useState("");
+  const [party, setParty] = useState(initialParty);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,8 +24,12 @@ export default function LedgerPage() {
       .finally(() => setLoading(false));
   }, [party]);
 
-  const totalCredit = data.reduce((sum, x) => sum + Number(x.creditAmount || 0), 0);
-  const totalDebit = data.reduce((sum, x) => sum + Number(x.debitAmount || 0), 0);
+  const filteredData = customerId
+    ? data.filter((x) => x.partyId === customerId || x.customerId === customerId || x.party?.id === customerId)
+    : data;
+
+  const totalCredit = filteredData.reduce((sum, x) => sum + Number(x.creditAmount || 0), 0);
+  const totalDebit = filteredData.reduce((sum, x) => sum + Number(x.debitAmount || 0), 0);
 
   return (
     <div className="space-y-6 pb-12">
@@ -54,7 +63,7 @@ export default function LedgerPage() {
             <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Logged Entries</span>
             <BookOpen size={18} className="text-orange-500" />
           </div>
-          <strong className="text-xl sm:text-2xl font-black text-foreground block">{data.length} Transactions</strong>
+          <strong className="text-xl sm:text-2xl font-black text-foreground block">{filteredData.length} Transactions</strong>
           <span className="text-[10px] font-semibold text-muted-foreground block">Audited general ledger logs</span>
         </div>
       </div>
@@ -80,7 +89,7 @@ export default function LedgerPage() {
       {loading ? (
         <div className="h-64 animate-pulse rounded-2xl bg-slate-200" />
       ) : (
-        <LedgerTable rows={data} />
+        <LedgerTable rows={filteredData} />
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
-import { Mail, Phone, Plus, DollarSign, Pencil, UserCheck, AlertTriangle, Receipt, Printer, Eye, Calendar } from "lucide-react";
+import { toast } from "sonner";
+import { Mail, Phone, Plus, DollarSign, Pencil, UserCheck, AlertTriangle, Receipt, Printer, Eye, Calendar, FilePlus, MessageCircle, IndianRupee, BookOpen } from "lucide-react";
 import { customerApi } from "../../api/customer.api";
 import paymentApi from "../../api/payment.api";
 import { PageHeader, SectionHeader } from "../../app/components/common/PageHeader";
@@ -10,6 +11,7 @@ import { useAuth } from "../../hooks/useAuth";
 import type { Customer } from "../../types/customer.types";
 import { hasPermission } from "../../utils/permissions";
 import { fmt } from "../../utils/currency";
+import { normalizeWhatsAppNumber, createWhatsAppLink } from "../../utils/whatsapp";
 
 export function CustomerDetailPage() {
   const { id = "" } = useParams();
@@ -35,6 +37,38 @@ export function CustomerDetailPage() {
       .catch(() => setLoadingPayments(false));
   }, [id]);
 
+  const handleWhatsAppShare = () => {
+    if (!data) return;
+    const phone = data.phone;
+    const normalizedPhone = normalizeWhatsAppNumber(phone);
+
+    if (!normalizedPhone) {
+      toast.error("Customer phone number is missing. Please update customer details.");
+      return;
+    }
+
+    const message = `Hello ${data.name || "Customer"},
+
+Greetings from APNI ESTATE.
+
+Please contact us regarding your account details.
+
+Thank you for your business.`;
+
+    const link = createWhatsAppLink(phone, message);
+    if (!link) {
+      toast.error("Customer phone number is missing. Please update customer details.");
+      return;
+    }
+
+    const whatsappWindow = window.open("", "_blank");
+    if (whatsappWindow) {
+      whatsappWindow.location.href = link;
+    } else {
+      window.location.href = link;
+    }
+  };
+
   if (error) return <div className="rounded-2xl bg-red-50 p-5 text-red-800 text-sm font-extrabold border border-red-200">{error}</div>;
   if (!data) return <div className="h-64 animate-pulse rounded-2xl bg-slate-200" />;
 
@@ -45,49 +79,115 @@ export function CustomerDetailPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header & Quick Action Buttons */}
-      <PageHeader
-        title={data.name}
-        description={`Customer Code: ${data.customerCode} · Phone: ${data.phone}${data.gstin ? ` · GSTIN: ${data.gstin}` : ""}`}
-        actions={
-          <div className="flex flex-wrap items-center gap-2.5">
+      {/* Customer Header Summary */}
+      <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5">
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-2xl font-black text-foreground tracking-tight">{data.name}</h1>
+              <BusinessStatusBadge status={data.isActive ? "ACTIVE" : "INACTIVE"} />
+            </div>
+            <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-bold text-muted-foreground">
+              <span>
+                Customer Code: <strong className="text-foreground">{data.customerCode}</strong>
+              </span>
+              {data.phone && (
+                <span className="flex items-center gap-1">
+                  Phone: <a href={`tel:${data.phone}`} className="text-orange-600 font-extrabold hover:underline">{data.phone}</a>
+                </span>
+              )}
+              {data.gstin && (
+                <span>
+                  GSTIN: <strong className="text-foreground uppercase font-mono">{data.gstin}</strong>
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/40 px-4 py-3 sm:self-center">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                Outstanding Dues
+              </span>
+              <strong className={`text-lg sm:text-xl font-black block ${hasDue ? "text-red-600" : "text-emerald-700"}`}>
+                {fmt(data.outstandingBalance)}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        {/* Profile Edit Option */}
+        {hasPermission(user, "customers:update") && (
+          <div className="flex justify-end pt-1">
+            <Link
+              to={`/customers/${data.id}/edit`}
+              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 text-xs font-bold text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
+            >
+              <Pencil size={14} />
+              Edit Profile
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Quick Actions Section */}
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
+        <SectionHeader title="Quick Actions" description="Fast CRM shortcuts for invoices, receipts, WhatsApp communication, and ledger details." />
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5 pt-1">
+          {/* Create Invoice */}
+          {hasPermission(user, "sales:manage") && (
+            <Link
+              to={`/invoices/new?customerId=${data.id}`}
+              className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50/60 px-3 py-2.5 text-xs font-extrabold text-orange-800 hover:bg-orange-100/80 transition-colors shadow-xs"
+            >
+              <FilePlus size={16} className="text-orange-600 shrink-0" />
+              Create Invoice
+            </Link>
+          )}
+
+          {/* WhatsApp Bill */}
+          <button
+            onClick={handleWhatsAppShare}
+            className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-2.5 text-xs font-extrabold text-emerald-800 hover:bg-emerald-100/80 transition-colors shadow-xs cursor-pointer"
+          >
+            <MessageCircle size={16} className="text-emerald-600 shrink-0" />
+            WhatsApp Bill
+          </button>
+
+          {/* Receive Payment */}
+          {hasPermission(user, "financials:manage") && (
+            <Link
+              to={`/payments/new?customerId=${data.id}`}
+              className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50/60 px-3 py-2.5 text-xs font-extrabold text-blue-800 hover:bg-blue-100/80 transition-colors shadow-xs"
+            >
+              <IndianRupee size={16} className="text-blue-600 shrink-0" />
+              Receive Payment
+            </Link>
+          )}
+
+          {/* View Ledger */}
+          {hasPermission(user, "financials:view") && (
+            <Link
+              to={`/financials/ledger?customerId=${data.id}`}
+              className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-purple-200 bg-purple-50/60 px-3 py-2.5 text-xs font-extrabold text-purple-800 hover:bg-purple-100/80 transition-colors shadow-xs"
+            >
+              <BookOpen size={16} className="text-purple-600 shrink-0" />
+              View Ledger
+            </Link>
+          )}
+
+          {/* Call Customer */}
+          {data.phone && (
             <a
               href={`tel:${data.phone}`}
-              className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-extrabold text-muted-foreground shadow-xs hover:bg-muted cursor-pointer"
+              className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-extrabold text-slate-800 hover:bg-slate-100 transition-colors shadow-xs"
             >
-              <Phone size={15} />
+              <Phone size={16} className="text-slate-600 shrink-0" />
               Call Customer
             </a>
-            {hasPermission(user, "sales:manage") && (
-              <Link
-                to={`/sales-orders/new?customerId=${data.id}`}
-                className="flex min-h-10 items-center justify-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-extrabold text-white shadow-xs transition-colors cursor-pointer"
-              >
-                <Plus size={15} />
-                + Create Sale
-              </Link>
-            )}
-            {hasPermission(user, "financials:manage") && hasDue && (
-              <Link
-                to={`/payments/new?customerId=${data.id}`}
-                className="flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#0F172A] hover:bg-slate-800 px-4 text-xs font-extrabold text-white shadow-xs transition-colors cursor-pointer"
-              >
-                <DollarSign size={15} />
-                Receive Payment
-              </Link>
-            )}
-            {hasPermission(user, "customers:update") && (
-              <Link
-                to={`/customers/${data.id}/edit`}
-                className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-extrabold text-muted-foreground shadow-xs hover:bg-muted transition-colors cursor-pointer"
-              >
-                <Pencil size={15} />
-                Edit Profile
-              </Link>
-            )}
-          </div>
-        }
-      />
+          )}
+        </div>
+      </section>
 
       {/* Prominent Stat Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">

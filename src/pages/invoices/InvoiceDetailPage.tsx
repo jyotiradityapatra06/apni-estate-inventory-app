@@ -8,7 +8,8 @@ import { useAuth } from "../../hooks/useAuth";
 import { hasPermission } from "../../utils/permissions";
 import { fmt, formatQuantity } from "../../utils/currency";
 import type { Invoice } from "../../features/invoices/invoice.types";
-import { ArrowLeft, Printer, FileCheck, Ban, CreditCard, Landmark, DollarSign, Share2 } from "lucide-react";
+import { ArrowLeft, Printer, FileCheck, Ban, CreditCard, Landmark, DollarSign, MessageCircle } from "lucide-react";
+import { normalizeWhatsAppNumber, createWhatsAppLink, formatInvoiceWhatsAppMessage } from "../../utils/whatsapp";
 
 export default function InvoiceDetailPage() {
   const { id = "" } = useParams();
@@ -46,6 +47,39 @@ export default function InvoiceDetailPage() {
       toast.error(e instanceof Error ? e.message : "Invoice could not be updated.");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    if (!x) return;
+    const phone = x.customerPhone || x.customer?.phone;
+    const normalizedPhone = normalizeWhatsAppNumber(phone);
+
+    if (!normalizedPhone) {
+      toast.error("Customer phone number is missing. Please update customer details.");
+      return;
+    }
+
+    const message = formatInvoiceWhatsAppMessage({
+      customerName: x.customerName || x.customer?.name,
+      businessName: x.businessName,
+      invoiceNumber: x.invoiceNumber,
+      totalAmount: x.totalAmount,
+      balanceDue: x.balanceDue,
+      invoiceLink: window.location.href,
+    });
+
+    const link = createWhatsAppLink(phone, message);
+    if (!link) {
+      toast.error("Customer phone number is missing. Please update customer details.");
+      return;
+    }
+
+    const whatsappWindow = window.open("", "_blank");
+    if (whatsappWindow) {
+      whatsappWindow.location.href = link;
+    } else {
+      window.location.href = link;
     }
   };
 
@@ -88,14 +122,11 @@ export default function InvoiceDetailPage() {
             Print Bill
           </button>
           <button 
-            onClick={() => {
-              const text = `Invoice ${x.invoiceNumber} for ${x.customerName}\nTotal Amount: ${fmt(x.totalAmount)}\nBalance Due: ${fmt(x.balanceDue)}\nLink: ${window.location.href}`;
-              window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-            }} 
+            onClick={handleWhatsAppShare} 
             className="flex min-h-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-xs font-black text-emerald-800 hover:bg-emerald-100 cursor-pointer transition-colors shadow-xs"
           >
-            <Share2 size={15} className="mr-1.5 text-emerald-600" />
-            Share WhatsApp
+            <MessageCircle size={15} className="mr-1.5 text-emerald-600" />
+            Share on WhatsApp
           </button>
           {Number(x.balanceDue) > 0 && manage && (
             <Link 
