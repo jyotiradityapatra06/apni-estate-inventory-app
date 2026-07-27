@@ -505,7 +505,7 @@ export const DeliveriesPage = () => {
           {canManageDeliveries && (
             <button
               onClick={() => setShowCreate(true)}
-              className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
+              className="w-10 h-10 rounded-lg flex items-center justify-center bg-card/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
             >
               <Plus size={18} className="text-white" />
             </button>
@@ -569,12 +569,12 @@ export const DeliveriesPage = () => {
 
         {/* Main Content Layout */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-64 bg-white border border-[rgba(20,18,14,0.1)] rounded-xl gap-2">
-            <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+          <div className="flex flex-col items-center justify-center h-64 bg-card border border-[rgba(20,18,14,0.1)] rounded-xl gap-2">
+            <div className="w-8 h-8 border-4 border-border border-t-blue-600 rounded-full animate-spin" />
             <span style={{ color: C.muted }} className="text-xs font-semibold">Loading deliveries...</span>
           </div>
         ) : fetchError ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-[rgba(20,18,14,0.1)] rounded-xl h-64 border-dashed">
+          <div className="flex flex-col items-center justify-center p-8 text-center bg-card border border-[rgba(20,18,14,0.1)] rounded-xl h-64 border-dashed">
             <div style={{ background: "rgba(239,68,68,0.05)" }} className="w-12 h-12 rounded-full flex items-center justify-center mb-3">
               <ClipboardList size={22} color={C.error} />
             </div>
@@ -589,7 +589,7 @@ export const DeliveriesPage = () => {
             </button>
           </div>
         ) : filteredDeliveries.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center bg-white border border-[rgba(20,18,14,0.1)] rounded-xl h-64 border-dashed">
+          <div className="flex flex-col items-center justify-center p-8 text-center bg-card border border-[rgba(20,18,14,0.1)] rounded-xl h-64 border-dashed">
             <div style={{ background: "rgba(42,76,214,0.05)" }} className="w-12 h-12 rounded-full flex items-center justify-center mb-3">
               <ClipboardList size={22} color={C.blue} />
             </div>
@@ -645,10 +645,10 @@ export const DeliveriesPage = () => {
                           </span>
                         </div>
                         <div style={{ color: C.muted }} className="text-xs mt-1 font-medium leading-relaxed whitespace-normal break-words">
-                          <span className="font-semibold text-slate-700">Items:</span> {d.materialName} · {d.quantity.toLocaleString("en-IN")} {d.unit}
+                          <span className="font-semibold text-muted-foreground">Items:</span> {d.materialName} · {d.quantity.toLocaleString("en-IN")} {d.unit}
                         </div>
                         <div style={{ color: C.muted }} className="text-xs mt-1 leading-relaxed whitespace-normal break-words">
-                          <span className="font-semibold text-slate-700">Address:</span> {d.deliveryAddress}
+                          <span className="font-semibold text-muted-foreground">Address:</span> {d.deliveryAddress}
                         </div>
                       </div>
                     </div>
@@ -734,16 +734,16 @@ export const DeliveriesPage = () => {
                   <Divider />
                   <div>
                     <span style={{ color: C.muted }} className="block text-[10px] uppercase font-black tracking-wider mb-2">Dispatch & Logistics</span>
-                    <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <div className="grid grid-cols-2 gap-3 text-xs bg-muted p-3 rounded-xl border border-border">
                       <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase block">Assigned Driver</span>
-                        <strong className="text-slate-900 font-extrabold block">{active.driverName || "Unassigned"}</strong>
-                        {active.driverPhone && <span className="text-[11px] text-slate-500 font-semibold block">{active.driverPhone}</span>}
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase block">Assigned Driver</span>
+                        <strong className="text-foreground font-extrabold block">{active.driverName || "Unassigned"}</strong>
+                        {active.driverPhone && <span className="text-[11px] text-muted-foreground font-semibold block">{active.driverPhone}</span>}
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase block">Vehicle Info</span>
-                        <strong className="text-slate-900 font-extrabold block">{active.vehicleNumber || "No Vehicle"}</strong>
-                        {active.vehicleType && <span className="text-[11px] text-slate-500 font-semibold block">{active.vehicleType}</span>}
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase block">Vehicle Info</span>
+                        <strong className="text-foreground font-extrabold block">{active.vehicleNumber || "No Vehicle"}</strong>
+                        {active.vehicleType && <span className="text-[11px] text-muted-foreground font-semibold block">{active.vehicleType}</span>}
                       </div>
                     </div>
                   </div>
@@ -753,9 +753,9 @@ export const DeliveriesPage = () => {
                   <div>
                     <span style={{ color: C.muted }} className="block text-[10px] uppercase font-black tracking-wider mb-2">Delivery Timeline</span>
                     <div className="space-y-2 text-xs">
-                      <div className="flex justify-between items-center bg-slate-50/70 p-2 rounded-lg border border-slate-100">
-                        <span className="font-bold text-slate-600">Created</span>
-                        <span className="font-extrabold text-slate-900">{new Date(active.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                      <div className="flex justify-between items-center bg-muted/70 p-2 rounded-lg border border-border">
+                        <span className="font-bold text-muted-foreground">Created</span>
+                        <span className="font-extrabold text-foreground">{new Date(active.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
                       </div>
                       {active.dispatchedAt && (
                         <div className="flex justify-between items-center bg-blue-50/50 p-2 rounded-lg border border-blue-100">
@@ -778,9 +778,9 @@ export const DeliveriesPage = () => {
                       <Divider />
                       <div className="text-xs space-y-1 bg-emerald-50/40 p-3 rounded-xl border border-emerald-100">
                         <span className="block text-[10px] font-black uppercase text-emerald-800 tracking-wider">Proof of Delivery / Completion</span>
-                        {active.receiverName && <p className="font-bold text-slate-800">Receiver: <span className="font-extrabold">{active.receiverName}</span></p>}
-                        {active.proofOfDeliveryReference && <p className="font-bold text-slate-800">POD Ref: <span className="font-extrabold">{active.proofOfDeliveryReference}</span></p>}
-                        {active.deliveryNotes && <p className="font-semibold text-slate-700 italic mt-1">"{active.deliveryNotes}"</p>}
+                        {active.receiverName && <p className="font-bold text-foreground">Receiver: <span className="font-extrabold">{active.receiverName}</span></p>}
+                        {active.proofOfDeliveryReference && <p className="font-bold text-foreground">POD Ref: <span className="font-extrabold">{active.proofOfDeliveryReference}</span></p>}
+                        {active.deliveryNotes && <p className="font-semibold text-muted-foreground italic mt-1">"{active.deliveryNotes}"</p>}
                       </div>
                     </>
                   )}
@@ -845,7 +845,7 @@ export const DeliveriesPage = () => {
                 <Badge label={(statusMeta[active.status] || statusMeta.PENDING).label} variant={(statusMeta[active.status] || statusMeta.PENDING).variant} />
                 <Badge label={(payStatusMeta[active.paymentStatus || "PENDING"] || payStatusMeta.PENDING).label} variant={(payStatusMeta[active.paymentStatus || "PENDING"] || payStatusMeta.PENDING).variant} />
               </div>
-              <button onClick={() => setSelectedId(null)} className="p-1 rounded-full bg-slate-100 text-gray-500 cursor-pointer">
+              <button onClick={() => setSelectedId(null)} className="p-1 rounded-full bg-muted text-muted-foreground cursor-pointer">
                 <X size={18} />
               </button>
             </div>
@@ -891,7 +891,7 @@ export const DeliveriesPage = () => {
                 <Divider />
                 <div className="text-xs">
                   <span style={{ color: C.muted }} className="block text-[10px] uppercase font-bold tracking-wider mb-0.5">Notes</span>
-                  <p style={{ color: C.ink }} className="bg-slate-50 p-2 border border-slate-100 rounded italic">{active.notes}</p>
+                  <p style={{ color: C.ink }} className="bg-muted p-2 border border-border rounded italic">{active.notes}</p>
                 </div>
               </>
             )}
@@ -965,11 +965,11 @@ export const DeliveriesPage = () => {
           <div style={{ background: C.white, borderRadius: 16 }} className="w-full max-w-sm p-5 flex flex-col gap-4 overflow-y-auto max-h-[90%]">
             <div className="flex items-center justify-between">
               <span style={{ color: C.ink }} className="text-base font-bold">New Delivery</span>
-              <button onClick={() => setShowCreate(false)} className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer">×</button>
+              <button onClick={() => setShowCreate(false)} className="text-muted-foreground hover:text-muted-foreground text-lg font-bold cursor-pointer">×</button>
             </div>
             <form onSubmit={handleCreateSubmit} className="flex flex-col gap-3.5 text-xs font-medium">
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Customer Name</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Customer Name</label>
                 <input
                   type="text"
                   required
@@ -983,7 +983,7 @@ export const DeliveriesPage = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Customer Phone (Optional)</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Customer Phone (Optional)</label>
                   <input
                     type="text"
                     placeholder="e.g. +91 98765 00002"
@@ -994,7 +994,7 @@ export const DeliveriesPage = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Scheduled Date (Optional)</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Scheduled Date (Optional)</label>
                   <input
                     type="date"
                     value={scheduledDate}
@@ -1006,7 +1006,7 @@ export const DeliveriesPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Delivery Address</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Delivery Address</label>
                 <input
                   type="text"
                   required
@@ -1019,7 +1019,7 @@ export const DeliveriesPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Select Material</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Select Material</label>
                 <select
                   required
                   value={materialName}
@@ -1036,7 +1036,7 @@ export const DeliveriesPage = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Quantity</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Quantity</label>
                   <input
                     type="number"
                     required
@@ -1048,7 +1048,7 @@ export const DeliveriesPage = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Unit</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Unit</label>
                   <input
                     type="text"
                     required
@@ -1062,7 +1062,7 @@ export const DeliveriesPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Dispatch Note (Optional)</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Dispatch Note (Optional)</label>
                 <textarea
                   placeholder="e.g. Gate clearance needed, ask for Vikram at warehouse"
                   value={notes}
@@ -1091,11 +1091,11 @@ export const DeliveriesPage = () => {
           <div style={{ background: C.white, borderRadius: 16 }} className="w-full max-w-sm p-5 flex flex-col gap-4 overflow-y-auto max-h-[90%]">
             <div className="flex items-center justify-between">
               <span style={{ color: C.ink }} className="text-base font-bold">Edit Delivery Details</span>
-              <button onClick={() => setShowEdit(false)} className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer">×</button>
+              <button onClick={() => setShowEdit(false)} className="text-muted-foreground hover:text-muted-foreground text-lg font-bold cursor-pointer">×</button>
             </div>
             <form onSubmit={handleEditSubmit} className="flex flex-col gap-3.5 text-xs font-medium">
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Customer Name</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Customer Name</label>
                 <input
                   type="text"
                   required
@@ -1109,7 +1109,7 @@ export const DeliveriesPage = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Customer Phone (Optional)</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Customer Phone (Optional)</label>
                   <input
                     type="text"
                     placeholder="e.g. +91 98765 00002"
@@ -1120,7 +1120,7 @@ export const DeliveriesPage = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Scheduled Date (Optional)</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Scheduled Date (Optional)</label>
                   <input
                     type="date"
                     value={editScheduledDate}
@@ -1132,7 +1132,7 @@ export const DeliveriesPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Delivery Address</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Delivery Address</label>
                 <input
                   type="text"
                   required
@@ -1145,7 +1145,7 @@ export const DeliveriesPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Select Material</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Select Material</label>
                 <select
                   required
                   value={editMaterialName}
@@ -1162,7 +1162,7 @@ export const DeliveriesPage = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Quantity</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Quantity</label>
                   <input
                     type="number"
                     required
@@ -1174,7 +1174,7 @@ export const DeliveriesPage = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Unit</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Unit</label>
                   <input
                     type="text"
                     required
@@ -1187,10 +1187,10 @@ export const DeliveriesPage = () => {
                 </div>
               </div>
 
-              <div className="border-t border-slate-100 pt-2 font-bold text-slate-700 text-[11px] uppercase">Driver & Vehicle Assignment</div>
+              <div className="border-t border-border pt-2 font-bold text-muted-foreground text-[11px] uppercase">Driver & Vehicle Assignment</div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Driver Name</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Driver Name</label>
                   <input
                     type="text"
                     placeholder="e.g. Ramesh Singh"
@@ -1201,7 +1201,7 @@ export const DeliveriesPage = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Driver Phone</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Driver Phone</label>
                   <input
                     type="text"
                     placeholder="e.g. +91 98220 11111"
@@ -1215,7 +1215,7 @@ export const DeliveriesPage = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Vehicle Number</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Vehicle Number</label>
                   <input
                     type="text"
                     placeholder="e.g. MH 12 AB 1234"
@@ -1226,7 +1226,7 @@ export const DeliveriesPage = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Vehicle Type</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Vehicle Type</label>
                   <input
                     type="text"
                     placeholder="e.g. 10-Ton Truck"
@@ -1238,10 +1238,10 @@ export const DeliveriesPage = () => {
                 </div>
               </div>
 
-              <div className="border-t border-slate-100 pt-2 font-bold text-slate-700 text-[11px] uppercase">Completion & Proof</div>
+              <div className="border-t border-border pt-2 font-bold text-muted-foreground text-[11px] uppercase">Completion & Proof</div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">Receiver Name</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">Receiver Name</label>
                   <input
                     type="text"
                     placeholder="e.g. Site Supervisor Anand"
@@ -1252,7 +1252,7 @@ export const DeliveriesPage = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-gray-500 text-[10px] uppercase">POD Reference</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">POD Reference</label>
                   <input
                     type="text"
                     placeholder="e.g. POD-88942"
@@ -1265,7 +1265,7 @@ export const DeliveriesPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Dispatch / Delivery Notes</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Dispatch / Delivery Notes</label>
                 <textarea
                   placeholder="e.g. Gate clearance needed, ask for Vikram at warehouse"
                   value={editNotes}

@@ -138,7 +138,7 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
   if (loading) return <LoadingSkeleton rows={6} />;
   if (error && mode === "edit" && !material) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
 
-  const inputClass = "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
+  const inputClass = "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 
   return (
     <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-32">
@@ -149,48 +149,48 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
 
       {error && <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-bold text-red-800">{error}</p>}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-5">
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-5">
         <SectionHeader title="Basic Details" description="Material name, category, SKU, and unit specs." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Material Name *
             <input ref={firstRef} required value={form.materialName} onChange={e => change("materialName", e.target.value)} placeholder="e.g. Ultratech PPC Cement 50kg" className={inputClass} />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Category *
             <input required value={form.category} onChange={e => change("category", e.target.value)} placeholder="Cement, Steel, Bricks, Sand, Hardware…" className={inputClass} />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Unit of Measurement *
             <input required value={form.unit} onChange={e => change("unit", e.target.value)} placeholder="Bags, Tonnes, MT, Pieces, Cu.Ft…" className={inputClass} />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             SKU / Item Code *
             <input required value={form.sku} onChange={e => change("sku", e.target.value)} placeholder="e.g. CEM-ULT-50" className={inputClass} />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Brand / Manufacturer
             <input value={form.brand} onChange={e => change("brand", e.target.value)} placeholder="e.g. UltraTech, Tata Tiscon, Ambuja" className={inputClass} />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Minimum Reorder Stock Level
             <input type="number" inputMode="decimal" min="0" step="0.001" value={form.minimumStockLevel} onChange={e => change("minimumStockLevel", e.target.value)} placeholder="e.g. 50" className={inputClass} />
           </label>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-5">
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-5">
         <SectionHeader title="Pricing and Supplier" description="Set cost price, selling price, and preferred vendor." />
         <div className="grid gap-4 md:grid-cols-3">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Purchase Cost Price (₹)
             <input type="number" inputMode="decimal" min="0.01" step="0.01" value={form.costPrice} onChange={e => change("costPrice", e.target.value)} placeholder="0.00" className={inputClass} />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Selling Price (₹)
             <input type="number" inputMode="decimal" min="0.01" step="0.01" value={form.sellingPrice} onChange={e => change("sellingPrice", e.target.value)} placeholder="0.00" className={inputClass} />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Preferred Supplier
             <select value={form.defaultSupplierId} onChange={e => change("defaultSupplierId", e.target.value)} className={inputClass}>
               <option value="">No preferred supplier selected</option>
@@ -205,10 +205,10 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
       </section>
 
       {mode === "create" && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-5">
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-5">
           <SectionHeader title="Opening Stock" description="Specify initial warehouse location and quantity in stock." />
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
               Godown / Warehouse *
               <select required value={form.godownId} onChange={e => change("godownId", e.target.value)} className={inputClass}>
                 <option value="">Choose godown location…</option>
@@ -219,7 +219,7 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
                 ))}
               </select>
             </label>
-            <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
               Opening Quantity in Hand
               <input type="number" inputMode="decimal" min="0" step="0.001" value={form.openingStock} onChange={e => change("openingStock", e.target.value)} className={inputClass} />
             </label>
@@ -227,18 +227,18 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
         </section>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-        <button type="button" onClick={() => setMore(!more)} className="flex min-h-12 w-full items-center justify-between px-5 text-xs font-black uppercase tracking-wider text-slate-700 hover:bg-slate-50 cursor-pointer">
+      <section className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+        <button type="button" onClick={() => setMore(!more)} className="flex min-h-12 w-full items-center justify-between px-5 text-xs font-black uppercase tracking-wider text-muted-foreground hover:bg-muted cursor-pointer">
           Tax & HSN Compliance Details (Optional)
           <ChevronDown size={18} className={more ? "rotate-180 transition-transform" : "transition-transform"} />
         </button>
         {more && (
-          <div className="grid gap-4 border-t border-slate-100 p-5 md:grid-cols-2">
-            <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <div className="grid gap-4 border-t border-border p-5 md:grid-cols-2">
+            <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
               HSN Code
               <input value={form.hsnCode} onChange={e => change("hsnCode", e.target.value)} placeholder="e.g. 2523" className={inputClass} />
             </label>
-            <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+            <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
               GST Rate %
               <input type="number" inputMode="decimal" min="0" max="100" step="0.01" value={form.taxRate} onChange={e => change("taxRate", e.target.value)} placeholder="e.g. 28" className={inputClass} />
             </label>
@@ -251,7 +251,7 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
         <button 
           type="button" 
           onClick={() => navigate(-1)} 
-          className="flex-1 min-h-[48px] rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+          className="flex-1 min-h-[48px] rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted cursor-pointer press-active"
         >
           Cancel
         </button>
@@ -269,7 +269,7 @@ export function MaterialFormPage({ mode }: { mode: "create" | "edit" }) {
         <button 
           type="button" 
           onClick={() => navigate(-1)} 
-          className="min-h-[46px] rounded-xl border border-slate-200 px-6 text-sm font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
+          className="min-h-[46px] rounded-xl border border-border px-6 text-sm font-extrabold text-muted-foreground hover:bg-muted cursor-pointer"
         >
           Cancel
         </button>

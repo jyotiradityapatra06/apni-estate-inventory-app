@@ -32,12 +32,12 @@ export function RecentReturnsSection({ dashboard }: { dashboard: DashboardData }
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Returns</h3>
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Recent Returns</h3>
         <div className="animate-pulse space-y-3">
-          <div className="h-8 bg-slate-100 rounded"></div>
-          <div className="h-8 bg-slate-100 rounded"></div>
-          <div className="h-8 bg-slate-100 rounded"></div>
+          <div className="h-8 bg-muted rounded"></div>
+          <div className="h-8 bg-muted rounded"></div>
+          <div className="h-8 bg-muted rounded"></div>
         </div>
       </div>
     );
@@ -45,22 +45,22 @@ export function RecentReturnsSection({ dashboard }: { dashboard: DashboardData }
 
   if (combined.length === 0) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">Recent Returns</h3>
-        <p className="text-sm text-slate-500">No returns recorded yet.</p>
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-foreground mb-2">Recent Returns</h3>
+        <p className="text-sm text-muted-foreground">No returns recorded yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      <div className="px-6 py-5 border-b border-slate-100">
-        <h3 className="text-lg font-semibold text-slate-900">Recent Returns</h3>
+    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      <div className="px-6 py-5 border-b border-border">
+        <h3 className="text-lg font-semibold text-foreground">Recent Returns</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-50 text-[12px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">
+            <tr className="bg-muted text-[12px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border">
               <th className="px-6 py-3">Return Info</th>
               <th className="px-6 py-3">Type</th>
               <th className="px-6 py-3">Reason</th>
@@ -75,11 +75,11 @@ export function RecentReturnsSection({ dashboard }: { dashboard: DashboardData }
                 <tr
                   key={`${item.type}-${item.id}`}
                   onClick={() => navigate(item.path)}
-                  className="hover:bg-slate-50 cursor-pointer transition-colors"
+                  className="hover:bg-muted cursor-pointer transition-colors"
                 >
                   <td className="px-6 py-4">
-                    <div className="font-semibold text-slate-900">{item.returnNumber}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="font-semibold text-foreground">{item.returnNumber}</div>
+                    <div className="text-xs text-muted-foreground">
                       {format(new Date(item.returnDate), "dd MMM yyyy")}
                     </div>
                   </td>
@@ -88,13 +88,13 @@ export function RecentReturnsSection({ dashboard }: { dashboard: DashboardData }
                       <span className={`p-1.5 rounded-lg ${item.iconColor}`}>
                         <Icon size={14} />
                       </span>
-                      <span className="font-medium text-slate-700">{item.type}</span>
+                      <span className="font-medium text-muted-foreground">{item.type}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-slate-500 line-clamp-1 max-w-[200px]" title={item.reason}>
+                  <td className="px-6 py-4 text-muted-foreground line-clamp-1 max-w-[200px]" title={item.reason}>
                     {item.reason}
                   </td>
-                  <td className="px-6 py-4 font-semibold text-slate-900">
+                  <td className="px-6 py-4 font-semibold text-foreground">
                     <CurrencyDisplay value={item.totalAmount} />
                   </td>
                   <td className="px-6 py-4">

@@ -161,7 +161,7 @@ export function ReportDetailPage({ type }: { type: ReportKey | "itc-tracker" | "
       {/* Back navigation button */}
       <button
         onClick={() => navigate("/reports")}
-        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer report-actions dark:text-slate-300 dark:hover:text-orange-400"
+        className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer report-actions dark:text-slate-300 dark:hover:text-orange-400"
       >
         <ArrowLeft size={14} />
         Back to Reports
@@ -176,7 +176,7 @@ export function ReportDetailPage({ type }: { type: ReportKey | "itc-tracker" | "
             <div className="flex gap-2.5">
               <button
                 onClick={() => window.print()}
-                className="flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                className="flex min-h-10 items-center justify-center rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground shadow-2xs hover:bg-muted transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 <Printer size={14} className="mr-1.5" />
                 Print Report
@@ -301,13 +301,13 @@ export function ReportDetailPage({ type }: { type: ReportKey | "itc-tracker" | "
 
           {/* Breakdowns List */}
           {Object.entries(data.breakdowns).slice(0, 3).map(([name, items]) => items.length > 0 && (
-            <section key={name} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3 text-xs">
-              <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider border-b pb-3 dark:text-slate-100 dark:border-slate-800">{human(name)}</h3>
+            <section key={name} className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3 text-xs">
+              <h3 className="font-black text-foreground text-sm uppercase tracking-wider border-b pb-3 dark:text-slate-100 dark:border-slate-800">{human(name)}</h3>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {items.slice(0, 10).map((x) => (
-                  <div key={x.name} className="flex justify-between items-center gap-3 rounded-xl bg-slate-50 p-3.5 border border-slate-200/80 font-semibold dark:bg-slate-800 dark:border-slate-700">
-                    <span className="text-slate-700 font-extrabold text-xs dark:text-slate-200">{x.name}</span>
-                    <strong className="text-slate-950 font-black text-sm dark:text-slate-100">{number(x.total)}</strong>
+                  <div key={x.name} className="flex justify-between items-center gap-3 rounded-xl bg-muted p-3.5 border border-border/80 font-semibold dark:bg-slate-800 dark:border-slate-700">
+                    <span className="text-muted-foreground font-extrabold text-xs dark:text-slate-200">{x.name}</span>
+                    <strong className="text-foreground font-black text-sm dark:text-slate-100">{number(x.total)}</strong>
                   </div>
                 ))}
               </div>
@@ -317,14 +317,14 @@ export function ReportDetailPage({ type }: { type: ReportKey | "itc-tracker" | "
           {/* 4. DETAILED DATA TABLE / MOBILE CARDS */}
           {data.rows.length ? (
             <div className="space-y-4">
-              <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">
+              <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">
                 Detailed Itemized Report Logs
               </h3>
 
               {/* Desktop Table View (>=768px) */}
-              <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-2xs dark:border-slate-800 dark:bg-slate-900">
+              <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block shadow-2xs dark:border-slate-800 dark:bg-slate-900">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
+                  <thead className="bg-muted text-muted-foreground border-b border-border dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
                     <tr>
                       {keys.map((k) => (
                         <th key={k} className="px-4 py-3.5 font-black text-[11px] uppercase tracking-wider">
@@ -335,9 +335,9 @@ export function ReportDetailPage({ type }: { type: ReportKey | "itc-tracker" | "
                   </thead>
                   <tbody>
                     {data.rows.map((row, i) => (
-                      <tr key={String(row.id || i)} className="border-b last:border-0 border-slate-100 hover:bg-slate-50/60 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50">
+                      <tr key={String(row.id || i)} className="border-b last:border-0 border-border hover:bg-muted/60 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50">
                         {keys.map((k) => (
-                          <td key={k} className="px-4 py-3.5 text-slate-700 font-semibold dark:text-slate-300">
+                          <td key={k} className="px-4 py-3.5 text-muted-foreground font-semibold dark:text-slate-300">
                             {String(row[k] ?? "—")}
                           </td>
                         ))}
@@ -364,17 +364,17 @@ export function ReportDetailPage({ type }: { type: ReportKey | "itc-tracker" | "
                 <button
                   disabled={page <= 1}
                   onClick={() => setPage((x) => x - 1)}
-                  className="min-h-10 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                  className="min-h-10 rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground hover:bg-muted disabled:opacity-40 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                 >
                   Previous
                 </button>
-                <span className="text-xs text-slate-500 font-medium dark:text-slate-400">
+                <span className="text-xs text-muted-foreground font-medium dark:text-muted-foreground">
                   Page {page} of {data.pagination.pages}
                 </span>
                 <button
                   disabled={page >= data.pagination.pages}
                   onClick={() => setPage((x) => x + 1)}
-                  className="min-h-10 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                  className="min-h-10 rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground hover:bg-muted disabled:opacity-40 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                 >
                   Next
                 </button>
@@ -389,7 +389,7 @@ export function ReportDetailPage({ type }: { type: ReportKey | "itc-tracker" | "
             />
           )}
 
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider dark:text-slate-500">
+          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider dark:text-muted-foreground">
             Generated {new Date(data.metadata.generatedAt).toLocaleString("en-IN")}
           </p>
         </div>

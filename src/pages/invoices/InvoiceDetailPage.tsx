@@ -62,17 +62,17 @@ export default function InvoiceDetailPage() {
         <div>
           <button 
             onClick={() => navigate("/invoices")} 
-            className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer"
+            className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer"
           >
             <ArrowLeft size={14}/>
             Back to Invoices
           </button>
           
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h1 className="text-xl font-black text-slate-900 tracking-tight">{x.invoiceNumber}</h1>
+            <h1 className="text-xl font-black text-foreground tracking-tight">{x.invoiceNumber}</h1>
             <BusinessStatusBadge status={x.status}/>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-              gst ? "bg-blue-50 text-blue-700 border border-blue-100" : "bg-slate-100 text-slate-700 border border-slate-200"
+              gst ? "bg-blue-50 text-blue-700 border border-blue-100" : "bg-muted text-muted-foreground border border-border"
             }`}>
               {gst ? "GST Invoice" : "Non-GST Bill"}
             </span>
@@ -82,9 +82,9 @@ export default function InvoiceDetailPage() {
         <div className="flex flex-wrap items-center gap-2.5">
           <button 
             onClick={() => window.print()} 
-            className="flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-black text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors shadow-xs"
+            className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-card px-4 text-xs font-black text-muted-foreground hover:bg-muted cursor-pointer transition-colors shadow-xs"
           >
-            <Printer size={15} className="mr-1.5 text-slate-500" />
+            <Printer size={15} className="mr-1.5 text-muted-foreground" />
             Print Bill
           </button>
           <button 
@@ -118,7 +118,7 @@ export default function InvoiceDetailPage() {
           {manage && ["DRAFT", "ISSUED"].includes(x.status) && (
             <button 
               onClick={() => setAction("cancel")} 
-              className="flex min-h-11 items-center justify-center rounded-xl border border-red-200 bg-white px-4 text-xs font-black text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+              className="flex min-h-11 items-center justify-center rounded-xl border border-red-200 bg-card px-4 text-xs font-black text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
             >
               <Ban size={15} className="mr-1.5" />
               Cancel Bill
@@ -129,7 +129,7 @@ export default function InvoiceDetailPage() {
 
       {/* Payment Integration Summary Banner */}
       {x.status !== "CANCELLED" && (
-        <div className="invoice-actions rounded-2xl border border-slate-200 bg-white p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="invoice-actions rounded-2xl border border-border bg-card p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4 text-xs">
             <div className="px-3.5 py-2 bg-green-50 rounded-xl border border-green-100">
               <span className="text-[10px] uppercase font-black text-green-700 block">Received Amount</span>
@@ -153,55 +153,55 @@ export default function InvoiceDetailPage() {
       )}
 
       {/* 7. Professional Invoice Template Card */}
-      <article className="invoice-print-root rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+      <article className="invoice-print-root rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm">
         <header className="flex flex-col justify-between gap-5 border-b pb-6 sm:flex-row">
           <div>
-            <h2 className="text-xl font-black text-slate-900 tracking-tight">{x.businessName}</h2>
-            {x.businessAddress && <p className="max-w-md whitespace-pre-line text-xs text-slate-500 mt-1 leading-relaxed">{x.businessAddress}</p>}
-            {x.businessPhone && <p className="text-xs text-slate-500 mt-1">Phone: {x.businessPhone}</p>}
-            {gst && x.businessGstin && <p className="text-xs text-slate-700 font-bold mt-1 uppercase">GSTIN: {x.businessGstin}</p>}
+            <h2 className="text-xl font-black text-foreground tracking-tight">{x.businessName}</h2>
+            {x.businessAddress && <p className="max-w-md whitespace-pre-line text-xs text-muted-foreground mt-1 leading-relaxed">{x.businessAddress}</p>}
+            {x.businessPhone && <p className="text-xs text-muted-foreground mt-1">Phone: {x.businessPhone}</p>}
+            {gst && x.businessGstin && <p className="text-xs text-muted-foreground font-bold mt-1 uppercase">GSTIN: {x.businessGstin}</p>}
           </div>
           <div className="sm:text-right">
-            <h3 className="text-lg font-black text-slate-800 tracking-wider uppercase">{gst ? "TAX INVOICE" : "BILL OF SUPPLY"}</h3>
-            <p className="font-bold text-sm text-slate-700 mt-1">{x.invoiceNumber}</p>
-            <p className="text-xs text-slate-500 mt-1">Date: {new Date(x.invoiceDate).toLocaleDateString("en-IN")}</p>
-            {x.dueDate && <p className="text-xs text-slate-500">Due Date: {new Date(x.dueDate).toLocaleDateString("en-IN")}</p>}
+            <h3 className="text-lg font-black text-foreground tracking-wider uppercase">{gst ? "TAX INVOICE" : "BILL OF SUPPLY"}</h3>
+            <p className="font-bold text-sm text-muted-foreground mt-1">{x.invoiceNumber}</p>
+            <p className="text-xs text-muted-foreground mt-1">Date: {new Date(x.invoiceDate).toLocaleDateString("en-IN")}</p>
+            {x.dueDate && <p className="text-xs text-muted-foreground">Due Date: {new Date(x.dueDate).toLocaleDateString("en-IN")}</p>}
           </div>
         </header>
 
         <section className="grid gap-5 border-b py-6 sm:grid-cols-2 text-xs">
           <div>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Bill To</span>
-            <p className="font-bold text-slate-900 text-sm mt-1">{x.customerName}</p>
-            <p className="text-slate-600 mt-0.5">{x.customerPhone}</p>
-            {x.billingAddress && <p className="whitespace-pre-line text-slate-500 mt-1 leading-relaxed">{x.billingAddress}</p>}
-            {gst && x.customerGstin && <p className="font-bold text-slate-700 mt-1 uppercase">GSTIN: {x.customerGstin}</p>}
+            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Bill To</span>
+            <p className="font-bold text-foreground text-sm mt-1">{x.customerName}</p>
+            <p className="text-muted-foreground mt-0.5">{x.customerPhone}</p>
+            {x.billingAddress && <p className="whitespace-pre-line text-muted-foreground mt-1 leading-relaxed">{x.billingAddress}</p>}
+            {gst && x.customerGstin && <p className="font-bold text-muted-foreground mt-1 uppercase">GSTIN: {x.customerGstin}</p>}
           </div>
         </section>
 
         {/* Desktop items table */}
-        <div className="mt-6 hidden overflow-hidden rounded-xl border border-slate-100 sm:block">
+        <div className="mt-6 hidden overflow-hidden rounded-xl border border-border sm:block">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b">
+            <thead className="bg-muted text-muted-foreground border-b">
               <tr>
                 {["Material Item", "HSN Code", "Qty", "Rate", "Discount", ...(gst ? ["GST %"] : []), "Line Total"].map((v) => (
-                  <th key={v} className="p-3 font-semibold text-slate-500 uppercase tracking-wider">{v}</th>
+                  <th key={v} className="p-3 font-semibold text-muted-foreground uppercase tracking-wider">{v}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {x.items.map((i) => (
-                <tr key={i.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+                <tr key={i.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
                   <td className="p-3">
-                    <span className="block font-bold text-slate-900">{i.materialName}</span>
-                    <span className="text-[10px] text-slate-400 font-medium">{i.sku}</span>
+                    <span className="block font-bold text-foreground">{i.materialName}</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">{i.sku}</span>
                   </td>
-                  <td className="text-slate-600 font-medium">{gst ? i.hsnCode || "—" : "—"}</td>
-                  <td className="text-slate-600 font-medium">{formatQuantity(i.quantity, i.unit)}</td>
-                  <td className="text-slate-600 font-medium">{fmt(i.rate)}</td>
-                  <td className="text-slate-500 font-medium">{fmt(i.discountAmount)}</td>
-                  {gst && <td className="text-slate-500 font-medium">{i.gstRate}%</td>}
-                  <td className="font-black text-slate-950">{fmt(i.lineTotal)}</td>
+                  <td className="text-muted-foreground font-medium">{gst ? i.hsnCode || "—" : "—"}</td>
+                  <td className="text-muted-foreground font-medium">{formatQuantity(i.quantity, i.unit)}</td>
+                  <td className="text-muted-foreground font-medium">{fmt(i.rate)}</td>
+                  <td className="text-muted-foreground font-medium">{fmt(i.discountAmount)}</td>
+                  {gst && <td className="text-muted-foreground font-medium">{i.gstRate}%</td>}
+                  <td className="font-black text-foreground">{fmt(i.lineTotal)}</td>
                 </tr>
               ))}
             </tbody>
@@ -211,12 +211,12 @@ export default function InvoiceDetailPage() {
         {/* Mobile items view */}
         <div className="mt-6 space-y-3 sm:hidden">
           {x.items.map((i) => (
-            <div key={i.id} className="rounded-xl bg-slate-50 p-3 border border-slate-100 text-xs space-y-1">
+            <div key={i.id} className="rounded-xl bg-muted p-3 border border-border text-xs space-y-1">
               <div className="flex justify-between font-bold">
-                <span className="text-slate-900">{i.materialName}</span>
-                <span className="text-slate-950 font-black">{fmt(i.lineTotal)}</span>
+                <span className="text-foreground">{i.materialName}</span>
+                <span className="text-foreground font-black">{fmt(i.lineTotal)}</span>
               </div>
-              <p className="text-slate-500">
+              <p className="text-muted-foreground">
                 {formatQuantity(i.quantity, i.unit)} &times; {fmt(i.rate)}
                 {gst ? ` · GST ${i.gstRate}%` : ""}
               </p>
@@ -245,13 +245,13 @@ export default function InvoiceDetailPage() {
         </section>
 
         {(x.notes || x.terms) && (
-          <section className="mt-6 border-t pt-4 text-[11px] text-slate-500 leading-relaxed space-y-1">
+          <section className="mt-6 border-t pt-4 text-[11px] text-muted-foreground leading-relaxed space-y-1">
             {x.notes && <p><b>Notes:</b> {x.notes}</p>}
             {x.terms && <p><b>Terms:</b> {x.terms}</p>}
           </section>
         )}
 
-        <footer className="mt-8 flex flex-col sm:flex-row justify-between border-t pt-5 text-xs text-slate-500 gap-4">
+        <footer className="mt-8 flex flex-col sm:flex-row justify-between border-t pt-5 text-xs text-muted-foreground gap-4">
           <div>
             {x.salesOrder && (
               <p>
@@ -267,7 +267,7 @@ export default function InvoiceDetailPage() {
               </p>
             ) : null}
           </div>
-          <p className="font-bold text-slate-700 sm:text-right">Authorised Signatory</p>
+          <p className="font-bold text-muted-foreground sm:text-right">Authorised Signatory</p>
         </footer>
       </article>
 
@@ -291,9 +291,9 @@ export default function InvoiceDetailPage() {
 function Info({ label, icon: Icon, children }: { label: string; icon?: any; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{label}</span>
-      <div className="flex items-center gap-1.5 font-bold text-slate-800 break-words mt-0.5">
-        {Icon && <Icon size={12} className="text-slate-400 shrink-0" />}
+      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">{label}</span>
+      <div className="flex items-center gap-1.5 font-bold text-foreground break-words mt-0.5">
+        {Icon && <Icon size={12} className="text-muted-foreground shrink-0" />}
         {children}
       </div>
     </div>
@@ -302,9 +302,9 @@ function Info({ label, icon: Icon, children }: { label: string; icon?: any; chil
 
 function Row({ label, value, large = false }: { label: string; value: string; large?: boolean }) {
   return (
-    <div className={`flex justify-between gap-4 py-0.5 ${large ? "text-sm font-black text-slate-900" : "text-xs font-semibold text-slate-500"}`}>
+    <div className={`flex justify-between gap-4 py-0.5 ${large ? "text-sm font-black text-foreground" : "text-xs font-semibold text-muted-foreground"}`}>
       <span>{label}</span>
-      <b className={large ? "text-red-700" : "text-slate-900"}>{value}</b>
+      <b className={large ? "text-red-700" : "text-foreground"}>{value}</b>
     </div>
   );
 }

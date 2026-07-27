@@ -96,20 +96,20 @@ export function StockListPage() {
 
   const filtersPanel = (
     <>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Category
-        <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Category
+        <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
           <option value="ALL">All categories</option>
           {categories.map((category) => <option key={category}>{category}</option>)}
         </select>
       </label>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Godown / Warehouse
-        <select value={draft.godown} onChange={(e) => setDraft({ ...draft, godown: e.target.value })} className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Godown / Warehouse
+        <select value={draft.godown} onChange={(e) => setDraft({ ...draft, godown: e.target.value })} className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
           <option value="ALL">All godowns</option>
           {godowns.map((godown) => <option key={godown.id} value={godown.id}>{godown.name}</option>)}
         </select>
       </label>
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Stock status
-        <select value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value })} className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Stock status
+        <select value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value })} className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
           <option value="ALL">All statuses</option>
           <option value="IN_STOCK">Available</option>
           <option value="LOW_STOCK">Low Stock</option>
@@ -148,7 +148,7 @@ export function StockListPage() {
             {hasPermission(user, "godowns:transfer") && (
               <button 
                 onClick={() => navigate("/transfers/new")} 
-                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors cursor-pointer"
+                className="flex min-h-10 items-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground shadow-sm hover:bg-muted transition-colors cursor-pointer"
               >
                 <ArrowLeftRight size={14}/>
                 Stock Transfer
@@ -168,20 +168,20 @@ export function StockListPage() {
       </div>
 
       {/* 4. Smart Search & Filters */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-4.5 shadow-sm space-y-4">
         <div className="flex gap-2.5">
           <div className="relative min-w-0 flex-1">
-            <Search className="absolute left-3.5 top-3 text-slate-400" size={20}/>
+            <Search className="absolute left-3.5 top-3 text-muted-foreground" size={20}/>
             <input 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
               placeholder="Search by material name, SKU, or category (e.g. Cement, Steel 12mm, Bricks)…" 
-              className="w-full rounded-xl border border-slate-200 pl-11 pr-4 h-11 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
+              className="w-full rounded-xl border border-border pl-11 pr-4 h-11 text-sm sm:text-base font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-muted-foreground"
             />
           </div>
           <button 
             onClick={() => { setDraft(filters); setFilterOpen(true); }} 
-            className="flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-200 px-4 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer"
+            className="flex min-h-[44px] items-center gap-2 rounded-xl border border-border px-4 text-xs sm:text-sm font-extrabold text-muted-foreground hover:bg-muted md:hidden cursor-pointer"
           >
             <Filter size={16}/>
             Filters
@@ -194,7 +194,7 @@ export function StockListPage() {
         </div>
 
         {/* Desktop Filter Panel */}
-        <div className="hidden md:grid md:grid-cols-4 gap-4 items-end border-t border-slate-100 pt-3.5">
+        <div className="hidden md:grid md:grid-cols-4 gap-4 items-end border-t border-border pt-3.5">
           {filtersPanel}
           <div className="flex gap-2">
             <button 
@@ -205,7 +205,7 @@ export function StockListPage() {
             </button>
             <button 
               onClick={() => { setDraft(initialFilters); setFilters(initialFilters); }} 
-              className="h-10 px-4 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              className="h-10 px-4 rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted cursor-pointer"
             >
               Clear
             </button>
@@ -259,7 +259,7 @@ export function StockListPage() {
                     <>
                       <button
                         onClick={() => navigate(`/materials/${item.id}`)}
-                        className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                        className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                       >
                         View Details
                       </button>
@@ -274,7 +274,7 @@ export function StockListPage() {
                       {hasPermission(user, "godowns:transfer") && (
                         <button
                           onClick={() => navigate(`/transfers/new?materialId=${item.id}`)}
-                          className="min-h-[44px] px-3.5 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                          className="min-h-[44px] px-3.5 rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                         >
                           Transfer
                         </button>
@@ -287,17 +287,17 @@ export function StockListPage() {
           </div>
 
           {/* Desktop Table Viewport (>=768px) */}
-          <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600 border-b">
+              <thead className="bg-muted text-muted-foreground border-b">
                 <tr>
-                  <th className="p-4 font-black text-xs uppercase tracking-wider text-slate-500">Material Name & SKU</th>
-                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Category</th>
-                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Unit</th>
-                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Available Quantity</th>
-                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Godowns & Warehouses</th>
-                  <th className="font-black text-xs uppercase tracking-wider text-slate-500">Stock Status</th>
-                  <th className="w-32 font-black text-xs uppercase tracking-wider text-slate-500 text-right pr-6">Actions</th>
+                  <th className="p-4 font-black text-xs uppercase tracking-wider text-muted-foreground">Material Name & SKU</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-muted-foreground">Category</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-muted-foreground">Unit</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-muted-foreground">Available Quantity</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-muted-foreground">Godowns & Warehouses</th>
+                  <th className="font-black text-xs uppercase tracking-wider text-muted-foreground">Stock Status</th>
+                  <th className="w-32 font-black text-xs uppercase tracking-wider text-muted-foreground text-right pr-6">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -311,23 +311,23 @@ export function StockListPage() {
                     <tr 
                       key={item.id} 
                       className={`transition-colors ${
-                        isOut ? "bg-red-50/20 hover:bg-red-50/40" : isLow ? "bg-amber-50/30 hover:bg-amber-50/50" : "hover:bg-slate-50/60"
+                        isOut ? "bg-red-50/20 hover:bg-red-50/40" : isLow ? "bg-amber-50/30 hover:bg-amber-50/50" : "hover:bg-muted/60"
                       }`}
                     >
                       <td className="p-4">
                         <button onClick={() => navigate(`/materials/${item.id}`)} className="text-left cursor-pointer group">
-                          <span className="block font-black text-slate-900 text-sm sm:text-base group-hover:text-orange-600 transition-colors leading-tight">
+                          <span className="block font-black text-foreground text-sm sm:text-base group-hover:text-orange-600 transition-colors leading-tight">
                             {item.materialName}
                           </span>
-                          <span className="text-xs text-slate-400 font-semibold">SKU: {item.sku}</span>
+                          <span className="text-xs text-muted-foreground font-semibold">SKU: {item.sku}</span>
                         </button>
                       </td>
-                      <td className="text-slate-700 font-bold text-xs sm:text-sm">{item.category}</td>
-                      <td className="text-slate-600 font-extrabold text-xs uppercase">{item.unit}</td>
-                      <td className="font-black text-slate-900 text-base sm:text-lg">
+                      <td className="text-muted-foreground font-bold text-xs sm:text-sm">{item.category}</td>
+                      <td className="text-muted-foreground font-extrabold text-xs uppercase">{item.unit}</td>
+                      <td className="font-black text-foreground text-base sm:text-lg">
                         <QuantityDisplay value={availableStock(item)} unit={item.unit}/>
                       </td>
-                      <td className="text-slate-600 text-xs font-semibold max-w-[200px] truncate" title={godownsText}>
+                      <td className="text-muted-foreground text-xs font-semibold max-w-[200px] truncate" title={godownsText}>
                         {godownsText}
                       </td>
                       <td>
@@ -342,27 +342,27 @@ export function StockListPage() {
                             View
                           </button>
                           <details className="relative">
-                            <summary aria-label={`More actions for ${item.materialName}`} className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-lg hover:bg-slate-100 border border-transparent">
+                            <summary aria-label={`More actions for ${item.materialName}`} className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-lg hover:bg-muted border border-transparent">
                               <MoreVertical size={18}/>
                             </summary>
-                            <div className="absolute right-0 z-20 w-44 rounded-xl border bg-white p-1.5 shadow-xl border-slate-100 text-left space-y-0.5">
+                            <div className="absolute right-0 z-20 w-44 rounded-xl border bg-card p-1.5 shadow-xl border-border text-left space-y-0.5">
                               {canIn && (
-                                <button onClick={() => openMovement("IN", item)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">
+                                <button onClick={() => openMovement("IN", item)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer text-left">
                                   + Stock In
                                 </button>
                               )}
                               {canOut && (
-                                <button onClick={() => openMovement("OUT", item)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">
+                                <button onClick={() => openMovement("OUT", item)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer text-left">
                                   - Stock Out
                                 </button>
                               )}
                               {hasPermission(user, "godowns:transfer") && (
-                                <button onClick={() => navigate(`/transfers/new?materialId=${item.id}`)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">
+                                <button onClick={() => navigate(`/transfers/new?materialId=${item.id}`)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer text-left">
                                   Transfer Stock
                                 </button>
                               )}
                               {canUpdate && (
-                                <button onClick={() => navigate(`/materials/${item.id}/edit`)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer text-left">
+                                <button onClick={() => navigate(`/materials/${item.id}/edit`)} className="min-h-9 w-full rounded-lg px-3 text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer text-left">
                                   Edit Details
                                 </button>
                               )}

@@ -24,29 +24,29 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
 
         return (
           <div className="space-y-2.5">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-start justify-between border-b border-border pb-2">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">{customerName}</p>
-                <p className="text-xs text-slate-500 font-semibold mt-0.5">Inv #: {invoiceNumber}</p>
+                <p className="font-extrabold text-foreground text-sm">{customerName}</p>
+                <p className="text-xs text-muted-foreground font-semibold mt-0.5">Inv #: {invoiceNumber}</p>
               </div>
               <BusinessStatusBadge status={status} />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-semibold">
+            <div className="grid grid-cols-2 gap-2 text-xs bg-muted p-2.5 rounded-xl border border-border font-semibold">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Amount</span>
-                <strong className="text-slate-900 font-black">{fmt(totalAmount)}</strong>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Total Amount</span>
+                <strong className="text-foreground font-black">{fmt(totalAmount)}</strong>
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Balance Due</span>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Balance Due</span>
                 <strong className={balanceDue > 0 ? "text-red-600 font-black" : "text-emerald-700 font-black"}>
                   {fmt(balanceDue)}
                 </strong>
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 pt-1">
-              <span>Type: <strong className="text-slate-700 uppercase">{invoiceType}</strong></span>
+            <div className="flex items-center justify-between text-[11px] font-bold text-muted-foreground pt-1">
+              <span>Type: <strong className="text-muted-foreground uppercase">{invoiceType}</strong></span>
             </div>
           </div>
         );
@@ -62,26 +62,26 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
 
         return (
           <div className="space-y-2.5">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-start justify-between border-b border-border pb-2">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">{supplierName}</p>
-                <p className="text-xs text-slate-500 font-semibold mt-0.5">PO #: {poNumber}</p>
+                <p className="font-extrabold text-foreground text-sm">{supplierName}</p>
+                <p className="text-xs text-muted-foreground font-semibold mt-0.5">PO #: {poNumber}</p>
               </div>
               <BusinessStatusBadge status={status} />
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-semibold text-center">
+            <div className="grid grid-cols-3 gap-2 text-[11px] bg-muted p-2.5 rounded-xl border border-border font-semibold text-center">
               <div>
-                <span className="text-[9px] uppercase font-bold text-slate-400 block">Ordered</span>
-                <strong className="text-slate-900 font-black">{fmt(totalAmount)}</strong>
+                <span className="text-[9px] uppercase font-bold text-muted-foreground block">Ordered</span>
+                <strong className="text-foreground font-black">{fmt(totalAmount)}</strong>
               </div>
               <div>
-                <span className="text-[9px] uppercase font-bold text-slate-400 block">Received</span>
+                <span className="text-[9px] uppercase font-bold text-muted-foreground block">Received</span>
                 <strong className="text-emerald-700 font-black">{fmt(receivedAmount)}</strong>
               </div>
               <div>
-                <span className="text-[9px] uppercase font-bold text-slate-400 block">Payable</span>
-                <strong className={balanceDue > 0 ? "text-red-600 font-black" : "text-slate-700 font-black"}>
+                <span className="text-[9px] uppercase font-bold text-muted-foreground block">Payable</span>
+                <strong className={balanceDue > 0 ? "text-red-600 font-black" : "text-muted-foreground font-black"}>
                   {fmt(balanceDue)}
                 </strong>
               </div>
@@ -99,22 +99,22 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
 
         return (
           <div className="space-y-2.5">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-start justify-between border-b border-border pb-2">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">{materialName}</p>
-                <p className="text-xs text-slate-500 font-semibold mt-0.5">SKU: {sku}</p>
+                <p className="font-extrabold text-foreground text-sm">{materialName}</p>
+                <p className="text-xs text-muted-foreground font-semibold mt-0.5">SKU: {sku}</p>
               </div>
               <BusinessStatusBadge status={stockStatus} />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-semibold">
+            <div className="grid grid-cols-2 gap-2 text-xs bg-muted p-2.5 rounded-xl border border-border font-semibold">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Current Stock</span>
-                <strong className="text-slate-900 font-black text-sm">{closingQuantity} {String(row.unit || "")}</strong>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Current Stock</span>
+                <strong className="text-foreground font-black text-sm">{closingQuantity} {String(row.unit || "")}</strong>
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Reorder Level</span>
-                <strong className="text-slate-700 font-bold">{reorderLevel} {String(row.unit || "")}</strong>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Reorder Level</span>
+                <strong className="text-muted-foreground font-bold">{reorderLevel} {String(row.unit || "")}</strong>
               </div>
             </div>
           </div>
@@ -129,10 +129,10 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
 
         return (
           <div className="space-y-2.5">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-start justify-between border-b border-border pb-2">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">{name}</p>
-                {row.contact && <p className="text-xs text-slate-500 font-semibold mt-0.5">{String(row.contact)}</p>}
+                <p className="font-extrabold text-foreground text-sm">{name}</p>
+                {row.contact && <p className="text-xs text-muted-foreground font-semibold mt-0.5">{String(row.contact)}</p>}
               </div>
               <span
                 className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase border ${
@@ -143,13 +143,13 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-semibold">
+            <div className="grid grid-cols-2 gap-2 text-xs bg-muted p-2.5 rounded-xl border border-border font-semibold">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Outstanding Dues</span>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Outstanding Dues</span>
                 <strong className="text-red-600 font-black text-sm">{fmt(outstanding)}</strong>
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Overdue Days</span>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Overdue Days</span>
                 <strong className={overdueDays > 0 ? "text-amber-700 font-black" : "text-emerald-700 font-bold"}>
                   {overdueDays > 0 ? `${overdueDays} Days` : "Current"}
                 </strong>
@@ -166,23 +166,23 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
 
         return (
           <div className="space-y-2.5">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-start justify-between border-b border-border pb-2">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">{name}</p>
-                {row.contact && <p className="text-xs text-slate-500 font-semibold mt-0.5">{String(row.contact)}</p>}
+                <p className="font-extrabold text-foreground text-sm">{name}</p>
+                {row.contact && <p className="text-xs text-muted-foreground font-semibold mt-0.5">{String(row.contact)}</p>}
               </div>
-              <span className="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-black uppercase text-slate-700 border border-slate-200">
+              <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-[10px] font-black uppercase text-muted-foreground border border-border">
                 Supplier Payable
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-semibold">
+            <div className="grid grid-cols-2 gap-2 text-xs bg-muted p-2.5 rounded-xl border border-border font-semibold">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Payable Balance</span>
-                <strong className="text-slate-900 font-black text-sm">{fmt(outstanding)}</strong>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Payable Balance</span>
+                <strong className="text-foreground font-black text-sm">{fmt(outstanding)}</strong>
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Ageing</span>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Ageing</span>
                 <strong className={overdueDays > 0 ? "text-amber-700 font-black" : "text-emerald-700 font-bold"}>
                   {overdueDays > 0 ? `${overdueDays} Days Overdue` : "Current"}
                 </strong>
@@ -200,22 +200,22 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
 
         return (
           <div className="space-y-2.5">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-start justify-between border-b border-border pb-2">
               <div>
-                <p className="font-extrabold text-slate-900 text-sm">{category}</p>
-                {row.expenseNumber && <p className="text-xs text-slate-500 font-semibold mt-0.5">Exp #: {String(row.expenseNumber)}</p>}
+                <p className="font-extrabold text-foreground text-sm">{category}</p>
+                {row.expenseNumber && <p className="text-xs text-muted-foreground font-semibold mt-0.5">Exp #: {String(row.expenseNumber)}</p>}
               </div>
               <BusinessStatusBadge status={paymentStatus} />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-semibold">
+            <div className="grid grid-cols-2 gap-2 text-xs bg-muted p-2.5 rounded-xl border border-border font-semibold">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Amount</span>
-                <strong className="text-slate-900 font-black text-sm">{fmt(totalAmount)}</strong>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Amount</span>
+                <strong className="text-foreground font-black text-sm">{fmt(totalAmount)}</strong>
               </div>
               <div className="text-right">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Payment Mode</span>
-                <strong className="text-slate-700 font-bold uppercase">{paymentMode}</strong>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block">Payment Mode</span>
+                <strong className="text-muted-foreground font-bold uppercase">{paymentMode}</strong>
               </div>
             </div>
           </div>
@@ -228,9 +228,9 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
         return (
           <div className="space-y-2">
             {keys.map((k) => (
-              <div key={k} className="flex justify-between items-center gap-3 py-1 border-b last:border-0 border-slate-100 font-semibold text-xs">
-                <span className="text-slate-400 uppercase text-[10px] font-black">{human(k)}</span>
-                <strong className="text-right text-slate-900 font-black">{String(row[k] ?? "—")}</strong>
+              <div key={k} className="flex justify-between items-center gap-3 py-1 border-b last:border-0 border-border font-semibold text-xs">
+                <span className="text-muted-foreground uppercase text-[10px] font-black">{human(k)}</span>
+                <strong className="text-right text-foreground font-black">{String(row[k] ?? "—")}</strong>
               </div>
             ))}
           </div>
@@ -240,12 +240,12 @@ export function ReportMobileCard({ type, row, source }: ReportMobileCardProps) {
   };
 
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs text-xs space-y-3">
+    <article className="rounded-2xl border border-border bg-card p-4 shadow-xs text-xs space-y-3">
       {renderCardContent()}
       {source && (
         <Link
           to={source}
-          className="mt-2 flex min-h-[42px] items-center justify-center rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 transition-colors"
+          className="mt-2 flex min-h-[42px] items-center justify-center rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted transition-colors"
         >
           View Source Records →
         </Link>

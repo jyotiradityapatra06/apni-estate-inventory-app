@@ -135,7 +135,7 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           <h2 className="text-lg font-black tracking-tight truncate text-white mt-0.5">
             {business?.name || "APNI ESTATE Material Store"}
           </h2>
-          <p className="text-xs font-semibold text-slate-400 mt-1">
+          <p className="text-xs font-semibold text-muted-foreground mt-1">
             Logged in as <span className="text-white font-bold">{user?.name || "Owner"}</span> ({user?.role})
           </p>
         </div>
@@ -152,10 +152,10 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
       {/* 2. Business Health Summary (Horizontal Carousel) */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">
+          <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
             Financial Health
           </h3>
-          <span className="text-xs font-bold text-slate-400">Swipe &rarr;</span>
+          <span className="text-xs font-bold text-muted-foreground">Swipe &rarr;</span>
         </div>
 
         <div
@@ -163,84 +163,84 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           style={{ scrollbarWidth: "none" }}
         >
           {/* Sales Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Total Sales</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Total Sales</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-[#F97316]">
                 <IndianRupee size={16} />
               </span>
             </div>
-            <strong className="text-2xl font-black text-slate-900 block leading-none">
+            <strong className="text-2xl font-black text-foreground block leading-none">
               {totalSales > 0 ? fmt(totalSales) : "₹0"}
             </strong>
-            <p className="text-xs text-slate-500 font-semibold truncate mt-1">
+            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">
               {totalSales > 0 ? `${invoices.length} Sales Invoices` : "No sales logged yet"}
             </p>
           </div>
 
           {/* Purchases Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Total Purchases</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Total Purchases</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                 <ShoppingBag size={16} />
               </span>
             </div>
-            <strong className="text-2xl font-black text-slate-900 block leading-none">
+            <strong className="text-2xl font-black text-foreground block leading-none">
               {totalPurchases > 0 ? fmt(totalPurchases) : "₹0"}
             </strong>
-            <p className="text-xs text-slate-500 font-semibold truncate mt-1">
+            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">
               {totalPurchases > 0 ? `${purchasesList.length} Orders` : "No purchases logged yet"}
             </p>
           </div>
 
           {/* Receivables Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Receivables</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Receivables</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
                 <Landmark size={16} />
               </span>
             </div>
-            <strong className={`text-2xl font-black block leading-none ${totalReceivables > 0 ? "text-orange-600" : "text-slate-900"}`}>
+            <strong className={`text-2xl font-black block leading-none ${totalReceivables > 0 ? "text-orange-600" : "text-foreground"}`}>
               {fmt(totalReceivables)}
             </strong>
-            <p className="text-xs text-slate-500 font-semibold truncate mt-1">Pending customer dues</p>
+            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">Pending customer dues</p>
           </div>
 
           {/* Payables Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Payables</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Payables</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600">
                 <Landmark size={16} />
               </span>
             </div>
-            <strong className={`text-2xl font-black block leading-none ${totalPayables > 0 ? "text-red-600" : "text-slate-900"}`}>
+            <strong className={`text-2xl font-black block leading-none ${totalPayables > 0 ? "text-red-600" : "text-foreground"}`}>
               {fmt(totalPayables)}
             </strong>
-            <p className="text-xs text-slate-500 font-semibold truncate mt-1">Due to suppliers</p>
+            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">Due to suppliers</p>
           </div>
 
           {/* Stock Value Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Stock Valuation</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Stock Valuation</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <Package size={16} />
               </span>
             </div>
-            <strong className="text-2xl font-black text-slate-900 block leading-none">
+            <strong className="text-2xl font-black text-foreground block leading-none">
               {fmt(totalStockValue)}
             </strong>
-            <p className="text-xs text-slate-500 font-semibold truncate mt-1">Physical store inventory</p>
+            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">Physical store inventory</p>
           </div>
         </div>
       </div>
 
       {/* 3. Supplier Quick Actions Grid */}
       <div className="space-y-2.5">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 px-1">
+        <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground px-1">
           Supplier Quick Actions
         </h3>
         <div className="grid grid-cols-2 gap-2.5">
@@ -253,8 +253,8 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
                 <ShoppingCart size={18} />
               </span>
               <div>
-                <span className="text-xs font-extrabold text-slate-900 block leading-tight">+ New Sale</span>
-                <span className="text-[10px] font-semibold text-slate-500 block">Create Invoice</span>
+                <span className="text-xs font-extrabold text-foreground block leading-tight">+ New Sale</span>
+                <span className="text-[10px] font-semibold text-muted-foreground block">Create Invoice</span>
               </div>
             </button>
           )}
@@ -262,14 +262,14 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           {canAddStock && (
             <button
               onClick={() => navigate("/materials/new")}
-              className="flex min-h-[48px] items-center gap-3 rounded-2xl border border-slate-200/80 bg-white p-3 text-left press-active cursor-pointer"
+              className="flex min-h-[48px] items-center gap-3 rounded-2xl border border-border/80 bg-card p-3 text-left press-active cursor-pointer"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-800">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-foreground">
                 <PackagePlus size={18} />
               </span>
               <div>
-                <span className="text-xs font-extrabold text-slate-900 block leading-tight">+ Add Material</span>
-                <span className="text-[10px] font-semibold text-slate-500 block">Add to Stock</span>
+                <span className="text-xs font-extrabold text-foreground block leading-tight">+ Add Material</span>
+                <span className="text-[10px] font-semibold text-muted-foreground block">Add to Stock</span>
               </div>
             </button>
           )}
@@ -277,14 +277,14 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           {canCreatePurchase && (
             <button
               onClick={() => navigate("/purchases/new")}
-              className="flex min-h-[48px] items-center gap-3 rounded-2xl border border-slate-200/80 bg-white p-3 text-left press-active cursor-pointer"
+              className="flex min-h-[48px] items-center gap-3 rounded-2xl border border-border/80 bg-card p-3 text-left press-active cursor-pointer"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-800">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted text-foreground">
                 <ShoppingBag size={18} />
               </span>
               <div>
-                <span className="text-xs font-extrabold text-slate-900 block leading-tight">+ Create Purchase</span>
-                <span className="text-[10px] font-semibold text-slate-500 block">Order Vendor PO</span>
+                <span className="text-xs font-extrabold text-foreground block leading-tight">+ Create Purchase</span>
+                <span className="text-[10px] font-semibold text-muted-foreground block">Order Vendor PO</span>
               </div>
             </button>
           )}
@@ -292,14 +292,14 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           {canReceivePayment && (
             <button
               onClick={() => navigate("/payments/new")}
-              className="flex min-h-[48px] items-center gap-3 rounded-2xl border border-slate-200/80 bg-white p-3 text-left press-active cursor-pointer"
+              className="flex min-h-[48px] items-center gap-3 rounded-2xl border border-border/80 bg-card p-3 text-left press-active cursor-pointer"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700 border border-green-100">
                 <DollarSign size={18} />
               </span>
               <div>
-                <span className="text-xs font-extrabold text-slate-900 block leading-tight">+ Receive Payment</span>
-                <span className="text-[10px] font-semibold text-slate-500 block">Log Cash / UPI</span>
+                <span className="text-xs font-extrabold text-foreground block leading-tight">+ Receive Payment</span>
+                <span className="text-[10px] font-semibold text-muted-foreground block">Log Cash / UPI</span>
               </div>
             </button>
           )}
@@ -319,11 +319,11 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
       <InventoryValueTrendChart materials={materials} movements={dashboard.movements.data || []} />
 
       {/* 5. Sales & Purchase Trends Chart */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+      <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-3">
+        <div className="flex items-center justify-between border-b border-border pb-2">
           <div className="flex items-center gap-2">
             <TrendingUp size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900">Sales & Purchase Trends</h3>
+            <h3 className="font-extrabold text-sm text-foreground">Sales & Purchase Trends</h3>
           </div>
         </div>
 
@@ -341,22 +341,22 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
                     <stop offset="95%" stopColor="#0F172A" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis dataKey="month" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                <XAxis dataKey="month" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
                 <Tooltip
                   contentStyle={{ backgroundColor: "#0F172A", color: "#FFF", borderRadius: "12px", fontSize: "11px", border: "none" }}
                   formatter={(val: any) => [fmt(Number(val)), ""]}
                 />
                 <Area type="monotone" dataKey="sales" name="Sales" stroke="#F97316" strokeWidth={2.5} fillOpacity={1} fill="url(#colorSales)" />
-                <Area type="monotone" dataKey="purchases" name="Purchases" stroke="#0F172A" strokeWidth={2} fillOpacity={1} fill="url(#colorPurchases)" />
+                <Area type="monotone" dataKey="purchases" name="Purchases" stroke="var(--chart-1)" strokeWidth={2} fillOpacity={1} fill="url(#colorPurchases)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         ) : (
           <div className="py-8 text-center space-y-2">
-            <p className="font-extrabold text-sm text-slate-900">No trend data yet</p>
-            <p className="text-xs text-slate-400 max-w-[240px] mx-auto">
+            <p className="font-extrabold text-sm text-foreground">No trend data yet</p>
+            <p className="text-xs text-muted-foreground max-w-[240px] mx-auto">
               Create your first sale or purchase order to generate live business analytics graphs.
             </p>
           </div>
@@ -364,11 +364,11 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
       </div>
 
       {/* 6. Outstanding Payments & Finance Widget */}
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-3">
+        <div className="flex items-center justify-between border-b border-border pb-3">
           <div className="flex items-center gap-2">
             <Landmark size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900">Cash Flow & Payments</h3>
+            <h3 className="font-extrabold text-sm text-foreground">Cash Flow & Payments</h3>
           </div>
           <Link to="/financials/receivables" className="text-xs font-bold text-[#F97316] hover:underline">
             Ledger
@@ -377,17 +377,17 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
 
         {totalSales === 0 && totalPurchases === 0 ? (
           <div className="py-6 text-center space-y-2">
-            <p className="font-extrabold text-sm text-slate-900">No outstanding payments</p>
-            <p className="text-xs text-slate-400">All customer & supplier balances are clean and up to date.</p>
+            <p className="font-extrabold text-sm text-foreground">No outstanding payments</p>
+            <p className="text-xs text-muted-foreground">All customer & supplier balances are clean and up to date.</p>
           </div>
         ) : (
           <div className="space-y-3 text-xs font-semibold">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-slate-500">Received Cash</span>
+                <span className="text-muted-foreground">Received Cash</span>
                 <span className="text-green-700 font-bold">{fmt(moneyReceived)}</span>
               </div>
-              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-green-600 rounded-full"
                   style={{ width: `${totalSales ? Math.min(100, (moneyReceived / totalSales) * 100) : 0}%` }}
@@ -397,10 +397,10 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
 
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-slate-500">Customer Dues (Receivables)</span>
+                <span className="text-muted-foreground">Customer Dues (Receivables)</span>
                 <span className="text-orange-600 font-bold">{fmt(totalReceivables)}</span>
               </div>
-              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#F97316] rounded-full"
                   style={{ width: `${totalSales ? Math.min(100, (totalReceivables / totalSales) * 100) : 0}%` }}
@@ -410,10 +410,10 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
 
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-slate-500">Supplier Dues (Payables)</span>
+                <span className="text-muted-foreground">Supplier Dues (Payables)</span>
                 <span className="text-red-600 font-bold">{fmt(totalPayables)}</span>
               </div>
-              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-red-600 rounded-full"
                   style={{ width: `${totalPurchases ? Math.min(100, (totalPayables / totalPurchases) * 100) : 0}%` }}

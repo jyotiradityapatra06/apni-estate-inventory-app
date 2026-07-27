@@ -40,16 +40,16 @@ export const MobileStickyFooter: React.FC<MobileStickyFooterProps> = ({
   const getSecondaryClass = (variant?: string) => {
     switch (variant) {
       case "ghost":
-        return "bg-transparent text-slate-600 hover:bg-slate-100 border-transparent";
+        return "bg-transparent text-muted-foreground hover:bg-muted border-transparent";
       default:
-        return "bg-white text-slate-700 border border-slate-200/90 hover:bg-slate-50";
+        return "bg-card text-muted-foreground border border-border/90 hover:bg-muted";
     }
   };
 
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200/80 p-3 pb-[max(16px,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(15,23,42,0.08)] transition-all",
+        "fixed bottom-0 left-0 right-0 z-40 md:hidden bg-card/95 backdrop-blur-md border-t border-border/80 p-3 pb-[max(16px,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(15,23,42,0.08)] transition-all",
         className
       )}
     >
@@ -65,7 +65,7 @@ export const MobileStickyFooter: React.FC<MobileStickyFooterProps> = ({
             )}
           >
             {secondaryAction.loading ? (
-              <Loader2 size={16} className="animate-spin text-slate-500" />
+              <Loader2 size={16} className="animate-spin text-muted-foreground" />
             ) : (
               secondaryAction.icon
             )}

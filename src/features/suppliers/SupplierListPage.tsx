@@ -81,12 +81,12 @@ export function SupplierListPage() {
   };
 
   const filtersPanel = (
-    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
       Supplier Status
       <select 
         value={draftActive} 
         onChange={e => setDraftActive(e.target.value)} 
-        className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+        className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
       >
         <option value="ALL">All Suppliers</option>
         <option value="ACTIVE">Active Suppliers</option>
@@ -119,21 +119,21 @@ export function SupplierListPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
         <div className="flex gap-2.5">
           <div className="relative min-w-0 flex-1">
-            <Search className="absolute left-3.5 top-3 text-slate-400" size={18}/>
+            <Search className="absolute left-3.5 top-3 text-muted-foreground" size={18}/>
             <input 
               aria-label="Search suppliers" 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
               placeholder="Search supplier name, phone number, GSTIN or code…" 
-              className="h-11 w-full rounded-xl border border-slate-200 pl-10 pr-4 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
+              className="h-11 w-full rounded-xl border border-border pl-10 pr-4 text-sm sm:text-base font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-muted-foreground"
             />
           </div>
           <button 
             onClick={() => { setDraftActive(active); setFilterOpen(true); }} 
-            className="flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer shrink-0"
+            className="flex min-h-[44px] items-center gap-2 rounded-xl border border-border px-4 text-xs font-bold text-muted-foreground hover:bg-muted md:hidden cursor-pointer shrink-0"
           >
             <Filter size={15}/>
             Filters
@@ -146,12 +146,12 @@ export function SupplierListPage() {
         </div>
 
         {/* Desktop Filter Bar */}
-        <div className="hidden md:flex md:items-center md:gap-3 border-t border-slate-100 pt-3">
+        <div className="hidden md:flex md:items-center md:gap-3 border-t border-border pt-3">
           {filtersPanel}
           {(search || active !== "ALL") && (
             <button 
               onClick={() => { setSearch(""); setActive("ALL"); setDraftActive("ALL"); }} 
-              className="font-bold text-xs text-slate-700 hover:bg-slate-50 px-4 h-10 border rounded-xl cursor-pointer mt-5"
+              className="font-bold text-xs text-muted-foreground hover:bg-muted px-4 h-10 border rounded-xl cursor-pointer mt-5"
             >
               Clear
             </button>
@@ -194,7 +194,7 @@ export function SupplierListPage() {
                   title={s.name}
                   subtitle={`${s.supplierCode || "VENDOR"} · ${s.phone}`}
                   badge={
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${s.isActive ? "bg-green-50 text-green-700 border border-green-100" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${s.isActive ? "bg-green-50 text-green-700 border border-green-100" : "bg-muted text-muted-foreground border border-border"}`}>
                       {s.isActive ? "Active" : "Inactive"}
                     </span>
                   }
@@ -202,7 +202,7 @@ export function SupplierListPage() {
                   primaryMetric={{
                     label: "Outstanding Payable",
                     value: (
-                      <span className={outstandingPayable > 0 ? "text-red-600 font-black" : "text-slate-900 font-black"}>
+                      <span className={outstandingPayable > 0 ? "text-red-600 font-black" : "text-foreground font-black"}>
                         {fmt(outstandingPayable)}
                       </span>
                     ),
@@ -220,7 +220,7 @@ export function SupplierListPage() {
                     <>
                       <button
                         onClick={() => nav(`/suppliers/${s.id}`)}
-                        className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                        className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                       >
                         View Supplier
                       </button>
@@ -232,7 +232,7 @@ export function SupplierListPage() {
                       </button>
                       <button
                         onClick={() => nav(`/financials/payables?supplierId=${s.id}`)}
-                        className="min-h-[44px] px-3.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                        className="min-h-[44px] px-3.5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                       >
                         Pay Vendor
                       </button>
@@ -244,12 +244,12 @@ export function SupplierListPage() {
           </div>
 
           {/* Desktop Table View (>=768px) */}
-          <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
+          <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600 border-b">
+              <thead className="bg-muted text-muted-foreground border-b">
                 <tr>
                   {["Supplier", "Phone", "GST Number", "Total Purchases", "Last Purchase", "Outstanding Payable", "Actions"].map(x => (
-                    <th key={x} className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-slate-500">{x}</th>
+                    <th key={x} className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">{x}</th>
                   ))}
                 </tr>
               </thead>
@@ -263,24 +263,24 @@ export function SupplierListPage() {
                   const outstandingPayable = supplierPurchases.reduce((sum, p) => sum + Number(p.balanceDue || 0), 0);
 
                   return (
-                    <tr key={s.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+                    <tr key={s.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
                       <td className="px-4 py-3.5">
-                        <Link to={`/suppliers/${s.id}`} className="font-bold text-slate-900 hover:text-orange-600 transition-colors block">
+                        <Link to={`/suppliers/${s.id}`} className="font-bold text-foreground hover:text-orange-600 transition-colors block">
                           {s.name}
                         </Link>
-                        <p className="text-xs text-slate-400 font-medium">{s.supplierCode}</p>
+                        <p className="text-xs text-muted-foreground font-medium">{s.supplierCode}</p>
                       </td>
                       <td className="px-4 py-3.5">
                         <a href={`tel:${s.phone}`} className="text-orange-600 font-semibold hover:underline">
                           {s.phone}
                         </a>
                       </td>
-                      <td className="px-4 py-3.5 text-slate-600 font-medium">{s.gstin || "—"}</td>
-                      <td className="px-4 py-3.5 text-slate-600 font-semibold">{totalPurchases} PO(s)</td>
-                      <td className="px-4 py-3.5 text-slate-500 font-medium">{lastPurchase}</td>
+                      <td className="px-4 py-3.5 text-muted-foreground font-medium">{s.gstin || "—"}</td>
+                      <td className="px-4 py-3.5 text-muted-foreground font-semibold">{totalPurchases} PO(s)</td>
+                      <td className="px-4 py-3.5 text-muted-foreground font-medium">{lastPurchase}</td>
                       <td className="px-4 py-3.5">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black ${
-                          outstandingPayable > 0 ? "bg-red-50 text-red-700 border border-red-200" : "text-slate-900"
+                          outstandingPayable > 0 ? "bg-red-50 text-red-700 border border-red-200" : "text-foreground"
                         }`}>
                           {fmt(outstandingPayable)}
                         </span>
@@ -293,7 +293,7 @@ export function SupplierListPage() {
                           <button 
                             aria-label={`Actions for ${s.name}`} 
                             onClick={() => setMenu(menu === s.id ? "" : s.id)} 
-                            className="h-8 w-8 rounded-lg hover:bg-slate-100 flex items-center justify-center cursor-pointer"
+                            className="h-8 w-8 rounded-lg hover:bg-muted flex items-center justify-center cursor-pointer"
                           >
                             <MoreVertical size={16}/>
                           </button>
@@ -357,11 +357,11 @@ function Actions({ view, po, pay, edit, del, inline = false, onClose }: { view: 
   };
 
   return (
-    <div className={inline ? "grid grid-cols-3 gap-2" : "absolute right-4 top-12 z-20 w-44 rounded-xl border bg-white p-1.5 shadow-lg border-slate-200 text-left space-y-0.5"}>
-      <button onClick={() => trigger(view)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 w-full cursor-pointer">View Details</button>
+    <div className={inline ? "grid grid-cols-3 gap-2" : "absolute right-4 top-12 z-20 w-44 rounded-xl border bg-card p-1.5 shadow-lg border-border text-left space-y-0.5"}>
+      <button onClick={() => trigger(view)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground w-full cursor-pointer">View Details</button>
       {po && <button onClick={() => trigger(po)} className="min-h-9 rounded-lg px-3 text-left text-xs font-bold text-orange-600 hover:bg-orange-50 w-full cursor-pointer">+ New Purchase Order</button>}
-      {pay && <button onClick={() => trigger(pay)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 w-full cursor-pointer">Make Payment</button>}
-      {edit && <button onClick={() => trigger(edit)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 w-full cursor-pointer">Edit Supplier</button>}
+      {pay && <button onClick={() => trigger(pay)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground w-full cursor-pointer">Make Payment</button>}
+      {edit && <button onClick={() => trigger(edit)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground w-full cursor-pointer">Edit Supplier</button>}
       {del && <button onClick={() => trigger(del)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-red-600 hover:bg-red-50 w-full cursor-pointer">Deactivate</button>}
     </div>
   );

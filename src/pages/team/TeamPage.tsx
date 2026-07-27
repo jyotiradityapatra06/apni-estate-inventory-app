@@ -269,7 +269,7 @@ export const TeamPage = () => {
   return (
     <div className="flex flex-col gap-6 pb-6 select-none max-w-6xl mx-auto">
       {/* Top Header Card */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card p-6 rounded-2xl border border-border shadow-sm">
         <div>
           <h1 style={{ color: C.ink }} className="text-xl font-bold flex items-center gap-2">
             <Users color={C.blue} size={24} />
@@ -304,7 +304,7 @@ export const TeamPage = () => {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Seat Limit Card */}
-        <Card className="p-4 flex flex-col justify-between shadow-sm bg-white border border-slate-200">
+        <Card className="p-4 flex flex-col justify-between shadow-sm bg-card border border-border">
           <div>
             <span style={{ color: C.muted }} className="block text-[10px] uppercase font-bold tracking-wider mb-1">Worker Seat Limit</span>
             {showSeatEdit ? (
@@ -328,7 +328,7 @@ export const TeamPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowSeatEdit(false)}
-                  className="px-2.5 py-1 border border-slate-200 text-slate-700 text-[10px] rounded cursor-pointer bg-white"
+                  className="px-2.5 py-1 border border-border text-muted-foreground text-[10px] rounded cursor-pointer bg-card"
                 >
                   X
                 </button>
@@ -383,12 +383,12 @@ export const TeamPage = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ color: C.ink }}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-slate-300 focus:bg-white transition-all"
+            className="w-full bg-muted border border-border rounded-xl pl-9 pr-4 py-2.5 text-xs outline-none focus:border-border focus:bg-card transition-all"
           />
           {search && (
             <button 
               onClick={() => setSearch("")} 
-              className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-3.5 text-muted-foreground hover:text-muted-foreground"
             >
               <X size={14} />
             </button>
@@ -402,13 +402,13 @@ export const TeamPage = () => {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 rounded-xl pl-3 pr-8 py-2.5 text-xs outline-none cursor-pointer focus:bg-white focus:border-slate-300 transition-all font-semibold"
+              className="appearance-none bg-muted border border-border text-muted-foreground rounded-xl pl-3 pr-8 py-2.5 text-xs outline-none cursor-pointer focus:bg-card focus:border-border transition-all font-semibold"
             >
               <option value="">All Roles</option>
               <option value="MANAGER">Manager</option>
               <option value="STAFF">Staff</option>
             </select>
-            <Filter size={12} className="absolute right-3 top-4 text-slate-400 pointer-events-none" />
+            <Filter size={12} className="absolute right-3 top-4 text-muted-foreground pointer-events-none" />
           </div>
 
           {/* Status Filter */}
@@ -416,13 +416,13 @@ export const TeamPage = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 text-slate-700 rounded-xl pl-3 pr-8 py-2.5 text-xs outline-none cursor-pointer focus:bg-white focus:border-slate-300 transition-all font-semibold"
+              className="appearance-none bg-muted border border-border text-muted-foreground rounded-xl pl-3 pr-8 py-2.5 text-xs outline-none cursor-pointer focus:bg-card focus:border-border transition-all font-semibold"
             >
               <option value="">All Statuses</option>
               <option value="active">Active Only</option>
               <option value="inactive">Inactive Only</option>
             </select>
-            <Filter size={12} className="absolute right-3 top-4 text-slate-400 pointer-events-none" />
+            <Filter size={12} className="absolute right-3 top-4 text-muted-foreground pointer-events-none" />
           </div>
         </div>
       </Card>
@@ -430,12 +430,12 @@ export const TeamPage = () => {
       {/* Directory Table / Card view */}
       {loading ? (
         <Card className="p-12 flex flex-col items-center justify-center gap-3">
-          <div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin" />
+          <div className="w-8 h-8 rounded-full border-4 border-border border-t-blue-600 animate-spin" />
           <span style={{ color: C.muted }} className="text-xs">Loading workers list...</span>
         </Card>
       ) : workers.length === 0 ? (
         <Card className="p-12 flex flex-col items-center justify-center text-center gap-3 border-dashed">
-          <div className="p-3 bg-slate-100 rounded-full text-slate-400">
+          <div className="p-3 bg-muted rounded-full text-muted-foreground">
             <Users size={32} />
           </div>
           <div>
@@ -463,10 +463,10 @@ export const TeamPage = () => {
       ) : (
         <>
           {/* Desktop Table View */}
-          <Card className="hidden md:block overflow-hidden border border-slate-200 shadow-sm">
+          <Card className="hidden md:block overflow-hidden border border-border shadow-sm">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                <tr className="bg-muted border-b border-border text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
                   <th className="px-6 py-4">Worker Profile</th>
                   <th className="px-6 py-4">Role</th>
                   <th className="px-6 py-4">Contact Detail</th>
@@ -476,13 +476,13 @@ export const TeamPage = () => {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
+              <tbody className="divide-y divide-slate-100 bg-card">
                 {workers.map((w) => (
-                  <tr key={w.id} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={w.id} className="hover:bg-muted/50 transition-colors">
                     {/* Worker Profile */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-600 font-bold text-sm flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-full bg-muted text-muted-foreground font-bold text-sm flex items-center justify-center">
                           {w.name[0].toUpperCase()}
                         </div>
                         <div>
@@ -516,12 +516,12 @@ export const TeamPage = () => {
                     </td>
 
                     {/* Joined Date */}
-                    <td className="px-6 py-4 text-xs text-slate-500">
+                    <td className="px-6 py-4 text-xs text-muted-foreground">
                       {formatDate(w.joiningDate)}
                     </td>
 
                     {/* Last Login */}
-                    <td className="px-6 py-4 text-xs text-slate-500">
+                    <td className="px-6 py-4 text-xs text-muted-foreground">
                       {formatDateTime(w.lastLogin)}
                     </td>
 
@@ -533,7 +533,7 @@ export const TeamPage = () => {
                           onClick={() => handleStatusToggle(w)}
                           disabled={statusToggleLoading[w.id]}
                           title={w.isActive ? "Deactivate User" : "Activate User"}
-                          className={`p-1.5 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer ${
+                          className={`p-1.5 rounded-lg hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer ${
                             w.isActive ? "text-amber-600" : "text-emerald-600"
                           }`}
                         >
@@ -547,7 +547,7 @@ export const TeamPage = () => {
                             setShowResetModal(true);
                           }}
                           title="Reset Password"
-                          className="p-1.5 rounded-lg hover:bg-slate-100 text-blue-600 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:bg-muted text-blue-600 transition-colors cursor-pointer"
                         >
                           <Key size={14} />
                         </button>
@@ -556,7 +556,7 @@ export const TeamPage = () => {
                         <button
                           onClick={() => openAddEditModal(w)}
                           title="Edit Details"
-                          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
                         >
                           <Edit2 size={14} />
                         </button>
@@ -568,7 +568,7 @@ export const TeamPage = () => {
                             setShowDeleteModal(true);
                           }}
                           title="Delete Account"
-                          className="p-1.5 rounded-lg hover:bg-slate-100 text-red-600 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:bg-muted text-red-600 transition-colors cursor-pointer"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -583,10 +583,10 @@ export const TeamPage = () => {
           {/* Mobile Card View */}
           <div className="md:hidden flex flex-col gap-3">
             {workers.map((w) => (
-              <Card key={w.id} className="p-4 flex flex-col gap-3 border border-slate-100">
+              <Card key={w.id} className="p-4 flex flex-col gap-3 border border-border">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-600 font-bold text-sm flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-full bg-muted text-muted-foreground font-bold text-sm flex items-center justify-center">
                       {w.name[0].toUpperCase()}
                     </div>
                     <div>
@@ -610,23 +610,23 @@ export const TeamPage = () => {
 
                 <div className="grid grid-cols-2 gap-y-2 text-[10px]">
                   <div>
-                    <span className="text-slate-400 block uppercase">Phone Number</span>
+                    <span className="text-muted-foreground block uppercase">Phone Number</span>
                     <span style={{ color: C.ink }} className="font-semibold flex items-center gap-1 mt-0.5">
-                      <Phone size={10} className="text-slate-400" />
+                      <Phone size={10} className="text-muted-foreground" />
                       {w.phone || "N/A"}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block uppercase">Joined Date</span>
+                    <span className="text-muted-foreground block uppercase">Joined Date</span>
                     <span style={{ color: C.ink }} className="font-semibold flex items-center gap-1 mt-0.5">
-                      <Calendar size={10} className="text-slate-400" />
+                      <Calendar size={10} className="text-muted-foreground" />
                       {formatDate(w.joiningDate)}
                     </span>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-slate-400 block uppercase">Last Activity</span>
+                    <span className="text-muted-foreground block uppercase">Last Activity</span>
                     <span style={{ color: C.ink }} className="font-semibold flex items-center gap-1 mt-0.5">
-                      <Clock size={10} className="text-slate-400" />
+                      <Clock size={10} className="text-muted-foreground" />
                       {formatDateTime(w.lastLogin)}
                     </span>
                   </div>
@@ -634,7 +634,7 @@ export const TeamPage = () => {
 
                 <Divider />
 
-                <div className="flex justify-end gap-2 bg-slate-50 -mx-4 -mb-4 p-2 rounded-b-xl border-t border-slate-100">
+                <div className="flex justify-end gap-2 bg-muted -mx-4 -mb-4 p-2 rounded-b-xl border-t border-border">
                   {/* Status Toggle */}
                   <button
                     onClick={() => handleStatusToggle(w)}
@@ -664,18 +664,18 @@ export const TeamPage = () => {
                       setSelectedWorker(w);
                       setShowResetModal(true);
                     }}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-[10px] font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border text-[10px] font-semibold text-muted-foreground bg-card hover:bg-muted transition-all cursor-pointer"
                   >
-                    <Key size={11} className="text-slate-400" />
+                    <Key size={11} className="text-muted-foreground" />
                     Reset Pin
                   </button>
 
                   {/* Edit */}
                   <button
                     onClick={() => openAddEditModal(w)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-[10px] font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border text-[10px] font-semibold text-muted-foreground bg-card hover:bg-muted transition-all cursor-pointer"
                   >
-                    <Edit2 size={11} className="text-slate-400" />
+                    <Edit2 size={11} className="text-muted-foreground" />
                     Edit
                   </button>
 
@@ -700,15 +700,15 @@ export const TeamPage = () => {
       {/* Add / Edit Modal Overlay */}
       {showAddEditModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-card rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-border flex flex-col max-h-[90vh]">
+            <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <h3 style={{ color: C.ink }} className="text-sm font-bold flex items-center gap-2">
                 <Users color={C.blue} size={18} />
                 {selectedWorker ? "Edit Team Member" : "Add Team Member"}
               </h3>
               <button 
                 onClick={() => setShowAddEditModal(false)}
-                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-muted-foreground"
               >
                 <X size={16} />
               </button>
@@ -717,7 +717,7 @@ export const TeamPage = () => {
             <form onSubmit={handleFormSubmit} className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
               {/* Full Name */}
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase font-bold text-slate-400">Full Name *</label>
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">Full Name *</label>
                 <input
                   type="text"
                   required
@@ -725,13 +725,13 @@ export const TeamPage = () => {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   style={{ color: C.ink }}
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-white focus:border-slate-300 transition-all"
+                  className="bg-muted border border-border rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-card focus:border-border transition-all"
                 />
               </div>
 
               {/* Contact Phone */}
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase font-bold text-slate-400">Phone Number *</label>
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">Phone Number *</label>
                 <input
                   type="tel"
                   required
@@ -739,13 +739,13 @@ export const TeamPage = () => {
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   style={{ color: C.ink }}
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-white focus:border-slate-300 transition-all"
+                  className="bg-muted border border-border rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-card focus:border-border transition-all"
                 />
               </div>
 
               {/* Email Address */}
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase font-bold text-slate-400">Email Address *</label>
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">Email Address *</label>
                 <input
                   type="email"
                   required
@@ -753,30 +753,30 @@ export const TeamPage = () => {
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   style={{ color: C.ink }}
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-white focus:border-slate-300 transition-all"
+                  className="bg-muted border border-border rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-card focus:border-border transition-all"
                 />
               </div>
 
               {/* Role Dropdown */}
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase font-bold text-slate-400">System Role *</label>
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">System Role *</label>
                 <div className="relative">
                   <select
                     value={formRole}
                     onChange={(e) => setFormRole(e.target.value as any)}
-                    className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 rounded-xl px-3.5 py-2.5 text-xs outline-none cursor-pointer focus:bg-white focus:border-slate-300 transition-all font-semibold"
+                    className="w-full appearance-none bg-muted border border-border text-muted-foreground rounded-xl px-3.5 py-2.5 text-xs outline-none cursor-pointer focus:bg-card focus:border-border transition-all font-semibold"
                   >
                     <option value="MANAGER">Manager</option>
                     <option value="STAFF">Staff</option>
                   </select>
-                  <Filter size={12} className="absolute right-3 top-3 text-slate-400 pointer-events-none" />
+                  <Filter size={12} className="absolute right-3 top-3 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
 
               {/* Password - Add only */}
               {!selectedWorker && (
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] uppercase font-bold text-slate-400">Temporary Password *</label>
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">Temporary Password *</label>
                   <input
                     type="password"
                     required
@@ -784,13 +784,13 @@ export const TeamPage = () => {
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
                     style={{ color: C.ink }}
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-white focus:border-slate-300 transition-all"
+                    className="bg-muted border border-border rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-card focus:border-border transition-all"
                   />
                 </div>
               )}
 
               {/* Active Toggle */}
-              <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div className="flex items-center justify-between bg-muted p-3 rounded-xl border border-border">
                 <div>
                   <span style={{ color: C.ink }} className="text-xs font-bold block">Account Status</span>
                   <span style={{ color: C.muted }} className="text-[10px]">Inactive accounts cannot log in or consume worker seats.</span>
@@ -804,7 +804,7 @@ export const TeamPage = () => {
                   <span
                     className={`${
                       formIsActive ? "translate-x-5" : "translate-x-0"
-                    } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                    } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-card shadow ring-0 transition duration-200 ease-in-out`}
                   />
                 </button>
               </div>
@@ -813,7 +813,7 @@ export const TeamPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddEditModal(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 border border-border text-muted-foreground text-xs font-semibold rounded-xl hover:bg-muted cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -823,7 +823,7 @@ export const TeamPage = () => {
                   style={{ background: C.blue }}
                   className="px-4 py-2 text-white text-xs font-semibold rounded-xl hover:bg-opacity-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  {formLoading && <div className="w-3 h-3 rounded-full border-2 border-slate-200 border-t-transparent animate-spin" />}
+                  {formLoading && <div className="w-3 h-3 rounded-full border-2 border-border border-t-transparent animate-spin" />}
                   Save Member
                 </button>
               </div>
@@ -835,15 +835,15 @@ export const TeamPage = () => {
       {/* Password Reset Modal Overlay */}
       {showResetModal && selectedWorker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden border border-slate-200">
-            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-card rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden border border-border">
+            <div className="px-5 py-4 border-b border-border flex items-center justify-between">
               <h3 style={{ color: C.ink }} className="text-sm font-bold flex items-center gap-2">
                 <Key color={C.blue} size={16} />
                 Reset Worker Password
               </h3>
               <button 
                 onClick={() => setShowResetModal(false)}
-                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-muted-foreground"
               >
                 <X size={16} />
               </button>
@@ -855,7 +855,7 @@ export const TeamPage = () => {
               </p>
               
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase font-bold text-slate-400">New Password *</label>
+                <label className="text-[10px] uppercase font-bold text-muted-foreground">New Password *</label>
                 <input
                   type="password"
                   required
@@ -863,7 +863,7 @@ export const TeamPage = () => {
                   value={resetPassword}
                   onChange={(e) => setResetPassword(e.target.value)}
                   style={{ color: C.ink }}
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-white focus:border-slate-300 transition-all"
+                  className="bg-muted border border-border rounded-xl px-3.5 py-2.5 text-xs outline-none focus:bg-card focus:border-border transition-all"
                 />
               </div>
 
@@ -871,7 +871,7 @@ export const TeamPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowResetModal(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 border border-border text-muted-foreground text-xs font-semibold rounded-xl hover:bg-muted cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -881,7 +881,7 @@ export const TeamPage = () => {
                   style={{ background: C.blue }}
                   className="px-4 py-2 text-white text-xs font-semibold rounded-xl hover:bg-opacity-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  {resetLoading && <div className="w-3 h-3 rounded-full border-2 border-slate-200 border-t-transparent animate-spin" />}
+                  {resetLoading && <div className="w-3 h-3 rounded-full border-2 border-border border-t-transparent animate-spin" />}
                   Reset Password
                 </button>
               </div>
@@ -893,7 +893,7 @@ export const TeamPage = () => {
       {/* Delete Confirmation Modal Overlay */}
       {showDeleteModal && selectedWorker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden border border-slate-200">
+          <div className="bg-card rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden border border-border">
             <div className="p-5 flex flex-col gap-4 text-center">
               <div className="mx-auto p-3 bg-red-50 text-red-600 rounded-full w-12 h-12 flex items-center justify-center">
                 <Trash2 size={24} />
@@ -909,7 +909,7 @@ export const TeamPage = () => {
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 py-2 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 cursor-pointer"
+                  className="flex-1 py-2 border border-border text-muted-foreground text-xs font-semibold rounded-xl hover:bg-muted cursor-pointer"
                 >
                   Cancel
                 </button>

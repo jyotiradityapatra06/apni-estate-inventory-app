@@ -14,7 +14,7 @@ import { calculateLine, calculateOrder } from "./salesOrderCalculations";
 
 type Line = { inventoryItemId: string; godownId: string; quantity: string; rate: string; discountRate: string; gstRate: string };
 const blank = (): Line => ({ inventoryItemId: "", godownId: "", quantity: "", rate: "", discountRate: "0", gstRate: "0" });
-const cls = "mt-2 min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none";
+const cls = "mt-2 min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none";
 
 export function SalesOrderFormPage() {
   const nav = useNavigate();
@@ -201,10 +201,10 @@ export function SalesOrderFormPage() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-4">
         <SectionHeader title="Customer & Billing Type" description="Select customer account and choose GST or Non-GST billing." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Select Customer *
             <select required value={customerId} onChange={e => setCustomerId(e.target.value)} className={cls}>
               <option value="">Choose customer account…</option>
@@ -213,7 +213,7 @@ export function SalesOrderFormPage() {
               ))}
             </select>
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Billing / Tax Mode *
             <select value={taxMode} onChange={e => setTaxMode(e.target.value as "GST" | "NON_GST")} className={cls}>
               <option value="GST">GST Sales Order (Tax Invoice)</option>
@@ -225,33 +225,33 @@ export function SalesOrderFormPage() {
         {/* Selected Customer Card Preview */}
         {customer && (
           <div className="space-y-3">
-            <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-4 space-y-2 text-xs">
+            <div className="rounded-xl bg-muted border border-border/80 p-4 space-y-2 text-xs">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-black text-sm text-slate-900">{customer.name}</span>
+                <span className="font-black text-sm text-foreground">{customer.name}</span>
                 {customer.gstin && (
                   <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-extrabold text-[10px] uppercase border border-blue-100">
                     GSTIN: {customer.gstin}
                   </span>
                 )}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-slate-600 pt-1">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-muted-foreground pt-1">
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Phone</span>
-                  <strong className="text-slate-900 font-bold block">{customer.phone}</strong>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground block">Phone</span>
+                  <strong className="text-foreground font-bold block">{customer.phone}</strong>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Outstanding Dues</span>
-                  <strong className={`font-black block ${customer.outstandingBalance > 0 ? "text-red-600" : "text-slate-900"}`}>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground block">Outstanding Dues</span>
+                  <strong className={`font-black block ${customer.outstandingBalance > 0 ? "text-red-600" : "text-foreground"}`}>
                     {fmt(customer.outstandingBalance)}
                   </strong>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Credit Limit</span>
-                  <strong className="text-slate-900 font-bold block">{customer.creditLimit > 0 ? fmt(customer.creditLimit) : "Unlimited"}</strong>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground block">Credit Limit</span>
+                  <strong className="text-foreground font-bold block">{customer.creditLimit > 0 ? fmt(customer.creditLimit) : "Unlimited"}</strong>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Available Credit</span>
-                  <strong className="text-slate-900 font-bold block">{customer.creditLimit > 0 ? fmt(Math.max(0, customer.creditLimit - customer.outstandingBalance)) : "Unlimited"}</strong>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground block">Available Credit</span>
+                  <strong className="text-foreground font-bold block">{customer.creditLimit > 0 ? fmt(Math.max(0, customer.creditLimit - customer.outstandingBalance)) : "Unlimited"}</strong>
                 </div>
               </div>
             </div>
@@ -287,9 +287,9 @@ export function SalesOrderFormPage() {
                 <div className="space-y-1.5 text-amber-950 flex-1">
                   <p className="font-black text-sm text-amber-900">Credit Limit Warning for {customer.name}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-1 font-bold text-[11px] bg-amber-100/60 p-2.5 rounded-lg border border-amber-200">
-                    <div>Outstanding: <span className="block text-slate-900">{fmt(currentOutstanding)}</span></div>
-                    <div>New Order: <span className="block text-slate-900">{fmt(newOrderAmount)}</span></div>
-                    <div>Credit Limit: <span className="block text-slate-900">{fmt(creditLimit)}</span></div>
+                    <div>Outstanding: <span className="block text-foreground">{fmt(currentOutstanding)}</span></div>
+                    <div>New Order: <span className="block text-foreground">{fmt(newOrderAmount)}</span></div>
+                    <div>Credit Limit: <span className="block text-foreground">{fmt(creditLimit)}</span></div>
                     <div>Total Exposure: <span className="block text-red-700">{fmt(totalExposure)}</span></div>
                   </div>
                   <p className="font-extrabold text-amber-900">Creating this order will exceed approved credit limit by {fmt(totalExposure - creditLimit)}. Manager approval required.</p>
@@ -322,8 +322,8 @@ export function SalesOrderFormPage() {
           const isOverStock = line.godownId && Number(line.quantity) > a.value;
 
           return (
-            <article key={i} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <article key={i} className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-border pb-2.5">
                 <span className="text-xs font-black uppercase tracking-wider text-orange-600">Material Item #{i + 1}</span>
                 {items.length > 1 && (
                   <button type="button" aria-label={`Remove item ${i + 1}`} onClick={() => setItems(x => x.filter((_, n) => n !== i))} className="text-red-600 hover:bg-red-50 p-1.5 rounded-lg cursor-pointer">
@@ -333,7 +333,7 @@ export function SalesOrderFormPage() {
               </div>
 
               <div className="grid gap-3 md:grid-cols-6">
-                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block md:col-span-2">
                   Material Item *
                   <select required value={line.inventoryItemId} onChange={e => {
                     const m = materials.find(x => x.id === e.target.value);
@@ -352,7 +352,7 @@ export function SalesOrderFormPage() {
                     ))}
                   </select>
                 </label>
-                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block md:col-span-2">
                   Supplying Godown *
                   <select required disabled={!a.material} value={line.godownId} onChange={e => change(i, "godownId", e.target.value)} className={cls}>
                     <option value="">Choose Godown warehouse…</option>
@@ -361,21 +361,21 @@ export function SalesOrderFormPage() {
                     ))}
                   </select>
                 </label>
-                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
                   Quantity ({a.material ? a.material.unit : "Qty"}) *
                   <input required type="number" inputMode="decimal" min="0.001" step="0.001" placeholder="0.00" value={line.quantity} onChange={e => change(i, "quantity", e.target.value)} className={cls} />
                 </label>
-                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
                   Unit Rate (₹) *
                   <input required type="number" inputMode="decimal" min="0" step="0.01" placeholder="0.00" value={line.rate} onChange={e => change(i, "rate", e.target.value)} className={cls} />
                 </label>
-                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block md:col-span-2">
                   Discount %
                   <input type="number" inputMode="decimal" min="0" max="100" step="0.01" value={line.discountRate} onChange={e => change(i, "discountRate", e.target.value)} className={cls} />
                 </label>
 
                 {a.balance && (
-                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 p-3 text-xs md:col-span-4 border border-slate-100 text-center">
+                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-muted p-3 text-xs md:col-span-4 border border-border text-center">
                     <Mini label="Physical Stock" value={`${a.balance.quantity} ${a.material?.unit}`} />
                     <Mini label="Reserved Stock" value={`${a.balance.reservedQuantity || 0} ${a.material?.unit}`} />
                     <Mini label="Net Available" value={`${a.value} ${a.material?.unit}`} isGreen />
@@ -403,26 +403,26 @@ export function SalesOrderFormPage() {
         </button>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+      <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
         <SectionHeader title="Delivery Information and Notes" />
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
             Expected delivery
             <input type="date" value={details.expectedDeliveryDate} onChange={e => setDetails({ ...details, expectedDeliveryDate: e.target.value })} className={cls} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
             Place of supply code
             <input maxLength={2} inputMode="numeric" value={details.placeOfSupplyCode} onChange={e => setDetails({ ...details, placeOfSupplyCode: e.target.value })} className={cls} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
             Billing address
             <textarea value={details.billingAddress} onChange={e => setDetails({ ...details, billingAddress: e.target.value })} className={`${cls} min-h-24 p-3`} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
             Delivery address
             <textarea value={details.deliveryAddress} onChange={e => setDetails({ ...details, deliveryAddress: e.target.value })} className={`${cls} min-h-24 p-3`} />
           </label>
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block md:col-span-2">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block md:col-span-2">
             Notes
             <textarea value={details.notes} onChange={e => setDetails({ ...details, notes: e.target.value })} className={`${cls} min-h-20 p-3`} />
           </label>
@@ -436,7 +436,7 @@ export function SalesOrderFormPage() {
         <div className="mt-3 border-t border-slate-800 pt-3">
           <Row label="Order Total" value={fmt(summary.total)} large />
         </div>
-        <p className="mt-3 text-[10px] text-slate-400 font-medium">
+        <p className="mt-3 text-[10px] text-muted-foreground font-medium">
           {items.length} line{items.length === 1 ? "" : "s"}. Backend totals remain authoritative. Stock is reserved only after confirmation.
         </p>
       </section>
@@ -446,7 +446,7 @@ export function SalesOrderFormPage() {
         <button 
           disabled={saving} 
           onClick={() => save(false)} 
-          className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+          className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
         >
           {saving && !confirming ? "Saving..." : "Save Draft"}
         </button>
@@ -468,7 +468,7 @@ export function SalesOrderFormPage() {
         <button 
           disabled={saving} 
           onClick={() => save(false)} 
-          className="min-h-11 rounded-xl border border-slate-200 px-5 text-sm font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+          className="min-h-11 rounded-xl border border-border px-5 text-sm font-bold text-muted-foreground hover:bg-muted cursor-pointer"
         >
           {saving && !confirming ? "Saving..." : "Save Draft"}
         </button>
@@ -487,7 +487,7 @@ export function SalesOrderFormPage() {
 
       {review && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/45 sm:items-center sm:p-4">
-          <div className="w-full rounded-t-2xl bg-white p-5 sm:max-w-md sm:rounded-2xl">
+          <div className="w-full rounded-t-2xl bg-card p-5 sm:max-w-md sm:rounded-2xl">
             <h2 className="text-xl font-bold">Confirm Sales Order?</h2>
             <div className="mt-5 space-y-3">
               <Mini label="Customer" value={customer?.name || ""} />
@@ -498,7 +498,7 @@ export function SalesOrderFormPage() {
               Confirming this order will reserve the required stock. Physical stock will not be deducted.
             </p>
             <div className="mt-5 flex gap-2">
-              <button onClick={() => setReview(false)} className="min-h-11 flex-1 rounded-xl border font-bold text-slate-700">Back</button>
+              <button onClick={() => setReview(false)} className="min-h-11 flex-1 rounded-xl border font-bold text-muted-foreground">Back</button>
               <button disabled={saving} onClick={() => save(true)} className="min-h-11 flex-[2] rounded-xl bg-orange-600 font-bold text-white">
                 {saving ? "Confirming..." : "Confirm Order"}
               </button>
@@ -513,8 +513,8 @@ export function SalesOrderFormPage() {
 function Mini({ label, value, isGreen = false, isOrange = false }: { label: string; value: string; isGreen?: boolean; isOrange?: boolean }) {
   return (
     <div>
-      <span className="text-slate-400 text-[10px] uppercase font-black block">{label}</span>
-      <b className={`text-xs sm:text-sm font-black mt-0.5 block ${isGreen ? "text-green-700" : isOrange ? "text-orange-600" : "text-slate-900"}`}>{value}</b>
+      <span className="text-muted-foreground text-[10px] uppercase font-black block">{label}</span>
+      <b className={`text-xs sm:text-sm font-black mt-0.5 block ${isGreen ? "text-green-700" : isOrange ? "text-orange-600" : "text-foreground"}`}>{value}</b>
     </div>
   );
 }

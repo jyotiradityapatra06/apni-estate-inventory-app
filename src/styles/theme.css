@@ -285,7 +285,31 @@
     line-height: 1.5;
   }
 
-  input, select, textarea { min-height: 48px; }
+  input, select, textarea {
+    min-height: 48px;
+    background-color: var(--input-background);
+    color: var(--foreground);
+    border-color: var(--border);
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: var(--muted-foreground);
+    opacity: 1;
+  }
+
+  select option {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+  }
+
+  table {
+    color: var(--foreground);
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--foreground);
+  }
   button, a { touch-action: manipulation; }
 }
 

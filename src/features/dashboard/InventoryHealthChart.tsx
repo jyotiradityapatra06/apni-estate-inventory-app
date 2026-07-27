@@ -36,11 +36,11 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
 
   if (total === 0 || chartData.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+      <div className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card dark:bg-slate-900 p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-border dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <Boxes size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Inventory Health Breakdown</h3>
+            <h3 className="font-extrabold text-sm text-foreground dark:text-white">Inventory Health Breakdown</h3>
           </div>
         </div>
 
@@ -49,8 +49,8 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
             <Boxes size={24} />
           </div>
           <div>
-            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">No inventory data yet</h4>
-            <p className="text-xs text-slate-400 dark:text-slate-400 mt-1 max-w-[260px] mx-auto">
+            <h4 className="font-extrabold text-sm text-foreground dark:text-white">No inventory data yet</h4>
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1 max-w-[260px] mx-auto">
               Add your first material to see stock health analytics.
             </p>
           </div>
@@ -69,11 +69,11 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+    <div className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="flex items-center justify-between border-b border-border dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <Boxes size={18} className="text-[#F97316]" />
-          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Inventory Health Breakdown</h3>
+          <h3 className="font-extrabold text-sm text-foreground dark:text-white">Inventory Health Breakdown</h3>
         </div>
         <button
           onClick={() => navigate("/materials")}
@@ -117,8 +117,8 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-            <span className="text-xl font-black text-slate-900 dark:text-white leading-none">{total}</span>
-            <span className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Total Items</span>
+            <span className="text-xl font-black text-foreground dark:text-white leading-none">{total}</span>
+            <span className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">Total Items</span>
           </div>
         </div>
 
@@ -129,8 +129,8 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-green-600 shrink-0" />
               <div>
-                <p className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight">Healthy Stock</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{healthyCount} items</p>
+                <p className="text-xs font-bold text-foreground dark:text-slate-100 leading-tight">Healthy Stock</p>
+                <p className="text-[10px] text-muted-foreground dark:text-muted-foreground font-semibold">{healthyCount} items</p>
               </div>
             </div>
             <span className="text-sm font-black text-green-700 dark:text-green-400">{healthyPct}%</span>
@@ -141,8 +141,8 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-[#F97316] shrink-0" />
               <div>
-                <p className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight">Low Stock</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{lowStockCount} items</p>
+                <p className="text-xs font-bold text-foreground dark:text-slate-100 leading-tight">Low Stock</p>
+                <p className="text-[10px] text-muted-foreground dark:text-muted-foreground font-semibold">{lowStockCount} items</p>
               </div>
             </div>
             <span className="text-sm font-black text-[#F97316]">{lowPct}%</span>
@@ -153,8 +153,8 @@ export const InventoryHealthChart: React.FC<InventoryHealthChartProps> = ({ mate
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-red-600 shrink-0" />
               <div>
-                <p className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight">Out of Stock</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{outOfStockCount} items</p>
+                <p className="text-xs font-bold text-foreground dark:text-slate-100 leading-tight">Out of Stock</p>
+                <p className="text-[10px] text-muted-foreground dark:text-muted-foreground font-semibold">{outOfStockCount} items</p>
               </div>
             </div>
             <span className="text-sm font-black text-red-600 dark:text-red-400">{outOfStockPct}%</span>

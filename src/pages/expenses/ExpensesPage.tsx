@@ -105,35 +105,35 @@ export default function ExpensesPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-border bg-card p-3 shadow-sm space-y-3">
         <div className="grid gap-3 md:grid-cols-4">
           <label className="relative md:col-span-2">
-            <Search className="absolute left-3 top-3 text-slate-400" size={18}/>
+            <Search className="absolute left-3 top-3 text-muted-foreground" size={18}/>
             <input 
               aria-label="Search expenses" 
               value={search} 
               onChange={e => { setSearch(e.target.value); setPage(1); }} 
               placeholder="Search category, payee, transaction ID or notes" 
-              className="h-10 w-full rounded-lg border border-slate-200 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="h-10 w-full rounded-lg border border-border pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
             />
           </label>
-          <input aria-label="From date" type="date" value={from} onChange={e => { setFrom(e.target.value); setPage(1); }} className="h-10 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
-          <input aria-label="To date" type="date" value={to} onChange={e => { setTo(e.target.value); setPage(1); }} className="h-10 rounded-lg border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
-          <select aria-label="Expense category" value={category} onChange={e => { setCategory(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+          <input aria-label="From date" type="date" value={from} onChange={e => { setFrom(e.target.value); setPage(1); }} className="h-10 rounded-lg border border-border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
+          <input aria-label="To date" type="date" value={to} onChange={e => { setTo(e.target.value); setPage(1); }} className="h-10 rounded-lg border border-border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"/>
+          <select aria-label="Expense category" value={category} onChange={e => { setCategory(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
             <option value="">All Categories</option>
             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <select aria-label="Payment status" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+          <select aria-label="Payment status" value={status} onChange={e => { setStatus(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
             <option value="">All Statuses</option>
             <option>PENDING</option>
             <option>PAID</option>
             <option>CANCELLED</option>
           </select>
-          <select aria-label="Payment mode" value={mode} onChange={e => { setMode(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+          <select aria-label="Payment mode" value={mode} onChange={e => { setMode(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
             <option value="">All Payment Methods</option>
             {["CASH", "UPI", "BANK_TRANSFER", "CHEQUE", "CARD", "OTHER"].map(x => <option key={x}>{x}</option>)}
           </select>
-          <select aria-label="GST applicable" value={gst} onChange={e => { setGst(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
+          <select aria-label="GST applicable" value={gst} onChange={e => { setGst(e.target.value); setPage(1); }} className="h-10 rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500">
             <option value="">GST & Non-GST</option>
             <option value="true">GST Invoice</option>
             <option value="false">No GST</option>
@@ -142,7 +142,7 @@ export default function ExpensesPage() {
         {(search || from || to || category || status || mode || gst) && (
           <button 
             onClick={clear} 
-            className="font-bold text-xs text-slate-700 hover:bg-slate-50 px-4 h-10 border rounded-lg cursor-pointer"
+            className="font-bold text-xs text-muted-foreground hover:bg-muted px-4 h-10 border rounded-lg cursor-pointer"
           >
             Clear Filters
           </button>
@@ -169,26 +169,26 @@ export default function ExpensesPage() {
       ) : (
         <>
           {/* Desktop Table */}
-          <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
+          <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600 border-b">
+              <thead className="bg-muted text-muted-foreground border-b">
                 <tr>
                   {["Expense Number", "Date", "Category", "Payee", "Total", "Payment Method", "Status", "Actions"].map(h => (
-                    <th key={h} className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-slate-500">{h}</th>
+                    <th key={h} className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {data.map(x => (
-                  <tr key={x.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
-                    <td className="px-4 py-3.5 font-bold text-slate-900">{x.expenseNumber}</td>
-                    <td className="px-4 py-3.5 text-slate-600 font-medium">
+                  <tr key={x.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
+                    <td className="px-4 py-3.5 font-bold text-foreground">{x.expenseNumber}</td>
+                    <td className="px-4 py-3.5 text-muted-foreground font-medium">
                       {new Date(x.expenseDate).toLocaleDateString("en-IN")}
                     </td>
-                    <td className="px-4 py-3.5 text-slate-900 font-semibold">{x.category.name}</td>
-                    <td className="px-4 py-3.5 text-slate-600 font-medium">{x.payee || "—"}</td>
-                    <td className="px-4 py-3.5 font-black text-slate-950">{fmt(x.totalAmount)}</td>
-                    <td className="px-4 py-3.5 text-slate-600 font-medium">{x.paymentMode?.replaceAll("_", " ") || "—"}</td>
+                    <td className="px-4 py-3.5 text-foreground font-semibold">{x.category.name}</td>
+                    <td className="px-4 py-3.5 text-muted-foreground font-medium">{x.payee || "—"}</td>
+                    <td className="px-4 py-3.5 font-black text-foreground">{fmt(x.totalAmount)}</td>
+                    <td className="px-4 py-3.5 text-muted-foreground font-medium">{x.paymentMode?.replaceAll("_", " ") || "—"}</td>
                     <td className="px-4 py-3.5">
                       <BusinessStatusBadge status={x.paymentStatus}/>
                     </td>
@@ -206,25 +206,25 @@ export default function ExpensesPage() {
           {/* Mobile Card List */}
           <div className="grid gap-4 md:hidden">
             {data.map(x => (
-              <article key={x.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+              <article key={x.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
                 <div className="flex justify-between items-start gap-3">
                   <div>
-                    <span className="font-bold text-slate-900 text-sm">{x.category.name}</span>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{x.expenseNumber} · {x.payee || "No payee"}</p>
+                    <span className="font-bold text-foreground text-sm">{x.category.name}</span>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase mt-1 tracking-wider">{x.expenseNumber} · {x.payee || "No payee"}</p>
                   </div>
                   <BusinessStatusBadge status={x.paymentStatus}/>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-xs border-t pt-3 border-slate-100">
+                <div className="grid grid-cols-2 gap-2 text-xs border-t pt-3 border-border">
                   <div>
-                    <span className="text-slate-400 block text-[9px] uppercase font-bold">Expense Total</span>
-                    <strong className="text-slate-950 text-sm mt-0.5 block">{fmt(x.totalAmount)}</strong>
+                    <span className="text-muted-foreground block text-[9px] uppercase font-bold">Expense Total</span>
+                    <strong className="text-foreground text-sm mt-0.5 block">{fmt(x.totalAmount)}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[9px] uppercase font-bold">Date</span>
-                    <span className="text-slate-700 text-xs mt-0.5 block">{new Date(x.expenseDate).toLocaleDateString("en-IN")}</span>
+                    <span className="text-muted-foreground block text-[9px] uppercase font-bold">Date</span>
+                    <span className="text-muted-foreground text-xs mt-0.5 block">{new Date(x.expenseDate).toLocaleDateString("en-IN")}</span>
                   </div>
                 </div>
-                <Link to={`/expenses/${x.id}`} className="flex min-h-9 items-center justify-center rounded-xl border text-xs font-bold text-slate-700 hover:bg-slate-50">
+                <Link to={`/expenses/${x.id}`} className="flex min-h-9 items-center justify-center rounded-xl border text-xs font-bold text-muted-foreground hover:bg-muted">
                   View Details
                 </Link>
               </article>
@@ -236,15 +236,15 @@ export default function ExpensesPage() {
             <button 
               disabled={page <= 1} 
               onClick={() => setPage(p => p - 1)} 
-              className="min-h-10 rounded-xl border px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+              className="min-h-10 rounded-xl border px-4 text-xs font-bold text-muted-foreground hover:bg-muted disabled:opacity-40 cursor-pointer"
             >
               Previous
             </button>
-            <span className="text-xs text-slate-500 font-medium">Page {page} of {pages}</span>
+            <span className="text-xs text-muted-foreground font-medium">Page {page} of {pages}</span>
             <button 
               disabled={page >= pages} 
               onClick={() => setPage(p => p + 1)} 
-              className="min-h-10 rounded-xl border px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+              className="min-h-10 rounded-xl border px-4 text-xs font-bold text-muted-foreground hover:bg-muted disabled:opacity-40 cursor-pointer"
             >
               Next
             </button>

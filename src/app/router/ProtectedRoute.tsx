@@ -15,7 +15,7 @@ export const ProtectedRoute = () => {
           {/* A premium loading spinner spinner */}
           <div
             style={{ borderTopColor: C.blue }}
-            className="w-10 h-10 border-4 border-gray-200 rounded-full animate-spin"
+            className="w-10 h-10 border-4 border-border rounded-full animate-spin"
           />
           <span style={{ color: C.muted }} className="text-xs font-semibold animate-pulse">
             Loading your session...

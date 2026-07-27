@@ -100,7 +100,7 @@ export default function PurchaseDetailsPage() {
       {/* Back button */}
       <button 
         onClick={() => navigate("/purchases")} 
-        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer"
+        className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer"
       >
         <ArrowLeft size={14}/>
         Back to Purchases
@@ -114,7 +114,7 @@ export default function PurchaseDetailsPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button 
               onClick={() => window.print()} 
-              className="flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors"
+              className="flex min-h-10 items-center justify-center rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
             >
               <Printer size={14} className="mr-1.5" />
               Print PO
@@ -141,7 +141,7 @@ export default function PurchaseDetailsPage() {
             {canCancel && (
               <button 
                 onClick={() => setAction("cancel")} 
-                className="flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-white px-4 text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+                className="flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-card px-4 text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
               >
                 <Ban size={14} className="mr-1.5" />
                 Cancel Order
@@ -154,19 +154,19 @@ export default function PurchaseDetailsPage() {
       {/* 7. Supplier Outstanding Card */}
       <div className="grid gap-6 md:grid-cols-3">
         {/* Payable Metrics */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 md:col-span-2">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Supplier Outstanding details</h3>
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4 md:col-span-2">
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Supplier Outstanding details</h3>
           <div className="grid grid-cols-3 gap-4 text-xs">
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Payable</span>
-              <strong className="text-slate-900 text-base font-black mt-1 block">{fmt(order.totalAmount)}</strong>
+              <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Total Payable</span>
+              <strong className="text-foreground text-base font-black mt-1 block">{fmt(order.totalAmount)}</strong>
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Paid Amount</span>
+              <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Paid Amount</span>
               <strong className="text-green-700 text-base font-black mt-1 block">{fmt(order.amountPaid)}</strong>
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Pending Amount</span>
+              <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Pending Amount</span>
               <strong className="text-red-600 text-base font-black mt-1 block">{fmt(order.balanceDue)}</strong>
             </div>
           </div>
@@ -182,56 +182,56 @@ export default function PurchaseDetailsPage() {
         </div>
 
         {/* Supplier Header */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3 text-xs">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Supplier Profile</h3>
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3 text-xs">
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Supplier Profile</h3>
           <div>
             <Link to={`/suppliers/${order.supplierId}`} className="font-bold text-orange-600 hover:text-orange-700 hover:underline text-sm block">
               {order.supplierName}
             </Link>
-            <p className="text-slate-500 font-semibold mt-1">{order.supplierPhone}</p>
-            {order.supplierGstin && <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">GSTIN: {order.supplierGstin}</p>}
+            <p className="text-muted-foreground font-semibold mt-1">{order.supplierPhone}</p>
+            {order.supplierGstin && <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase">GSTIN: {order.supplierGstin}</p>}
           </div>
         </div>
       </div>
 
       {/* Materials list */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Ordered Materials</h3>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Ordered Materials</h3>
         <div className="space-y-4">
           {order.items.map(i => {
             const percent = Math.min(100, Math.round((Number(i.receivedQuantity || 0) / Math.max(1, Number(i.quantity))) * 100));
             const remaining = Math.max(0, Number(i.quantity) - Number(i.receivedQuantity));
             return (
-              <article key={i.id} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-3 text-xs dark:border-slate-800 dark:bg-slate-800/40">
+              <article key={i.id} className="rounded-xl border border-border bg-muted/50 p-4 space-y-3 text-xs dark:border-slate-800 dark:bg-slate-800/40">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <span className="font-bold text-slate-900 text-sm block dark:text-slate-100">{i.materialName}</span>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">{i.godown.name} · {i.sku}</span>
+                    <span className="font-bold text-foreground text-sm block dark:text-slate-100">{i.materialName}</span>
+                    <span className="text-[10px] text-muted-foreground font-bold uppercase mt-1 tracking-wider">{i.godown.name} · {i.sku}</span>
                   </div>
                   
                   <div className="flex gap-6">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Ordered</span>
-                      <strong className="text-slate-950 block mt-0.5 dark:text-slate-100">{formatQuantity(i.quantity, i.unit)}</strong>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground block">Ordered</span>
+                      <strong className="text-foreground block mt-0.5 dark:text-slate-100">{formatQuantity(i.quantity, i.unit)}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Received</span>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground block">Received</span>
                       <strong className="text-emerald-700 block mt-0.5 dark:text-emerald-400">{formatQuantity(i.receivedQuantity, i.unit)}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Remaining</span>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground block">Remaining</span>
                       <strong className="text-rose-600 block mt-0.5 dark:text-rose-400">{formatQuantity(remaining, i.unit)}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Line Total</span>
-                      <strong className="text-slate-950 block mt-0.5 dark:text-slate-100">{fmt(i.lineTotal)}</strong>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground block">Line Total</span>
+                      <strong className="text-foreground block mt-0.5 dark:text-slate-100">{fmt(i.lineTotal)}</strong>
                     </div>
                   </div>
                 </div>
 
                 {/* Receiving Progress Bar */}
                 <div className="space-y-1">
-                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                  <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground">
                     <span>Item Receiving Progress ({percent}%)</span>
                     <span>{i.receivedQuantity} / {i.quantity} {i.unit}</span>
                   </div>
@@ -256,25 +256,25 @@ export default function PurchaseDetailsPage() {
 
       {/* GRN Receipt History Section */}
       {order.receipts && order.receipts.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3 dark:text-slate-100 dark:border-slate-800">
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3 dark:text-slate-100 dark:border-slate-800">
             Goods Receipt Notes (GRN) Audit History ({order.receipts.length})
           </h3>
           <div className="grid gap-3 sm:grid-cols-2">
             {order.receipts.map((r) => (
               <div
                 key={r.id}
-                className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-2 dark:border-slate-700 dark:bg-slate-800/60 text-xs"
+                className="rounded-xl border border-border bg-muted/70 p-3.5 space-y-2 dark:border-slate-700 dark:bg-slate-800/60 text-xs"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-900 font-mono dark:text-slate-100">
+                  <span className="font-extrabold text-foreground font-mono dark:text-slate-100">
                     {r.receiptNumber}
                   </span>
-                  <strong className="text-slate-900 font-black dark:text-slate-100">
+                  <strong className="text-foreground font-black dark:text-slate-100">
                     {fmt(r.totalAmount)}
                   </strong>
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground dark:text-muted-foreground">
                   <span>Date: {new Date(r.receiptDate).toLocaleDateString("en-IN")}</span>
                   <span>Items: {r.items?.length || "Multiple"}</span>
                 </div>
@@ -285,7 +285,7 @@ export default function PurchaseDetailsPage() {
       )}
 
       {/* Financials totals */}
-      <section className="ml-auto max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-2 text-xs font-semibold text-slate-500">
+      <section className="ml-auto max-w-sm rounded-2xl border border-border bg-card p-5 shadow-sm space-y-2 text-xs font-semibold text-muted-foreground">
         <Row label="Subtotal" value={fmt(order.subtotal)}/>
         <Row label="Discount" value={fmt(order.discountTotal)}/>
         <Row label="GST taxes" value={fmt(order.taxTotal)}/>
@@ -297,16 +297,16 @@ export default function PurchaseDetailsPage() {
 
       {/* Receipts list */}
       {order.receipts?.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3 text-xs">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Goods Receipt Logs</h3>
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3 text-xs">
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Goods Receipt Logs</h3>
           <div className="space-y-2">
             {order.receipts.map(r => (
-              <div key={r.id} className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+              <div key={r.id} className="flex justify-between items-center bg-muted p-2.5 rounded-xl border border-border">
                 <div>
-                  <strong className="text-slate-800">Challan: {r.receiptNumber}</strong>
-                  <span className="block text-[10px] text-slate-400 mt-0.5">{new Date(r.receiptDate).toLocaleString("en-IN")}</span>
+                  <strong className="text-foreground">Challan: {r.receiptNumber}</strong>
+                  <span className="block text-[10px] text-muted-foreground mt-0.5">{new Date(r.receiptDate).toLocaleString("en-IN")}</span>
                 </div>
-                <strong className="text-slate-900">{fmt(r.totalAmount)}</strong>
+                <strong className="text-foreground">{fmt(r.totalAmount)}</strong>
               </div>
             ))}
           </div>
@@ -315,13 +315,13 @@ export default function PurchaseDetailsPage() {
 
       {/* Payments list */}
       {order.payments.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3 text-xs">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Supplier Payments history</h3>
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3 text-xs">
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Supplier Payments history</h3>
           <div className="space-y-2">
             {order.payments.map(p => (
               <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 border-b py-2.5 last:border-0">
                 <div>
-                  <span className={`font-bold text-slate-800 ${p.status === "REVERSED" ? "text-slate-400 line-through" : ""}`}>
+                  <span className={`font-bold text-foreground ${p.status === "REVERSED" ? "text-muted-foreground line-through" : ""}`}>
                     {p.paymentNumber} · {p.paymentMode}
                   </span>
                   {p.status === "REVERSED" && (
@@ -329,7 +329,7 @@ export default function PurchaseDetailsPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <strong className={p.status === "REVERSED" ? "text-slate-400 line-through" : "text-slate-900"}>{fmt(p.amount)}</strong>
+                  <strong className={p.status === "REVERSED" ? "text-muted-foreground line-through" : "text-foreground"}>{fmt(p.amount)}</strong>
                   {manageFinancials && p.status === "POSTED" && (
                     <button 
                       onClick={() => setReversing(p)} 
@@ -346,39 +346,39 @@ export default function PurchaseDetailsPage() {
       )}
 
       {/* Status Timeline */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 max-w-md">
-        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Purchase Order Timeline</h3>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4 max-w-md">
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Purchase Order Timeline</h3>
         
-        <div className="relative border-l border-slate-100 pl-5 space-y-4 text-xs">
+        <div className="relative border-l border-border pl-5 space-y-4 text-xs">
           <div className="relative">
-            <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-green-600" />
-            <p className="font-bold text-slate-900">PO Created</p>
+            <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-green-600" />
+            <p className="font-bold text-foreground">PO Created</p>
           </div>
           
           {order.status !== "DRAFT" && (
             <div className="relative">
-              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-green-600" />
-              <p className="font-bold text-slate-900">PO Sent to Supplier</p>
+              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-green-600" />
+              <p className="font-bold text-foreground">PO Sent to Supplier</p>
             </div>
           )}
 
           {["PARTIALLY_RECEIVED", "RECEIVED"].includes(order.status) && (
             <div className="relative">
-              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-green-600" />
-              <p className="font-bold text-slate-900">Stock Received (Warehouse)</p>
+              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-green-600" />
+              <p className="font-bold text-foreground">Stock Received (Warehouse)</p>
             </div>
           )}
 
           {order.status === "RECEIVED" && (
             <div className="relative">
-              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-orange-500" />
+              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-orange-500" />
               <p className="font-bold text-orange-600">PO Completed</p>
             </div>
           )}
 
           {order.status === "CANCELLED" && (
             <div className="relative">
-              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-red-500" />
+              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-red-500" />
               <p className="font-bold text-red-600">PO Cancelled</p>
             </div>
           )}
@@ -398,10 +398,10 @@ export default function PurchaseDetailsPage() {
       {/* Goods Receipt Dialog */}
       {receiving && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/50 sm:items-center sm:p-4">
-          <div className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 sm:max-w-xl sm:rounded-2xl space-y-4 shadow-xl">
+          <div className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-card p-5 sm:max-w-xl sm:rounded-2xl space-y-4 shadow-xl">
             <div>
-              <h2 className="text-lg font-black text-slate-900 tracking-tight">Receive Materials into Warehouse</h2>
-              <p className="text-xs text-slate-500 font-semibold mt-0.5">Verify incoming material quantities from supplier delivery challan.</p>
+              <h2 className="text-lg font-black text-foreground tracking-tight">Receive Materials into Warehouse</h2>
+              <p className="text-xs text-muted-foreground font-semibold mt-0.5">Verify incoming material quantities from supplier delivery challan.</p>
             </div>
 
             {/* Stock Confirmation Notice */}
@@ -412,33 +412,33 @@ export default function PurchaseDetailsPage() {
             
             <div className="space-y-4">
               {order.items.filter(i => Number(i.receivedQuantity) < Number(i.quantity)).map(i => (
-                <div key={i.id} className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-3 text-xs">
+                <div key={i.id} className="rounded-xl border border-border bg-muted/70 p-4 space-y-3 text-xs">
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="font-black text-slate-900 text-sm block">{i.materialName}</span>
-                      <span className="text-[10px] text-slate-500 font-extrabold uppercase mt-0.5 block">
+                      <span className="font-black text-foreground text-sm block">{i.materialName}</span>
+                      <span className="text-[10px] text-muted-foreground font-extrabold uppercase mt-0.5 block">
                         Target Warehouse: <strong className="text-orange-600">{i.godown.name}</strong> · SKU: {i.sku}
                       </span>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-2 text-center border-y py-2.5 border-slate-200/70">
+                  <div className="grid grid-cols-3 gap-2 text-center border-y py-2.5 border-border/70">
                     <div>
-                      <span className="text-[9px] uppercase font-black text-slate-400 block">Ordered</span>
-                      <strong className="block text-slate-950 font-black mt-0.5">{formatQuantity(i.quantity, i.unit)}</strong>
+                      <span className="text-[9px] uppercase font-black text-muted-foreground block">Ordered</span>
+                      <strong className="block text-foreground font-black mt-0.5">{formatQuantity(i.quantity, i.unit)}</strong>
                     </div>
                     <div>
-                      <span className="text-[9px] uppercase font-black text-slate-400 block">Prev Received</span>
+                      <span className="text-[9px] uppercase font-black text-muted-foreground block">Prev Received</span>
                       <strong className="block text-green-700 font-black mt-0.5">{formatQuantity(i.receivedQuantity, i.unit)}</strong>
                     </div>
                     <div>
-                      <span className="text-[9px] uppercase font-black text-slate-400 block">Remaining</span>
+                      <span className="text-[9px] uppercase font-black text-muted-foreground block">Remaining</span>
                       <strong className="block text-red-600 font-black mt-0.5">{formatQuantity(Number(i.quantity) - Number(i.receivedQuantity), i.unit)}</strong>
                     </div>
                   </div>
 
                   <label className="block space-y-1">
-                    <span className="text-[10px] text-slate-700 font-black uppercase tracking-wider block">Quantity Received Now ({i.unit}) *</span>
+                    <span className="text-[10px] text-muted-foreground font-black uppercase tracking-wider block">Quantity Received Now ({i.unit}) *</span>
                     <input 
                       aria-label={`Receive ${i.materialName}`} 
                       type="number" 
@@ -448,17 +448,17 @@ export default function PurchaseDetailsPage() {
                       placeholder="0.00"
                       value={qty[i.id] || ""} 
                       onChange={e => setQty({ ...qty, [i.id]: e.target.value })} 
-                      className="mt-1 h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                      className="mt-1 h-11 w-full rounded-xl border border-border bg-card px-3.5 text-sm font-black text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                     />
                   </label>
                 </div>
               ))}
             </div>
             
-            <div className="flex gap-3 pt-4 border-t border-slate-100">
+            <div className="flex gap-3 pt-4 border-t border-border">
               <button 
                 onClick={() => setReceiving(false)} 
-                className="min-h-11 flex-1 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                className="min-h-11 flex-1 rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted cursor-pointer"
               >
                 Cancel
               </button>
@@ -481,36 +481,36 @@ export default function PurchaseDetailsPage() {
       <SupplierPaymentReversalDialog open={!!reversing} paymentNumber={reversing?.paymentNumber || "payment"} busy={reverseBusy} onCancel={() => !reverseBusy && setReversing(null)} onConfirm={reverse}/>
 
       {/* 10. Printable Purchase Order (A4 Print-only template) */}
-      <article className="invoice-print-root hidden print:block bg-white p-8 text-xs">
+      <article className="invoice-print-root hidden print:block bg-card p-8 text-xs">
         <header className="flex justify-between border-b pb-6">
           <div>
-            <h2 className="text-lg font-black text-slate-900 tracking-tight">{business?.name || "APNI ESTATE"}</h2>
-            {business?.address && <p className="max-w-md text-xs text-slate-500 mt-1 leading-relaxed">{business.address}</p>}
-            {business?.phone && <p className="text-xs text-slate-500 mt-1">Phone: {business.phone}</p>}
-            {business?.gstNumber && <p className="text-xs text-slate-700 font-bold mt-1 uppercase">GSTIN: {business.gstNumber}</p>}
+            <h2 className="text-lg font-black text-foreground tracking-tight">{business?.name || "APNI ESTATE"}</h2>
+            {business?.address && <p className="max-w-md text-xs text-muted-foreground mt-1 leading-relaxed">{business.address}</p>}
+            {business?.phone && <p className="text-xs text-muted-foreground mt-1">Phone: {business.phone}</p>}
+            {business?.gstNumber && <p className="text-xs text-muted-foreground font-bold mt-1 uppercase">GSTIN: {business.gstNumber}</p>}
           </div>
           <div className="text-right">
-            <h3 className="text-base font-black text-slate-800 tracking-wider uppercase">PURCHASE ORDER</h3>
-            <p className="font-bold text-sm text-slate-700 mt-1">{order.purchaseOrderNumber}</p>
-            <p className="text-xs text-slate-500 mt-1">Date: {new Date(order.orderDate).toLocaleDateString("en-IN")}</p>
+            <h3 className="text-base font-black text-foreground tracking-wider uppercase">PURCHASE ORDER</h3>
+            <p className="font-bold text-sm text-muted-foreground mt-1">{order.purchaseOrderNumber}</p>
+            <p className="text-xs text-muted-foreground mt-1">Date: {new Date(order.orderDate).toLocaleDateString("en-IN")}</p>
           </div>
         </header>
 
         <section className="grid gap-5 border-b py-6 grid-cols-2 text-xs">
           <div>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Vendor / Supplier</span>
-            <p className="font-bold text-slate-900 text-sm mt-1">{order.supplierName}</p>
-            <p className="text-slate-600 mt-0.5">{order.supplierPhone}</p>
-            {order.supplierGstin && <p className="font-bold text-slate-700 mt-1 uppercase">GSTIN: {order.supplierGstin}</p>}
+            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Vendor / Supplier</span>
+            <p className="font-bold text-foreground text-sm mt-1">{order.supplierName}</p>
+            <p className="text-muted-foreground mt-0.5">{order.supplierPhone}</p>
+            {order.supplierGstin && <p className="font-bold text-muted-foreground mt-1 uppercase">GSTIN: {order.supplierGstin}</p>}
           </div>
         </section>
 
-        <div className="mt-6 overflow-hidden rounded-xl border border-slate-100">
+        <div className="mt-6 overflow-hidden rounded-xl border border-border">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b">
+            <thead className="bg-muted text-muted-foreground border-b">
               <tr>
                 {["Material Item", "Qty", "Rate", "Discount", "GST %", "Line Total"].map((v) => (
-                  <th key={v} className="p-3 font-semibold text-slate-500 uppercase tracking-wider">{v}</th>
+                  <th key={v} className="p-3 font-semibold text-muted-foreground uppercase tracking-wider">{v}</th>
                 ))}
               </tr>
             </thead>
@@ -518,14 +518,14 @@ export default function PurchaseDetailsPage() {
               {order.items.map((i) => (
                 <tr key={i.id} className="border-b last:border-0">
                   <td className="p-3">
-                    <span className="block font-bold text-slate-900">{i.materialName}</span>
-                    <span className="text-[10px] text-slate-400 font-medium">{i.sku}</span>
+                    <span className="block font-bold text-foreground">{i.materialName}</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">{i.sku}</span>
                   </td>
-                  <td className="text-slate-600 font-medium">{formatQuantity(i.quantity, i.unit)}</td>
-                  <td className="text-slate-600 font-medium">{fmt(i.rate)}</td>
-                  <td className="text-slate-500 font-medium">{i.discountRate}%</td>
-                  <td className="text-slate-500 font-medium">{i.gstRate || 0}%</td>
-                  <td className="font-black text-slate-950">{fmt(i.lineTotal)}</td>
+                  <td className="text-muted-foreground font-medium">{formatQuantity(i.quantity, i.unit)}</td>
+                  <td className="text-muted-foreground font-medium">{fmt(i.rate)}</td>
+                  <td className="text-muted-foreground font-medium">{i.discountRate}%</td>
+                  <td className="text-muted-foreground font-medium">{i.gstRate || 0}%</td>
+                  <td className="font-black text-foreground">{fmt(i.lineTotal)}</td>
                 </tr>
               ))}
             </tbody>
@@ -547,9 +547,9 @@ export default function PurchaseDetailsPage() {
 
 function Row({ label, value, large = false }: { label: string; value: string; large?: boolean }) {
   return (
-    <div className={`flex justify-between gap-4 py-0.5 ${large ? "text-sm font-black text-slate-900" : "text-xs font-semibold text-slate-500"}`}>
+    <div className={`flex justify-between gap-4 py-0.5 ${large ? "text-sm font-black text-foreground" : "text-xs font-semibold text-muted-foreground"}`}>
       <span>{label}</span>
-      <b className={large ? "text-red-700" : "text-slate-900"}>{value}</b>
+      <b className={large ? "text-red-700" : "text-foreground"}>{value}</b>
     </div>
   );
 }

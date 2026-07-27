@@ -504,11 +504,11 @@ export const SalesPage = () => {
                 <Divider />
                 <div className="grid grid-cols-2 gap-4">
                   <div style={{ background: C.surface, borderRadius: 10 }} className="p-3">
-                    <span className="text-[10px] text-gray-500 block uppercase tracking-wider font-semibold mb-1">Total Invoiced</span>
+                    <span className="text-[10px] text-muted-foreground block uppercase tracking-wider font-semibold mb-1">Total Invoiced</span>
                     <span style={{ color: C.ink, fontFamily: "'Space Grotesk'" }} className="text-sm font-semibold">{fmt(sel.total)}</span>
                   </div>
                   <div style={{ background: C.surface, borderRadius: 10 }} className="p-3">
-                    <span className="text-[10px] text-gray-500 block uppercase tracking-wider font-semibold mb-1">Amount Paid</span>
+                    <span className="text-[10px] text-muted-foreground block uppercase tracking-wider font-semibold mb-1">Amount Paid</span>
                     <span style={{ color: C.ink, fontFamily: "'Space Grotesk'" }} className="text-sm font-semibold">{fmt(sel.paid)}</span>
                   </div>
                 </div>
@@ -642,15 +642,15 @@ export const SalesPage = () => {
 
       {/* MODAL: ACCOUNT STATEMENT */}
       {showStatement && sel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm print:relative print:p-0 print:bg-white" onClick={() => setShowStatement(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm print:relative print:p-0 print:bg-card" onClick={() => setShowStatement(false)}>
           <div 
-            className="bg-white rounded-2xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto flex flex-col gap-4 shadow-xl print:shadow-none print:max-h-none print:w-full print:p-0"
+            className="bg-card rounded-2xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto flex flex-col gap-4 shadow-xl print:shadow-none print:max-h-none print:w-full print:p-0"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b pb-3 print:hidden">
-              <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Account Statement</span>
-              <button onClick={() => setShowStatement(false)} className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer">×</button>
+              <span className="text-sm font-bold text-foreground uppercase tracking-wide">Account Statement</span>
+              <button onClick={() => setShowStatement(false)} className="text-muted-foreground hover:text-muted-foreground text-lg font-bold cursor-pointer">×</button>
             </div>
 
             {/* Demo watermark banner */}
@@ -660,29 +660,29 @@ export const SalesPage = () => {
             </div>
 
             {/* Statement Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl text-xs text-gray-700">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-muted p-4 rounded-xl text-xs text-muted-foreground">
               <div>
-                <span className="text-gray-400 block mb-0.5">Party Name</span>
-                <span className="font-bold text-gray-900 text-sm">{sel.name}</span>
+                <span className="text-muted-foreground block mb-0.5">Party Name</span>
+                <span className="font-bold text-foreground text-sm">{sel.name}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Phone Number</span>
-                <span className="font-semibold text-gray-900">{sel.phone || "N/A"}</span>
+                <span className="text-muted-foreground block mb-0.5">Phone Number</span>
+                <span className="font-semibold text-foreground">{sel.phone || "N/A"}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Credit Terms</span>
-                <span className="font-semibold text-gray-900">{sel.terms}</span>
+                <span className="text-muted-foreground block mb-0.5">Credit Terms</span>
+                <span className="font-semibold text-foreground">{sel.terms}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Total Invoiced</span>
-                <span className="font-bold text-gray-900">{fmt(sel.total)}</span>
+                <span className="text-muted-foreground block mb-0.5">Total Invoiced</span>
+                <span className="font-bold text-foreground">{fmt(sel.total)}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Total Paid</span>
-                <span className="font-bold text-gray-900">{fmt(sel.paid)}</span>
+                <span className="text-muted-foreground block mb-0.5">Total Paid</span>
+                <span className="font-bold text-foreground">{fmt(sel.paid)}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Remaining Balance</span>
+                <span className="text-muted-foreground block mb-0.5">Remaining Balance</span>
                 <span className="font-bold text-blue-700">{fmt(sel.total - sel.paid)}</span>
               </div>
             </div>
@@ -692,10 +692,10 @@ export const SalesPage = () => {
               <SectionLabel>Transactions Log</SectionLabel>
               
               {/* Desktop Table */}
-              <div className="hidden md:block overflow-hidden border border-gray-100 rounded-lg bg-white mt-2">
+              <div className="hidden md:block overflow-hidden border border-border rounded-lg bg-card mt-2">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-gray-50 border-b font-semibold text-gray-500">
+                    <tr className="bg-muted border-b font-semibold text-muted-foreground">
                       <th className="p-3">Date</th>
                       <th className="p-3">Reference</th>
                       <th className="p-3">Type</th>
@@ -709,20 +709,20 @@ export const SalesPage = () => {
                   <tbody>
                     {sel.transactions && sel.transactions.length > 0 ? (
                       sel.transactions.map(t => (
-                        <tr key={t.id} className="border-b last:border-none hover:bg-gray-50 text-gray-700">
+                        <tr key={t.id} className="border-b last:border-none hover:bg-muted text-muted-foreground">
                           <td className="p-3">{t.date}</td>
                           <td className="p-3 font-semibold">{t.reference}</td>
                           <td className="p-3 capitalize">{t.type}</td>
                           <td className="p-3 max-w-[200px] truncate" title={t.description}>{t.description}</td>
                           <td className="p-3 text-right font-semibold">{t.debit > 0 ? fmt(t.debit) : "-"}</td>
                           <td className="p-3 text-right font-semibold">{t.credit > 0 ? fmt(t.credit) : "-"}</td>
-                          <td className="p-3 text-right font-bold text-gray-955">{fmt(t.runningBalance)}</td>
+                          <td className="p-3 text-right font-bold text-foreground">{fmt(t.runningBalance)}</td>
                           <td className="p-3"><Badge label={t.status.toUpperCase()} variant={t.status === "completed" ? "success" : "warning"} /></td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={8} className="p-6 text-center text-gray-400">No transactions recorded.</td>
+                        <td colSpan={8} className="p-6 text-center text-muted-foreground">No transactions recorded.</td>
                       </tr>
                     )}
                   </tbody>
@@ -733,30 +733,30 @@ export const SalesPage = () => {
               <div className="md:hidden flex flex-col gap-2 mt-2">
                 {sel.transactions && sel.transactions.length > 0 ? (
                   sel.transactions.map(t => (
-                    <div key={t.id} className="border rounded-xl p-3 bg-white flex flex-col gap-1.5 text-xs text-gray-700 font-medium">
+                    <div key={t.id} className="border rounded-xl p-3 bg-card flex flex-col gap-1.5 text-xs text-muted-foreground font-medium">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-gray-900">{t.reference}</span>
-                        <span className="text-[10px] text-gray-400">{t.date}</span>
+                        <span className="font-semibold text-foreground">{t.reference}</span>
+                        <span className="text-[10px] text-muted-foreground">{t.date}</span>
                       </div>
-                      <div className="text-[11px] text-gray-500">{t.description}</div>
+                      <div className="text-[11px] text-muted-foreground">{t.description}</div>
                       <div className="grid grid-cols-3 gap-2 text-[10px] border-t pt-1.5 mt-1">
                         <div>
-                          <span className="text-gray-400 block uppercase font-bold text-[8px]">Debit</span>
+                          <span className="text-muted-foreground block uppercase font-bold text-[8px]">Debit</span>
                           <span className="font-semibold">{t.debit > 0 ? fmt(t.debit) : "-"}</span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block uppercase font-bold text-[8px]">Credit</span>
+                          <span className="text-muted-foreground block uppercase font-bold text-[8px]">Credit</span>
                           <span className="font-semibold">{t.credit > 0 ? fmt(t.credit) : "-"}</span>
                         </div>
                         <div>
-                          <span className="text-gray-400 block uppercase font-bold text-[8px]">Balance</span>
-                          <span className="font-bold text-gray-950">{fmt(t.runningBalance)}</span>
+                          <span className="text-muted-foreground block uppercase font-bold text-[8px]">Balance</span>
+                          <span className="font-bold text-foreground">{fmt(t.runningBalance)}</span>
                         </div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="p-6 text-center border border-dashed rounded-xl text-gray-400">No transactions recorded.</div>
+                  <div className="p-6 text-center border border-dashed rounded-xl text-muted-foreground">No transactions recorded.</div>
                 )}
               </div>
             </div>
@@ -784,15 +784,15 @@ export const SalesPage = () => {
 
       {/* MODAL: PARTY LEDGER */}
       {showLedger && sel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm print:relative print:p-0 print:bg-white" onClick={() => setShowLedger(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm print:relative print:p-0 print:bg-card" onClick={() => setShowLedger(false)}>
           <div 
-            className="bg-white rounded-2xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto flex flex-col gap-4 shadow-xl print:shadow-none print:max-h-none print:w-full print:p-0"
+            className="bg-card rounded-2xl w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto flex flex-col gap-4 shadow-xl print:shadow-none print:max-h-none print:w-full print:p-0"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b pb-3 print:hidden">
-              <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Business Ledger</span>
-              <button onClick={() => setShowLedger(false)} className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer">×</button>
+              <span className="text-sm font-bold text-foreground uppercase tracking-wide">Business Ledger</span>
+              <button onClick={() => setShowLedger(false)} className="text-muted-foreground hover:text-muted-foreground text-lg font-bold cursor-pointer">×</button>
             </div>
 
             {/* Demo watermark banner */}
@@ -802,29 +802,29 @@ export const SalesPage = () => {
             </div>
 
             {/* Ledger Meta Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-xl text-xs text-gray-700">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-muted p-4 rounded-xl text-xs text-muted-foreground">
               <div>
-                <span className="text-gray-400 block mb-0.5">Party Name</span>
-                <span className="font-bold text-gray-900 text-sm">{sel.name}</span>
+                <span className="text-muted-foreground block mb-0.5">Party Name</span>
+                <span className="font-bold text-foreground text-sm">{sel.name}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Current Balance</span>
+                <span className="text-muted-foreground block mb-0.5">Current Balance</span>
                 <span className="font-bold text-blue-700 text-sm">{fmt(sel.total - sel.paid)}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Total Debited</span>
-                <span className="font-semibold text-gray-900">{fmt(sel.total)}</span>
+                <span className="text-muted-foreground block mb-0.5">Total Debited</span>
+                <span className="font-semibold text-foreground">{fmt(sel.total)}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Total Credited</span>
-                <span className="font-semibold text-gray-900">{fmt(sel.paid)}</span>
+                <span className="text-muted-foreground block mb-0.5">Total Credited</span>
+                <span className="font-semibold text-foreground">{fmt(sel.paid)}</span>
               </div>
             </div>
 
             {/* Ledger Filters section */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-gray-50/50 p-3 rounded-lg text-xs print:hidden">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-muted/50 p-3 rounded-lg text-xs print:hidden">
               <div className="flex flex-col gap-1 col-span-2 md:col-span-1">
-                <label className="text-gray-400 font-semibold uppercase text-[9px]">Reference Search</label>
+                <label className="text-muted-foreground font-semibold uppercase text-[9px]">Reference Search</label>
                 <input 
                   type="text"
                   placeholder="e.g. INV-2025"
@@ -835,7 +835,7 @@ export const SalesPage = () => {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-gray-400 font-semibold uppercase text-[9px]">Type</label>
+                <label className="text-muted-foreground font-semibold uppercase text-[9px]">Type</label>
                 <select
                   value={ledgerType}
                   onChange={e => setLedgerType(e.target.value as any)}
@@ -848,7 +848,7 @@ export const SalesPage = () => {
                 </select>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-gray-400 font-semibold uppercase text-[9px]">Start Date</label>
+                <label className="text-muted-foreground font-semibold uppercase text-[9px]">Start Date</label>
                 <input 
                   type="date"
                   value={ledgerStart}
@@ -858,7 +858,7 @@ export const SalesPage = () => {
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-gray-400 font-semibold uppercase text-[9px]">End Date</label>
+                <label className="text-muted-foreground font-semibold uppercase text-[9px]">End Date</label>
                 <input 
                   type="date"
                   value={ledgerEnd}
@@ -871,7 +871,7 @@ export const SalesPage = () => {
 
             {/* Clear Filters indicator */}
             <div className="flex justify-between items-center print:hidden text-xs">
-              <span className="text-gray-500 font-semibold">Showing {
+              <span className="text-muted-foreground font-semibold">Showing {
                 (sel.transactions || []).filter(t => {
                   const matchSearch = t.reference.toLowerCase().includes(ledgerSearch.toLowerCase()) || 
                                       t.description.toLowerCase().includes(ledgerSearch.toLowerCase());
@@ -894,10 +894,10 @@ export const SalesPage = () => {
             {/* Ledger transactions list */}
             <div>
               {/* Desktop Table View */}
-              <div className="hidden md:block overflow-hidden border border-gray-100 rounded-lg bg-white">
+              <div className="hidden md:block overflow-hidden border border-border rounded-lg bg-card">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-gray-50 border-b font-semibold text-gray-500">
+                    <tr className="bg-muted border-b font-semibold text-muted-foreground">
                       <th className="p-3">Date</th>
                       <th className="p-3">Reference</th>
                       <th className="p-3">Description</th>
@@ -923,18 +923,18 @@ export const SalesPage = () => {
                         const matchEnd = !ledgerEnd || t.date <= ledgerEnd;
                         return matchSearch && matchType && matchStart && matchEnd;
                       }).map(t => (
-                        <tr key={t.id} className="border-b last:border-none hover:bg-gray-50 text-gray-700">
+                        <tr key={t.id} className="border-b last:border-none hover:bg-muted text-muted-foreground">
                           <td className="p-3">{t.date}</td>
                           <td className="p-3 font-semibold">{t.reference}</td>
                           <td className="p-3 max-w-[240px] truncate" title={t.description}>{t.description}</td>
                           <td className="p-3 text-right font-semibold text-red-600">{t.debit > 0 ? fmt(t.debit) : "-"}</td>
                           <td className="p-3 text-right font-semibold text-green-700">{t.credit > 0 ? fmt(t.credit) : "-"}</td>
-                          <td className="p-3 text-right font-bold text-gray-955">{fmt(t.runningBalance)}</td>
+                          <td className="p-3 text-right font-bold text-foreground">{fmt(t.runningBalance)}</td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="p-6 text-center text-gray-400">No ledger entries match current filters.</td>
+                        <td colSpan={6} className="p-6 text-center text-muted-foreground">No ledger entries match current filters.</td>
                       </tr>
                     )}
                   </tbody>
@@ -959,21 +959,21 @@ export const SalesPage = () => {
                     const matchEnd = !ledgerEnd || t.date <= ledgerEnd;
                     return matchSearch && matchType && matchStart && matchEnd;
                   }).map(t => (
-                    <div key={t.id} className="border rounded-xl p-3 bg-white flex flex-col gap-1 text-xs text-gray-700">
+                    <div key={t.id} className="border rounded-xl p-3 bg-card flex flex-col gap-1 text-xs text-muted-foreground">
                       <div className="flex items-center justify-between font-semibold">
                         <span>{t.reference}</span>
-                        <span className="text-[10px] text-gray-400 font-normal">{t.date}</span>
+                        <span className="text-[10px] text-muted-foreground font-normal">{t.date}</span>
                       </div>
-                      <div className="text-[11px] text-gray-500 mb-1">{t.description}</div>
+                      <div className="text-[11px] text-muted-foreground mb-1">{t.description}</div>
                       <div className="flex items-center justify-between border-t pt-1.5 text-[10px]">
                         <span>Dr: <span className="font-semibold text-red-600">{t.debit > 0 ? fmt(t.debit) : "-"}</span></span>
                         <span>Cr: <span className="font-semibold text-green-700">{t.credit > 0 ? fmt(t.credit) : "-"}</span></span>
-                        <span className="font-bold text-gray-950">Bal: {fmt(t.runningBalance)}</span>
+                        <span className="font-bold text-foreground">Bal: {fmt(t.runningBalance)}</span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="p-6 text-center border border-dashed rounded-xl text-gray-400 text-xs">No ledger entries match current filters.</div>
+                  <div className="p-6 text-center border border-dashed rounded-xl text-muted-foreground text-xs">No ledger entries match current filters.</div>
                 )}
               </div>
             </div>

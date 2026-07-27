@@ -166,6 +166,7 @@ export function GoodsReceiptPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     if (!selectedOrder) {
       toast.error("Please select a Purchase Order.");
       return;
@@ -249,7 +250,7 @@ export function GoodsReceiptPage() {
       {/* Navigation */}
       <button
         onClick={() => navigate("/purchases")}
-        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer dark:text-slate-300 dark:hover:text-orange-400"
+        className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer dark:text-slate-300 dark:hover:text-orange-400"
       >
         <ArrowLeft size={14} />
         Back to Purchase Orders
@@ -260,13 +261,13 @@ export function GoodsReceiptPage() {
         title="Goods Receipt Note (GRN) & Physical Stock Receiving"
         description="Record physically received materials, track partial shipments, shortage & damaged items, and update warehouse stock."
         actions={
-          <div className="flex items-center gap-2 rounded-xl bg-slate-100 p-1 dark:bg-slate-800">
+          <div className="flex items-center gap-2 rounded-xl bg-muted p-1 dark:bg-slate-800">
             <button
               onClick={() => setActiveTab("create")}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                 activeTab === "create"
-                  ? "bg-white text-orange-600 shadow-2xs dark:bg-slate-900 dark:text-orange-400"
-                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400"
+                  ? "bg-card text-orange-600 shadow-2xs dark:bg-slate-900 dark:text-orange-400"
+                  : "text-muted-foreground hover:text-foreground dark:text-muted-foreground"
               }`}
             >
               Receive Goods (GRN)
@@ -275,8 +276,8 @@ export function GoodsReceiptPage() {
               onClick={() => setActiveTab("history")}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                 activeTab === "history"
-                  ? "bg-white text-orange-600 shadow-2xs dark:bg-slate-900 dark:text-orange-400"
-                  : "text-slate-600 hover:text-slate-900 dark:text-slate-400"
+                  ? "bg-card text-orange-600 shadow-2xs dark:bg-slate-900 dark:text-orange-400"
+                  : "text-muted-foreground hover:text-foreground dark:text-muted-foreground"
               }`}
             >
               GRN Receipt History ({receiptHistory.length})
@@ -304,22 +305,22 @@ export function GoodsReceiptPage() {
           {/* Form Container */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Step 1 & Reference Info Header */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-              <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+              <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
                 <FileCheck size={16} className="text-orange-500" />
                 Step 1 — Purchase Order & Delivery Reference
               </h3>
 
               <div className="grid gap-4 sm:grid-cols-3 text-xs">
                 <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                  <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
                     Select Purchase Order *
                   </label>
                   <select
                     required
                     value={selectedPoId}
                     onChange={(e) => setSelectedPoId(e.target.value)}
-                    className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   >
                     <option value="">Select PO (Sent / Partial)...</option>
                     {activeReceivableOrders.map((o) => (
@@ -331,7 +332,7 @@ export function GoodsReceiptPage() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                  <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
                     Delivery Challan / Invoice #
                   </label>
                   <input
@@ -339,12 +340,12 @@ export function GoodsReceiptPage() {
                     placeholder="e.g. DC-98421"
                     value={challanNumber}
                     onChange={(e) => setChallanNumber(e.target.value)}
-                    className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                  <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
                     Internal Remarks / Vehicle #
                   </label>
                   <input
@@ -352,7 +353,7 @@ export function GoodsReceiptPage() {
                     placeholder="e.g. Driver: Ramesh / MH-04-1234"
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
-                    className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                    className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   />
                 </div>
               </div>
@@ -360,13 +361,13 @@ export function GoodsReceiptPage() {
 
             {/* Step 2 to 5: Item Line Receiving Breakdown */}
             {selectedOrder && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
-                  <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+                <div className="flex items-center justify-between border-b border-border pb-3 dark:border-slate-800">
+                  <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
                     <Boxes size={16} className="text-orange-500" />
                     Step 2 to 5 — Item Shipment Quantities & Warehouse Destination
                   </h3>
-                  <span className="text-xs font-bold text-slate-500">
+                  <span className="text-xs font-bold text-muted-foreground">
                     PO Value: <strong>{fmt(selectedOrder.totalAmount)}</strong>
                   </span>
                 </div>
@@ -374,7 +375,7 @@ export function GoodsReceiptPage() {
                 {/* Items Line Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
+                    <thead className="bg-muted text-muted-foreground border-b border-border dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
                       <tr>
                         <th className="px-3.5 py-3 font-black uppercase">Material Item</th>
                         <th className="px-3.5 py-3 font-black uppercase">Ordered</th>
@@ -403,16 +404,16 @@ export function GoodsReceiptPage() {
                         return (
                           <tr
                             key={item.id}
-                            className="border-b last:border-0 border-slate-100 dark:border-slate-800 font-semibold"
+                            className="border-b last:border-0 border-border dark:border-slate-800 font-semibold"
                           >
                             <td className="px-3.5 py-3.5">
-                              <strong className="text-slate-900 dark:text-slate-100 block">{item.materialName}</strong>
-                              <span className="text-[10px] text-slate-400">{item.sku}</span>
+                              <strong className="text-foreground dark:text-slate-100 block">{item.materialName}</strong>
+                              <span className="text-[10px] text-muted-foreground">{item.sku}</span>
                             </td>
-                            <td className="px-3.5 py-3.5 text-slate-700 dark:text-slate-300">
+                            <td className="px-3.5 py-3.5 text-muted-foreground dark:text-slate-300">
                               {item.quantity} {item.unit}
                             </td>
-                            <td className="px-3.5 py-3.5 text-slate-600 dark:text-slate-400">
+                            <td className="px-3.5 py-3.5 text-muted-foreground dark:text-muted-foreground">
                               {item.receivedQuantity} {item.unit}
                             </td>
                             <td className="px-3.5 py-3.5 font-bold text-amber-800 dark:text-amber-300">
@@ -426,7 +427,7 @@ export function GoodsReceiptPage() {
                                 step="any"
                                 value={input.receivedQty}
                                 onChange={(e) => handleInputChange(item.id, "receivedQty", e.target.value)}
-                                className="w-24 h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                                className="w-24 h-9 rounded-lg border border-border bg-card px-2.5 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                               />
                             </td>
                             <td className="px-3.5 py-3.5">
@@ -437,7 +438,7 @@ export function GoodsReceiptPage() {
                                 step="any"
                                 value={input.damagedQty}
                                 onChange={(e) => handleInputChange(item.id, "damagedQty", e.target.value)}
-                                className="w-20 h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                                className="w-20 h-9 rounded-lg border border-border bg-card px-2.5 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                               />
                             </td>
                             <td className="px-3.5 py-3.5">
@@ -451,14 +452,14 @@ export function GoodsReceiptPage() {
                                   {shortageQty} {item.unit} Short
                                 </span>
                               ) : (
-                                <span className="text-slate-400 font-normal">None</span>
+                                <span className="text-muted-foreground font-normal">None</span>
                               )}
                             </td>
                             <td className="px-3.5 py-3.5">
                               <select
                                 value={input.godownId}
                                 onChange={(e) => handleInputChange(item.id, "godownId", e.target.value)}
-                                className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                                className="h-9 rounded-lg border border-border bg-card px-2 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                               >
                                 {godowns.map((g) => (
                                   <option key={g.id} value={g.id}>{g.name}</option>
@@ -473,7 +474,7 @@ export function GoodsReceiptPage() {
                 </div>
 
                 {/* Submit Action Bar */}
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-border dark:border-slate-800">
                   <button
                     type="submit"
                     disabled={submitting}
@@ -491,20 +492,20 @@ export function GoodsReceiptPage() {
       {/* Tab 2: Goods Receipt History Audit Log */}
       {activeTab === "history" && (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-slate-800">
-              <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3 dark:border-slate-800">
+              <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
                 <History size={16} className="text-orange-500" />
                 Goods Receipt Notes (GRN) Audit Trail History ({filteredHistory.length})
               </h3>
 
               <div className="relative">
-                <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+                <Search size={14} className="absolute left-3 top-3 text-muted-foreground" />
                 <input
                   value={historySearch}
                   onChange={(e) => setHistorySearch(e.target.value)}
                   placeholder="Search GRN #, PO #, Supplier..."
-                  className="h-10 rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  className="h-10 rounded-xl border border-border bg-card pl-9 pr-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 />
               </div>
             </div>
@@ -517,9 +518,9 @@ export function GoodsReceiptPage() {
             ) : (
               <>
                 {/* Desktop History Table */}
-                <div className="hidden overflow-hidden rounded-xl border border-slate-200 md:block dark:border-slate-800">
+                <div className="hidden overflow-hidden rounded-xl border border-border md:block dark:border-slate-800">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
+                    <thead className="bg-muted text-muted-foreground border-b border-border dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
                       <tr>
                         <th className="px-4 py-3.5 font-black uppercase">GRN Number</th>
                         <th className="px-4 py-3.5 font-black uppercase">PO Number</th>
@@ -534,29 +535,29 @@ export function GoodsReceiptPage() {
                       {filteredHistory.map((r) => (
                         <tr
                           key={r.receiptId}
-                          className="border-b last:border-0 border-slate-100 hover:bg-slate-50/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50 font-semibold"
+                          className="border-b last:border-0 border-border hover:bg-muted/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50 font-semibold"
                         >
-                          <td className="px-4 py-3.5 font-mono text-slate-900 font-extrabold dark:text-slate-100">
+                          <td className="px-4 py-3.5 font-mono text-foreground font-extrabold dark:text-slate-100">
                             {r.receiptNumber}
                           </td>
-                          <td className="px-4 py-3.5 text-slate-700 dark:text-slate-300 font-bold">
+                          <td className="px-4 py-3.5 text-muted-foreground dark:text-slate-300 font-bold">
                             <Link to={`/purchases/${r.poId}`} className="hover:text-orange-600">
                               {r.poNumber}
                             </Link>
                           </td>
-                          <td className="px-4 py-3.5 text-slate-800 dark:text-slate-200">
+                          <td className="px-4 py-3.5 text-foreground dark:text-slate-200">
                             {r.supplierName}
                           </td>
-                          <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400">
+                          <td className="px-4 py-3.5 text-muted-foreground dark:text-muted-foreground">
                             {new Date(r.receiptDate).toLocaleString("en-IN", {
                               dateStyle: "short",
                               timeStyle: "short",
                             })}
                           </td>
-                          <td className="px-4 py-3.5 font-black text-slate-900 dark:text-slate-100">
+                          <td className="px-4 py-3.5 font-black text-foreground dark:text-slate-100">
                             {fmt(r.totalAmount)}
                           </td>
-                          <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 font-semibold">
+                          <td className="px-4 py-3.5 text-muted-foreground dark:text-muted-foreground font-semibold">
                             {r.recordedBy}
                           </td>
                           <td className="px-4 py-3.5 text-right">
@@ -578,21 +579,21 @@ export function GoodsReceiptPage() {
                   {filteredHistory.map((r) => (
                     <div
                       key={r.receiptId}
-                      className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-800/40 text-xs"
+                      className="rounded-xl border border-border bg-muted/60 p-4 space-y-2 dark:border-slate-800 dark:bg-slate-800/40 text-xs"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-black text-slate-900 font-mono dark:text-slate-100">
+                        <span className="font-black text-foreground font-mono dark:text-slate-100">
                           {r.receiptNumber}
                         </span>
-                        <strong className="text-slate-900 font-black dark:text-slate-100">
+                        <strong className="text-foreground font-black dark:text-slate-100">
                           {fmt(r.totalAmount)}
                         </strong>
                       </div>
-                      <div className="flex items-center justify-between text-[11px] text-slate-500">
+                      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                         <span>PO: {r.poNumber}</span>
                         <span>{r.supplierName}</span>
                       </div>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-muted-foreground">
                         Received on {new Date(r.receiptDate).toLocaleDateString("en-IN")} by {r.recordedBy}
                       </p>
                     </div>

@@ -29,7 +29,7 @@ export const DeliveryRouteGuard: React.FC = () => {
         <div className="flex flex-col items-center gap-3">
           <div
             style={{ borderTopColor: C.blue }}
-            className="w-10 h-10 border-4 border-gray-200 rounded-full animate-spin"
+            className="w-10 h-10 border-4 border-border rounded-full animate-spin"
           />
           <span style={{ color: C.muted }} className="text-xs font-semibold animate-pulse">
             Loading your session...
@@ -56,7 +56,7 @@ export const DeliveryRouteGuard: React.FC = () => {
         <div className="flex flex-col items-center gap-3">
           <div
             style={{ borderTopColor: C.blue }}
-            className="w-10 h-10 border-4 border-gray-200 rounded-full animate-spin"
+            className="w-10 h-10 border-4 border-border rounded-full animate-spin"
           />
           <span style={{ color: C.muted }} className="text-xs font-semibold animate-pulse">
             Redirecting...

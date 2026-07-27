@@ -112,7 +112,7 @@ export const ManagementPage = () => {
           </div>
           <button 
             onClick={handleLogout}
-            className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
+            className="w-10 h-10 rounded-lg flex items-center justify-center bg-card/10 active:scale-95 transition-all border border-white/20 cursor-pointer"
           >
             <LogOut size={18} className="text-white" />
           </button>
@@ -168,7 +168,7 @@ export const ManagementPage = () => {
         {activeTab === "profile" || !canManageTeam ? (
           <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
             {/* Header info */}
-            <div className="flex items-center gap-4 bg-white border border-[rgba(20,18,14,0.1)] rounded-xl p-5 shadow-sm">
+            <div className="flex items-center gap-4 bg-card border border-[rgba(20,18,14,0.1)] rounded-xl p-5 shadow-sm">
               <div style={{ background: "rgba(42,76,214,0.08)" }} className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0">
                 <span style={{ color: C.blue }} className="text-lg font-bold">{initials}</span>
               </div>
@@ -177,7 +177,7 @@ export const ManagementPage = () => {
                 <div style={{ color: C.muted }} className="text-xs mt-0.5">{user?.role} · {user?.email}</div>
               </div>
               <div className="text-right hidden sm:block">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Business Unit</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Business Unit</span>
                 <div style={{ color: C.ink }} className="text-xs font-bold truncate max-w-[150px]">{business?.name || "Shri Krishna Traders"}</div>
               </div>
             </div>
@@ -217,22 +217,22 @@ export const ManagementPage = () => {
 
                 <div className="grid grid-cols-2 gap-4 text-xs font-medium">
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">GST Registration</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{business?.gstNumber || "Not Provided"}</span>
+                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">GST Registration</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{business?.gstNumber || "Not Provided"}</span>
                   </div>
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">GST State / Code</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">
+                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">GST State / Code</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">
                       {business?.state || "Unspecified"} {business?.stateCode ? `(${business.stateCode})` : ""}
                     </span>
                   </div>
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">Business Contact</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{business?.phone || "Not Provided"}</span>
+                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">Business Contact</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{business?.phone || "Not Provided"}</span>
                   </div>
                   <div className="col-span-2">
-                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">Operating Address</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{business?.address || "Not Provided"}</span>
+                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">Operating Address</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{business?.address || "Not Provided"}</span>
                   </div>
                 </div>
 
@@ -240,12 +240,12 @@ export const ManagementPage = () => {
 
                 <div className="grid grid-cols-2 gap-4 text-xs font-medium pt-2">
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">Invoice Prefix / Format</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{localStorage.getItem("invoice_prefix") || "INV-"} (Next: {localStorage.getItem("invoice_next") || "1001"})</span>
+                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">Invoice Prefix / Format</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{localStorage.getItem("invoice_prefix") || "INV-"} (Next: {localStorage.getItem("invoice_next") || "1001"})</span>
                   </div>
                   <div>
-                    <span style={{ color: C.muted }} className="block text-xs text-slate-500 font-semibold mb-1">Active Financial Year</span>
-                    <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{localStorage.getItem("fy_active") || "FY 2026 - 2027"}</span>
+                    <span style={{ color: C.muted }} className="block text-xs text-muted-foreground font-semibold mb-1">Active Financial Year</span>
+                    <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{localStorage.getItem("fy_active") || "FY 2026 - 2027"}</span>
                   </div>
                 </div>
               </Card>
@@ -257,17 +257,17 @@ export const ManagementPage = () => {
               <Card className="p-5 flex flex-col gap-3 text-sm font-medium">
                 <div className="flex justify-between py-1">
                   <span style={{ color: C.muted }}>User Identifier</span>
-                  <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{user?.id}</span>
+                  <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{user?.id}</span>
                 </div>
                 <Divider />
                 <div className="flex justify-between py-1">
                   <span style={{ color: C.muted }}>Staff Name</span>
-                  <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{user?.name}</span>
+                  <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{user?.name}</span>
                 </div>
                 <Divider />
                 <div className="flex justify-between py-1">
                   <span style={{ color: C.muted }}>Email Address</span>
-                  <span style={{ color: C.ink }} className="text-sm font-bold text-slate-900">{user?.email}</span>
+                  <span style={{ color: C.ink }} className="text-sm font-bold text-foreground">{user?.email}</span>
                 </div>
                 <Divider />
                 <div className="flex justify-between py-1">
@@ -307,11 +307,11 @@ export const ManagementPage = () => {
           <div style={{ background: C.white, borderRadius: 16 }} className="w-full max-w-sm p-5 flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <span style={{ color: C.ink }} className="text-base font-bold">Edit Business Profile</span>
-              <button onClick={() => setShowEditBusiness(false)} className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer">×</button>
+              <button onClick={() => setShowEditBusiness(false)} className="text-muted-foreground hover:text-muted-foreground text-lg font-bold cursor-pointer">×</button>
             </div>
             <form onSubmit={handleEditBusinessSubmit} className="flex flex-col gap-3.5 text-xs font-medium">
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Business Name</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Business Name</label>
                 <input
                   type="text"
                   required
@@ -324,7 +324,7 @@ export const ManagementPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">GSTIN (Registration No.)</label>
+                <label className="text-muted-foreground text-[10px] uppercase">GSTIN (Registration No.)</label>
                 <input
                   type="text"
                   placeholder="e.g. 27AABFR5987M1ZP"
@@ -337,7 +337,7 @@ export const ManagementPage = () => {
 
               <div className="flex gap-2">
                 <div className="flex flex-col gap-1 w-2/3">
-                  <label className="text-gray-500 text-[10px] uppercase">State Name</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">State Name</label>
                   <input
                     type="text"
                     placeholder="e.g. Maharashtra"
@@ -348,7 +348,7 @@ export const ManagementPage = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1 w-1/3">
-                  <label className="text-gray-500 text-[10px] uppercase">State Code</label>
+                  <label className="text-muted-foreground text-[10px] uppercase">State Code</label>
                   <input
                     type="text"
                     maxLength={2}
@@ -362,7 +362,7 @@ export const ManagementPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Business Phone</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Business Phone</label>
                 <input
                   type="text"
                   placeholder="e.g. +91 98765 00001"
@@ -374,7 +374,7 @@ export const ManagementPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Office Address</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Office Address</label>
                 <textarea
                   placeholder="e.g. Plot 14, Bhosari MIDC, Pune 411026"
                   value={bAddress}
@@ -385,7 +385,7 @@ export const ManagementPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Invoice Settings (Prefix & Start No.)</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Invoice Settings (Prefix & Start No.)</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -407,7 +407,7 @@ export const ManagementPage = () => {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-gray-500 text-[10px] uppercase">Financial Year</label>
+                <label className="text-muted-foreground text-[10px] uppercase">Financial Year</label>
                 <select
                   value={bFy}
                   onChange={(e) => setBFy(e.target.value)}

@@ -100,23 +100,23 @@ export function CustomerListPage() {
       </div>
 
       {/* Filter panel */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-[1fr_220px_auto]">
           <label className="relative">
-            <Search className="absolute left-3.5 top-3 text-slate-400" size={18}/>
+            <Search className="absolute left-3.5 top-3 text-muted-foreground" size={18}/>
             <input 
               aria-label="Search customers" 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
               placeholder="Search customer name, phone number, GSTIN or code…" 
-              className="h-11 w-full rounded-xl border border-slate-200 pl-10 pr-4 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
+              className="h-11 w-full rounded-xl border border-border pl-10 pr-4 text-sm sm:text-base font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-muted-foreground"
             />
           </label>
           <select 
             aria-label="Balance status" 
             value={balance} 
             onChange={e => setBalance(e.target.value)} 
-            className="h-11 rounded-xl border border-slate-200 bg-white px-3.5 text-xs sm:text-sm font-extrabold text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            className="h-11 rounded-xl border border-border bg-card px-3.5 text-xs sm:text-sm font-extrabold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           >
             <option value="ALL">All Accounts</option>
             <option value="DUE">Outstanding Dues Only</option>
@@ -125,7 +125,7 @@ export function CustomerListPage() {
           {(search || balance !== "ALL") && (
             <button 
               onClick={() => { setSearch(""); setBalance("ALL"); }} 
-              className="font-extrabold text-xs text-slate-700 hover:bg-slate-50 px-4 h-11 border border-slate-200 rounded-xl cursor-pointer"
+              className="font-extrabold text-xs text-muted-foreground hover:bg-muted px-4 h-11 border border-border rounded-xl cursor-pointer"
             >
               Clear
             </button>
@@ -153,12 +153,12 @@ export function CustomerListPage() {
       ) : (
         <>
           {/* Desktop Table Viewport (>=768px) */}
-          <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
+          <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600 border-b">
+              <thead className="bg-muted text-muted-foreground border-b">
                 <tr>
                   {["Customer Name & Code", "Phone & Contact", "GSTIN", "Total Orders", "Last Purchase", "Outstanding Due", "Quick Actions"].map(x => (
-                    <th key={x} className="px-4 py-3.5 font-black text-xs uppercase tracking-wider text-slate-500">{x}</th>
+                    <th key={x} className="px-4 py-3.5 font-black text-xs uppercase tracking-wider text-muted-foreground">{x}</th>
                   ))}
                 </tr>
               </thead>
@@ -172,13 +172,13 @@ export function CustomerListPage() {
                   const hasDue = c.outstandingBalance > 0;
 
                   return (
-                    <tr key={c.id} className={`transition-colors ${hasDue ? "bg-amber-50/20 hover:bg-amber-50/40" : "hover:bg-slate-50/60"}`}>
+                    <tr key={c.id} className={`transition-colors ${hasDue ? "bg-amber-50/20 hover:bg-amber-50/40" : "hover:bg-muted/60"}`}>
                       <td className="px-4 py-3.5">
-                        <Link to={`/customers/${c.id}`} className="font-black text-slate-900 text-sm sm:text-base hover:text-orange-600 transition-colors block">
+                        <Link to={`/customers/${c.id}`} className="font-black text-foreground text-sm sm:text-base hover:text-orange-600 transition-colors block">
                           {c.name}
                         </Link>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-xs text-slate-400 font-bold uppercase">{c.customerCode}</span>
+                          <span className="text-xs text-muted-foreground font-bold uppercase">{c.customerCode}</span>
                           {c.allowCredit === false ? (
                             <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black text-red-700 uppercase border border-red-200">Credit Blocked</span>
                           ) : c.creditLimit > 0 && c.outstandingBalance > c.creditLimit ? (
@@ -194,12 +194,12 @@ export function CustomerListPage() {
                           {c.phone}
                         </a>
                       </td>
-                      <td className="px-4 py-3.5 text-slate-700 font-extrabold text-xs uppercase">{c.gstin || "—"}</td>
-                      <td className="px-4 py-3.5 text-slate-700 font-extrabold text-xs sm:text-sm">{totalOrders} order(s)</td>
-                      <td className="px-4 py-3.5 text-slate-500 font-semibold text-xs">{lastPurchase}</td>
+                      <td className="px-4 py-3.5 text-muted-foreground font-extrabold text-xs uppercase">{c.gstin || "—"}</td>
+                      <td className="px-4 py-3.5 text-muted-foreground font-extrabold text-xs sm:text-sm">{totalOrders} order(s)</td>
+                      <td className="px-4 py-3.5 text-muted-foreground font-semibold text-xs">{lastPurchase}</td>
                       <td className="px-4 py-3.5">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black ${
-                          hasDue ? "bg-red-100 text-red-800 border border-red-200" : "bg-slate-100 text-slate-700"
+                          hasDue ? "bg-red-100 text-red-800 border border-red-200" : "bg-muted text-muted-foreground"
                         }`}>
                           {fmt(c.outstandingBalance)}
                         </span>
@@ -223,7 +223,7 @@ export function CustomerListPage() {
                           <button 
                             aria-label={`Actions for ${c.name}`} 
                             onClick={() => setMenu(menu === c.id ? "" : c.id)} 
-                            className="h-8 w-8 rounded-lg hover:bg-slate-100 flex items-center justify-center cursor-pointer ml-1"
+                            className="h-8 w-8 rounded-lg hover:bg-muted flex items-center justify-center cursor-pointer ml-1"
                           >
                             <MoreVertical size={16}/>
                           </button>
@@ -252,42 +252,42 @@ export function CustomerListPage() {
               const hasDue = c.outstandingBalance > 0;
 
               return (
-                <article key={c.id} className={`rounded-2xl border bg-white p-4 shadow-sm space-y-3 ${
-                  hasDue ? "border-amber-300/80 bg-amber-50/10" : "border-slate-200"
+                <article key={c.id} className={`rounded-2xl border bg-card p-4 shadow-sm space-y-3 ${
+                  hasDue ? "border-amber-300/80 bg-amber-50/10" : "border-border"
                 }`}>
                   <div className="flex justify-between items-start gap-3">
                     <div>
-                      <Link to={`/customers/${c.id}`} className="font-black text-slate-900 text-base leading-tight block hover:text-orange-600">
+                      <Link to={`/customers/${c.id}`} className="font-black text-foreground text-base leading-tight block hover:text-orange-600">
                         {c.name}
                       </Link>
-                      <p className="text-xs text-slate-500 font-bold mt-0.5">{c.customerCode} · {c.phone}</p>
-                      {c.gstin && <p className="text-[10px] text-slate-400 font-extrabold uppercase mt-0.5">GSTIN: {c.gstin}</p>}
+                      <p className="text-xs text-muted-foreground font-bold mt-0.5">{c.customerCode} · {c.phone}</p>
+                      {c.gstin && <p className="text-[10px] text-muted-foreground font-extrabold uppercase mt-0.5">GSTIN: {c.gstin}</p>}
                     </div>
                     {canUpdate && (
                       <button 
                         aria-label={`Actions for ${c.name}`} 
                         onClick={() => setMenu(menu === c.id ? "" : c.id)} 
-                        className="h-9 w-9 shrink-0 rounded-xl hover:bg-slate-100 flex items-center justify-center cursor-pointer border border-slate-200"
+                        className="h-9 w-9 shrink-0 rounded-xl hover:bg-muted flex items-center justify-center cursor-pointer border border-border"
                       >
                         <MoreVertical size={18}/>
                       </button>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs pt-2.5 border-t border-slate-100">
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-2.5 border-t border-border">
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-black">Outstanding Dues</span>
-                      <strong className={`text-sm font-black mt-0.5 block ${hasDue ? "text-red-700" : "text-slate-950"}`}>
+                      <span className="text-muted-foreground block text-[10px] uppercase font-black">Outstanding Dues</span>
+                      <strong className={`text-sm font-black mt-0.5 block ${hasDue ? "text-red-700" : "text-foreground"}`}>
                         {fmt(c.outstandingBalance)}
                       </strong>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-black">Total Orders</span>
-                      <strong className="text-slate-700 text-xs mt-0.5 block font-extrabold">{totalOrders} order(s)</strong>
+                      <span className="text-muted-foreground block text-[10px] uppercase font-black">Total Orders</span>
+                      <strong className="text-muted-foreground text-xs mt-0.5 block font-extrabold">{totalOrders} order(s)</strong>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
                     <Link 
                       to={`/sales-orders/new?customerId=${c.id}`} 
                       className="flex-1 min-h-[44px] flex items-center justify-center rounded-xl bg-orange-600 text-xs font-black text-white hover:bg-orange-700 cursor-pointer press-active"
@@ -304,14 +304,14 @@ export function CustomerListPage() {
                     )}
                     <a 
                       href={`tel:${c.phone}`} 
-                      className="px-3.5 min-h-[44px] flex items-center justify-center gap-1 rounded-xl border border-slate-200 text-xs font-black text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                      className="px-3.5 min-h-[44px] flex items-center justify-center gap-1 rounded-xl border border-border text-xs font-black text-muted-foreground hover:bg-muted cursor-pointer press-active"
                     >
                       <Phone size={14} />
                     </a>
                   </div>
 
                   {menu === c.id && (
-                    <div className="mt-2 pt-2 border-t border-slate-100">
+                    <div className="mt-2 pt-2 border-t border-border">
                       <Menu 
                         inline 
                         view={() => nav(`/customers/${c.id}`)} 
@@ -348,10 +348,10 @@ function Menu({ view, edit, del, inline = false, onClose }: { view: () => void; 
   };
 
   return (
-    <div className={inline ? "grid grid-cols-3 gap-2" : "absolute right-4 top-12 z-20 w-36 rounded-xl border bg-white p-1 shadow-lg border-slate-100 text-left"}>
-      <button onClick={() => trigger(view)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 w-full cursor-pointer">View</button>
-      {edit && <button onClick={() => trigger(edit)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 w-full cursor-pointer">Edit</button>}
-      {del && <button onClick={() => trigger(del)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-red-600 hover:bg-slate-50 w-full cursor-pointer">Delete</button>}
+    <div className={inline ? "grid grid-cols-3 gap-2" : "absolute right-4 top-12 z-20 w-36 rounded-xl border bg-card p-1 shadow-lg border-border text-left"}>
+      <button onClick={() => trigger(view)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground w-full cursor-pointer">View</button>
+      {edit && <button onClick={() => trigger(edit)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground w-full cursor-pointer">Edit</button>}
+      {del && <button onClick={() => trigger(del)} className="min-h-9 rounded-lg px-3 text-left text-xs font-semibold text-red-600 hover:bg-muted w-full cursor-pointer">Delete</button>}
     </div>
   );
 }

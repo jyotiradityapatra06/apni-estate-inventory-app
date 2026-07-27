@@ -122,15 +122,15 @@ export default function LinkedDeliveryDetailPage() {
             <span>Back to Deliveries</span>
           </button>
           <div className="mt-2 flex items-center gap-3">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight md:text-3xl">
+            <h1 className="text-2xl font-black text-foreground tracking-tight md:text-3xl">
               {d.deliveryNumber}
             </h1>
             <BusinessStatusBadge status={d.status} />
           </div>
-          <p className="mt-1 text-xs font-semibold text-slate-500 flex flex-wrap items-center gap-2">
-            <span>Customer: <strong className="text-slate-800">{d.customerName}</strong></span>
+          <p className="mt-1 text-xs font-semibold text-muted-foreground flex flex-wrap items-center gap-2">
+            <span>Customer: <strong className="text-foreground">{d.customerName}</strong></span>
             <span>·</span>
-            <span>Order: <strong className="font-mono text-slate-800">{d.salesOrder?.orderNumber}</strong></span>
+            <span>Order: <strong className="font-mono text-foreground">{d.salesOrder?.orderNumber}</strong></span>
             <span>·</span>
             {d.vehicleNumber ? (
               <span className="text-green-700 font-bold flex items-center gap-1">
@@ -205,7 +205,7 @@ export default function LinkedDeliveryDetailPage() {
             className={`rounded-xl border p-3 text-center text-xs font-extrabold ${
               i <= statusIdx
                 ? "border-orange-200 bg-orange-50/60 text-[#F97316]"
-                : "border-slate-100 bg-white text-slate-400"
+                : "border-border bg-card text-muted-foreground"
             }`}
           >
             {x}
@@ -243,19 +243,19 @@ export default function LinkedDeliveryDetailPage() {
 
       {/* Line Items Card Section (Hidden on Print) */}
       <section className="space-y-3 print:hidden">
-        <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
+        <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
           Delivery Line Items
         </h3>
         {d.items.map((x: any) => (
-          <div key={x.id} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3">
+          <div key={x.id} className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-3">
             <div className="flex justify-between items-start">
               <div>
-                <b className="text-sm font-black text-slate-900 block">{x.materialName}</b>
-                <p className="text-xs text-slate-500 font-semibold">{x.godown?.name || "Central Store"}</p>
+                <b className="text-sm font-black text-foreground block">{x.materialName}</b>
+                <p className="text-xs text-muted-foreground font-semibold">{x.godown?.name || "Central Store"}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5 text-xs pt-1 border-t border-slate-100">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5 text-xs pt-1 border-t border-border">
               {[
                 ["Planned", x.plannedQuantity],
                 ["Dispatched", x.dispatchedQuantity],
@@ -263,9 +263,9 @@ export default function LinkedDeliveryDetailPage() {
                 ["Rejected", x.rejectedQuantity],
                 ["Remaining", Number(x.plannedQuantity) - Number(x.receivedQuantity)],
               ].map(([l, v]) => (
-                <div key={String(l)} className="p-2 rounded-xl bg-slate-50 border border-slate-100">
-                  <p className="text-[10px] uppercase font-bold text-slate-400">{l}</p>
-                  <strong className="text-xs font-extrabold text-slate-800">{formatQuantity(v, x.unit)}</strong>
+                <div key={String(l)} className="p-2 rounded-xl bg-muted border border-border">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground">{l}</p>
+                  <strong className="text-xs font-extrabold text-foreground">{formatQuantity(v, x.unit)}</strong>
                 </div>
               ))}
             </div>

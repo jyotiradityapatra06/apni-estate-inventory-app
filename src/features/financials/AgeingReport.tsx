@@ -9,10 +9,10 @@ export function AgeingReport({ rows }: { rows: any[] }) {
   ];
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+    <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-4">
       <div>
-        <h2 className="text-base font-black text-slate-900 tracking-tight">Payment Ageing Breakdown</h2>
-        <p className="text-xs font-semibold text-slate-500 mt-0.5">Categorized breakdown of outstanding balances by aging period.</p>
+        <h2 className="text-base font-black text-foreground tracking-tight">Payment Ageing Breakdown</h2>
+        <p className="text-xs font-semibold text-muted-foreground mt-0.5">Categorized breakdown of outstanding balances by aging period.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3.5 md:grid-cols-4 pt-1">
@@ -24,7 +24,7 @@ export function AgeingReport({ rows }: { rows: any[] }) {
           return (
             <div key={b.key} className={`rounded-xl border p-4 space-y-1.5 shadow-xs ${b.color}`}>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-600">{b.label}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">{b.label}</span>
                 <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase border ${b.badge}`}>
                   {b.key}
                 </span>

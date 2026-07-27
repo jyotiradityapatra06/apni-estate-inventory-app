@@ -10,31 +10,31 @@ export function PurchaseTable({ data }: { data: PurchaseOrder[] }) {
   return (
     <>
       {/* Desktop Table Viewport (>=768px) */}
-      <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
+      <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 text-slate-600 border-b">
+          <thead className="bg-muted text-muted-foreground border-b">
             <tr>
               {["PO Number", "Supplier", "Date", "Amount", "Payment Status", "Order Status", "Actions"].map((x) => (
-                <th className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-slate-500" key={x}>{x}</th>
+                <th className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground" key={x}>{x}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {data.map((x) => (
-              <tr className="border-b last:border-0 hover:bg-slate-50/50 transition-colors" key={x.id}>
+              <tr className="border-b last:border-0 hover:bg-muted/50 transition-colors" key={x.id}>
                 <td className="px-4 py-3.5">
                   <Link className="font-bold text-orange-600 hover:text-orange-700 hover:underline" to={`/purchases/${x.id}`}>
                     {x.purchaseOrderNumber}
                   </Link>
                 </td>
                 <td className="px-4 py-3.5">
-                  <span className="block font-bold text-slate-900">{x.supplierName}</span>
-                  <span className="text-xs text-slate-400 font-medium">{x.supplierPhone}</span>
+                  <span className="block font-bold text-foreground">{x.supplierName}</span>
+                  <span className="text-xs text-muted-foreground font-medium">{x.supplierPhone}</span>
                 </td>
-                <td className="px-4 py-3.5 text-slate-600 font-medium">
+                <td className="px-4 py-3.5 text-muted-foreground font-medium">
                   {new Date(x.orderDate).toLocaleDateString("en-IN")}
                 </td>
-                <td className="px-4 py-3.5 font-black text-slate-950">{fmt(x.totalAmount)}</td>
+                <td className="px-4 py-3.5 font-black text-foreground">{fmt(x.totalAmount)}</td>
                 <td className="px-4 py-3.5">
                   <BusinessStatusBadge status={x.paymentStatus}/>
                 </td>
@@ -82,7 +82,7 @@ export function PurchaseTable({ data }: { data: PurchaseOrder[] }) {
               <>
                 <button
                   onClick={() => navigate(`/purchases/${x.id}`)}
-                  className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                  className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                 >
                   View PO Details
                 </button>

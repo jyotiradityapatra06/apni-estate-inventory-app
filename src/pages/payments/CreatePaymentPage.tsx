@@ -59,14 +59,14 @@ export default function CreatePaymentPage() {
       window.dispatchEvent(new Event("notifications:refresh"));
       nav(`/payments/${r.data.id}`);
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e?.message || "Payment could not be recorded. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
   const inputClass =
-    "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
+    "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 
   return (
     <form onSubmit={submit} className="mx-auto max-w-2xl space-y-6 pb-28">
@@ -75,10 +75,10 @@ export default function CreatePaymentPage() {
         description="Enter payment received from customer against an issued invoice."
       />
 
-      <section className="grid gap-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm md:grid-cols-2">
+      <section className="grid gap-5 rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm md:grid-cols-2">
         <SectionHeader title="Payment & Invoice Details" description="Select customer account and target invoice." />
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Customer Account *
           <select
             required
@@ -95,7 +95,7 @@ export default function CreatePaymentPage() {
           </select>
         </label>
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Target Invoice *
           <select
             required
@@ -127,7 +127,7 @@ export default function CreatePaymentPage() {
           </div>
         )}
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Received Amount (₹) *
           <input
             required
@@ -139,11 +139,11 @@ export default function CreatePaymentPage() {
             placeholder="0.00"
             value={form.amount}
             onChange={(e) => setForm({ ...form, amount: e.target.value })}
-            className="mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-base font-black text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
+            className="mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-base font-black text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
           />
         </label>
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Payment Date *
           <input
             required
@@ -154,7 +154,7 @@ export default function CreatePaymentPage() {
           />
         </label>
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Payment Method *
           <select
             value={form.paymentMethod}
@@ -169,7 +169,7 @@ export default function CreatePaymentPage() {
           </select>
         </label>
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Reference / UTR Number
           <input
             placeholder="e.g. UPI Ref or Cheque No."
@@ -179,7 +179,7 @@ export default function CreatePaymentPage() {
           />
         </label>
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Bank Name
           <input
             placeholder="e.g. HDFC Bank, SBI"
@@ -189,7 +189,7 @@ export default function CreatePaymentPage() {
           />
         </label>
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Notes / Remarks
           <input
             placeholder="Optional payment notes"
@@ -201,11 +201,11 @@ export default function CreatePaymentPage() {
       </section>
 
       {/* Action Footer */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-white p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-card p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
         <button
           type="button"
           onClick={() => nav(-1)}
-          className="min-h-[48px] flex-1 rounded-xl border border-slate-200 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 md:flex-none md:px-6 cursor-pointer"
+          className="min-h-[48px] flex-1 rounded-xl border border-border text-xs sm:text-sm font-extrabold text-muted-foreground hover:bg-muted md:flex-none md:px-6 cursor-pointer"
         >
           Cancel
         </button>

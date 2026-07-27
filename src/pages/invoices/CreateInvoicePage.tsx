@@ -125,7 +125,7 @@ export default function CreateInvoicePage() {
   };
 
   const inputClass =
-    "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
+    "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 
   return (
     <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-28">
@@ -142,10 +142,10 @@ export default function CreateInvoicePage() {
       )}
 
       {/* Sales Order & Bill Type */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-5">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-5">
         <SectionHeader title="Sales Order & Bill Category" description="Choose confirmed sales order and select bill tax classification." />
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Select Confirmed Sales Order *
           <select required value={orderId} onChange={(e) => setOrderId(e.target.value)} className={inputClass}>
             <option value="">Choose confirmed Sales Order…</option>
@@ -165,14 +165,14 @@ export default function CreateInvoicePage() {
             className={`min-h-[84px] rounded-2xl border p-4 text-left cursor-pointer transition-all ${
               type === "GST"
                 ? "border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 shadow-sm"
-                : "border-slate-200 bg-white hover:bg-slate-50"
+                : "border-border bg-card hover:bg-muted"
             }`}
           >
             <div className="flex items-center justify-between">
               <span className="font-black text-sm text-blue-900">GST Tax Invoice</span>
               {type === "GST" && <CheckCircle2 size={18} className="text-blue-600" />}
             </div>
-            <p className="mt-1 text-xs text-slate-600 font-medium">Includes HSN code, CGST, SGST & IGST tax breakdown.</p>
+            <p className="mt-1 text-xs text-muted-foreground font-medium">Includes HSN code, CGST, SGST & IGST tax breakdown.</p>
           </button>
 
           <button
@@ -180,23 +180,23 @@ export default function CreateInvoicePage() {
             onClick={() => setType("NON_GST")}
             className={`min-h-[84px] rounded-2xl border p-4 text-left cursor-pointer transition-all ${
               type === "NON_GST"
-                ? "border-slate-800 bg-slate-100 ring-2 ring-slate-800/20 shadow-sm"
-                : "border-slate-200 bg-white hover:bg-slate-50"
+                ? "border-slate-800 bg-muted ring-2 ring-slate-800/20 shadow-sm"
+                : "border-border bg-card hover:bg-muted"
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="font-black text-sm text-slate-900">Non-GST Bill</span>
-              {type === "NON_GST" && <CheckCircle2 size={18} className="text-slate-800" />}
+              <span className="font-black text-sm text-foreground">Non-GST Bill</span>
+              {type === "NON_GST" && <CheckCircle2 size={18} className="text-foreground" />}
             </div>
-            <p className="mt-1 text-xs text-slate-600 font-medium">Simple commercial voucher without tax breakdown.</p>
+            <p className="mt-1 text-xs text-muted-foreground font-medium">Simple commercial voucher without tax breakdown.</p>
           </button>
         </div>
 
         {order && (
-          <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs space-y-1">
-            <span className="text-[10px] font-black uppercase text-slate-400 block">Customer Account</span>
-            <b className="text-sm font-black text-slate-900 block">{order.customerName}</b>
-            <p className="text-slate-600 font-semibold">
+          <div className="rounded-xl bg-muted border border-border p-4 text-xs space-y-1">
+            <span className="text-[10px] font-black uppercase text-muted-foreground block">Customer Account</span>
+            <b className="text-sm font-black text-foreground block">{order.customerName}</b>
+            <p className="text-muted-foreground font-semibold">
               Phone: {order.customerPhone} {order.customerGstin ? `· GSTIN: ${order.customerGstin}` : ""}
             </p>
           </div>
@@ -205,7 +205,7 @@ export default function CreateInvoicePage() {
 
       {/* Invoice Items */}
       {order && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+        <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-4">
           <SectionHeader title="Invoice Line Items" description="Specify billing quantity per item. Partial invoicing supported." />
 
           <div className="space-y-4 pt-1">
@@ -215,24 +215,24 @@ export default function CreateInvoicePage() {
               const remaining = Number(item.quantity) - already;
 
               return (
-                <article key={line.id} className="rounded-xl bg-slate-50 border border-slate-200/80 p-4 space-y-3">
+                <article key={line.id} className="rounded-xl bg-muted border border-border/80 p-4 space-y-3">
                   <div className="flex justify-between items-start">
                     <div>
-                      <b className="text-sm font-black text-slate-900 block">{item.materialName}</b>
-                      <p className="text-xs text-slate-500 font-bold">
+                      <b className="text-sm font-black text-foreground block">{item.materialName}</b>
+                      <p className="text-xs text-muted-foreground font-bold">
                         SKU: {item.sku} {type === "GST" && item.hsnCode ? `· HSN: ${item.hsnCode}` : ""}
                       </p>
                     </div>
-                    <strong className="text-base font-black text-slate-900">
+                    <strong className="text-base font-black text-foreground">
                       {fmt(Number(line.quantity) * Number(line.rate))}
                     </strong>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4 pt-2 border-t border-slate-200/60">
+                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4 pt-2 border-t border-border/60">
                     <Mini label="Ordered Qty" value={formatQuantity(item.quantity, item.unit)} />
                     <Mini label="Already Invoiced" value={formatQuantity(already, item.unit)} />
                     <Mini label="Remaining Qty" value={formatQuantity(remaining, item.unit)} isGreen />
-                    <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+                    <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
                       Invoice Now
                       <input
                         aria-label={`Invoice quantity ${item.materialName}`}
@@ -244,12 +244,12 @@ export default function CreateInvoicePage() {
                         onChange={(e) =>
                           setLines((x) => x.map((v, n) => (n === i ? { ...v, quantity: e.target.value } : v)))
                         }
-                        className="mt-1 min-h-[40px] w-full rounded-lg border border-slate-300 bg-white px-3 text-base font-black text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
+                        className="mt-1 min-h-[40px] w-full rounded-lg border border-border bg-card px-3 text-base font-black text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
                       />
                     </label>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-xs pt-1 border-t border-slate-200/60 text-slate-600">
+                  <div className="grid grid-cols-3 gap-2 text-xs pt-1 border-t border-border/60 text-muted-foreground">
                     <Mini label="Unit Rate" value={fmt(line.rate)} />
                     <Mini label="Discount" value={`${line.discountRate}%`} />
                     {type === "GST" && <Mini label="GST Rate" value={`${line.gstRate}%`} />}
@@ -262,14 +262,14 @@ export default function CreateInvoicePage() {
       )}
 
       {/* Due Date & Notes */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-4">
         <SectionHeader title="Payment Due Date & Terms" description="Set invoice payment due date and custom notes." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Payment Due Date
             <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className={inputClass} />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Payment Terms
             <input
               placeholder="e.g. Net 15 days or Due on receipt"
@@ -278,7 +278,7 @@ export default function CreateInvoicePage() {
               className={inputClass}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block md:col-span-2">
             Notes / Bank Account Details
             <textarea
               rows={2}
@@ -303,11 +303,11 @@ export default function CreateInvoicePage() {
       </section>
 
       {/* Action Footer */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-white p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-card p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
         <button
           type="button"
           onClick={() => nav(-1)}
-          className="min-h-[48px] flex-1 rounded-xl border border-slate-200 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 md:flex-none md:px-6 cursor-pointer"
+          className="min-h-[48px] flex-1 rounded-xl border border-border text-xs sm:text-sm font-extrabold text-muted-foreground hover:bg-muted md:flex-none md:px-6 cursor-pointer"
         >
           Cancel
         </button>
@@ -326,8 +326,8 @@ export default function CreateInvoicePage() {
 function Mini({ label, value, isGreen = false }: { label: string; value: string; isGreen?: boolean }) {
   return (
     <div>
-      <span className="text-[10px] font-black uppercase text-slate-400 block">{label}</span>
-      <strong className={`text-xs sm:text-sm font-black mt-0.5 block ${isGreen ? "text-green-700" : "text-slate-900"}`}>
+      <span className="text-[10px] font-black uppercase text-muted-foreground block">{label}</span>
+      <strong className={`text-xs sm:text-sm font-black mt-0.5 block ${isGreen ? "text-green-700" : "text-foreground"}`}>
         {value}
       </strong>
     </div>

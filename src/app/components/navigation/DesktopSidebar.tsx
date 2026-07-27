@@ -35,15 +35,15 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
       <div className="relative border-b border-slate-800 px-4 py-5 flex items-center justify-between min-h-[81px]">
         {!collapsed && (
           <div className="flex items-center gap-3">
-            <img src="/brand/apni-estate-logo.jpeg" alt="APNI ESTATE" className="h-9 w-9 rounded-lg bg-white object-cover" />
+            <img src="/brand/apni-estate-logo.jpeg" alt="APNI ESTATE" className="h-9 w-9 rounded-lg bg-card object-cover" />
             <div>
               <p className="text-sm font-black tracking-wide text-white">APNI ESTATE</p>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Inventory ERP</p>
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Inventory ERP</p>
             </div>
           </div>
         )}
         {collapsed && (
-          <img src="/brand/apni-estate-logo.jpeg" alt="APNI ESTATE" className="h-9 w-9 mx-auto rounded-lg bg-white object-cover" />
+          <img src="/brand/apni-estate-logo.jpeg" alt="APNI ESTATE" className="h-9 w-9 mx-auto rounded-lg bg-card object-cover" />
         )}
         
         {/* Toggle Collapse Button */}
@@ -59,7 +59,7 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
       {!collapsed && (
         <div className="px-3 pt-4">
           <div className="rounded-xl bg-slate-800/40 border border-slate-800/60 px-3 py-2.5">
-            <p className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Current Shop / Business</p>
+            <p className="text-[11px] uppercase font-bold text-muted-foreground tracking-wider">Current Shop / Business</p>
             <p className="mt-0.5 truncate text-xs font-bold text-slate-100">{business?.name || "APNI ESTATE Store"}</p>
           </div>
         </div>
@@ -74,7 +74,7 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
           return (
             <section key={group} className="space-y-1.5">
               {!collapsed && (
-                <h2 className="px-3 pb-1 text-xs font-black uppercase tracking-wider text-slate-400">{group}</h2>
+                <h2 className="px-3 pb-1 text-xs font-black uppercase tracking-wider text-muted-foreground">{group}</h2>
               )}
               <div className="space-y-1">
                 {grouped.map((item) => {
@@ -113,7 +113,7 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
           {!collapsed && (
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs sm:text-sm font-extrabold text-white">{user?.name}</p>
-              <p className="text-[11px] text-slate-400 font-bold uppercase">{user?.role}</p>
+              <p className="text-[11px] text-muted-foreground font-bold uppercase">{user?.role}</p>
             </div>
           )}
           {!collapsed && (
@@ -123,7 +123,7 @@ export function DesktopSidebar({ collapsed, onToggle }: DesktopSidebarProps) {
                 onClick={signOut} 
                 aria-label="Logout" 
                 title="Logout" 
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-slate-800 hover:text-white cursor-pointer"
               >
                 <LogOut size={16} />
               </button>

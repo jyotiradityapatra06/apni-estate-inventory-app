@@ -27,7 +27,7 @@ const empty: SupplierInput = {
 };
 
 const cls =
-  "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
+  "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 const phonePattern = /^(?:\+91[ -]?)?[6-9]\d{9}$/;
 const gstPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 const panPattern = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
@@ -140,10 +140,10 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
         </p>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <SectionHeader title="Basic Information" description="Supplier name, business name, location, and primary contact." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Supplier Name *
             <input
               ref={first}
@@ -154,7 +154,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Company Name
             <input
               placeholder="Registered firm/company name"
@@ -163,7 +163,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Contact Person
             <input
               placeholder="Manager or sales representative name"
@@ -172,7 +172,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Phone Number *
             <input
               required
@@ -183,7 +183,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Alternate Phone
             <input
               inputMode="tel"
@@ -193,7 +193,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Email Address
             <input
               type="email"
@@ -203,7 +203,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             GSTIN Number
             <input
               maxLength={15}
@@ -213,7 +213,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             State Name
             <input
               placeholder="e.g. Maharashtra"
@@ -222,7 +222,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             GST State Code
             <input
               maxLength={2}
@@ -236,10 +236,10 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <SectionHeader title="Address, PAN & Credit Terms" description="Tax registration and vendor credit limits." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             PAN Number
             <input
               maxLength={10}
@@ -249,7 +249,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Registered Address
             <textarea
               rows={3}
@@ -259,7 +259,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={`${cls} min-h-24 p-3`}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Opening Payable Balance (₹)
             <input
               type="number"
@@ -272,7 +272,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Credit Limit (₹)
             <input
               type="number"
@@ -285,7 +285,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Payment Terms
             <input
               placeholder="e.g. Net 30 days or 7 days advance"
@@ -295,12 +295,12 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
             />
           </label>
           <div className="flex items-center pt-6">
-            <label className="flex min-h-[46px] w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-extrabold text-slate-900 cursor-pointer">
+            <label className="flex min-h-[46px] w-full items-center gap-3 rounded-xl border border-border bg-muted p-3 text-xs font-extrabold text-foreground cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.isActive !== false}
                 onChange={(e) => set("isActive", e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                className="h-4 w-4 rounded border-border text-orange-600 focus:ring-orange-500"
               />
               Supplier Account Active
             </label>
@@ -308,7 +308,7 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <SectionHeader title="Materials Supplied" description="Check materials supplied by this vendor." />
         <div className="grid max-h-64 gap-2.5 overflow-y-auto pr-1 md:grid-cols-2 pt-1">
           {materials.map((m) => (
@@ -317,18 +317,18 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
               className={`flex min-h-[46px] items-center gap-3 rounded-xl border p-3 cursor-pointer transition-colors ${
                 form.materialIds?.includes(m.id)
                   ? "border-orange-300 bg-orange-50/50"
-                  : "border-slate-200 bg-white hover:bg-slate-50"
+                  : "border-border bg-card hover:bg-muted"
               }`}
             >
               <input
                 type="checkbox"
                 checked={form.materialIds?.includes(m.id)}
                 onChange={() => toggle(m.id)}
-                className="h-4 w-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
+                className="h-4 w-4 rounded border-border text-orange-600 focus:ring-orange-500"
               />
               <div>
-                <b className="text-xs font-black text-slate-900 block">{m.materialName}</b>
-                <span className="text-[10px] font-semibold text-slate-400 block">SKU: {m.sku} ({m.unit})</span>
+                <b className="text-xs font-black text-foreground block">{m.materialName}</b>
+                <span className="text-[10px] font-semibold text-muted-foreground block">SKU: {m.sku} ({m.unit})</span>
               </div>
             </label>
           ))}
@@ -336,11 +336,11 @@ export function SupplierFormPage({ mode }: { mode: "create" | "edit" }) {
       </section>
 
       {/* Action Footer */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-white p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-card p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
         <button
           type="button"
           onClick={() => nav(-1)}
-          className="min-h-[48px] flex-1 rounded-xl border border-slate-200 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 md:flex-none md:px-6 cursor-pointer"
+          className="min-h-[48px] flex-1 rounded-xl border border-border text-xs sm:text-sm font-extrabold text-muted-foreground hover:bg-muted md:flex-none md:px-6 cursor-pointer"
         >
           Cancel
         </button>

@@ -53,7 +53,7 @@ export function CustomerDetailPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             <a
               href={`tel:${data.phone}`}
-              className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-extrabold text-slate-700 shadow-xs hover:bg-slate-50 cursor-pointer"
+              className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-extrabold text-muted-foreground shadow-xs hover:bg-muted cursor-pointer"
             >
               <Phone size={15} />
               Call Customer
@@ -79,7 +79,7 @@ export function CustomerDetailPage() {
             {hasPermission(user, "customers:update") && (
               <Link
                 to={`/customers/${data.id}/edit`}
-                className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-extrabold text-slate-700 shadow-xs hover:bg-slate-50 transition-colors cursor-pointer"
+                className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-extrabold text-muted-foreground shadow-xs hover:bg-muted transition-colors cursor-pointer"
               >
                 <Pencil size={15} />
                 Edit Profile
@@ -120,7 +120,7 @@ export function CustomerDetailPage() {
       </div>
 
       {/* Payment History Section */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between border-b pb-3">
           <SectionHeader title="Payment History & Receipts" description="Recent customer payments, receipts, and settlement records." />
           {hasPermission(user, "financials:manage") && (
@@ -134,16 +134,16 @@ export function CustomerDetailPage() {
         </div>
 
         {loadingPayments ? (
-          <div className="h-32 animate-pulse rounded-xl bg-slate-100" />
+          <div className="h-32 animate-pulse rounded-xl bg-muted" />
         ) : payments.length === 0 ? (
-          <div className="py-8 text-center space-y-1 text-slate-500">
-            <p className="font-bold text-sm text-slate-800">No payment receipts recorded</p>
-            <p className="text-xs text-slate-400">No payments have been received from this customer yet.</p>
+          <div className="py-8 text-center space-y-1 text-muted-foreground">
+            <p className="font-bold text-sm text-foreground">No payment receipts recorded</p>
+            <p className="text-xs text-muted-foreground">No payments have been received from this customer yet.</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-slate-200">
+          <div className="overflow-hidden rounded-xl border border-border">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold uppercase tracking-wider">
+              <thead className="bg-muted text-muted-foreground border-b border-border font-bold uppercase tracking-wider">
                 <tr>
                   <th className="p-3">Receipt #</th>
                   <th className="p-3">Date</th>
@@ -154,15 +154,15 @@ export function CustomerDetailPage() {
                   <th className="p-3 text-center">Receipt Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-semibold text-slate-800">
+              <tbody className="divide-y divide-slate-100 font-semibold text-foreground">
                 {payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-3 font-bold text-slate-900">{p.paymentNumber}</td>
-                    <td className="p-3 text-slate-600">{new Date(p.paymentDate).toLocaleDateString("en-IN")}</td>
-                    <td className="p-3 text-slate-700">{p.invoice?.invoiceNumber || "—"}</td>
+                  <tr key={p.id} className="hover:bg-muted/60 transition-colors">
+                    <td className="p-3 font-bold text-foreground">{p.paymentNumber}</td>
+                    <td className="p-3 text-muted-foreground">{new Date(p.paymentDate).toLocaleDateString("en-IN")}</td>
+                    <td className="p-3 text-muted-foreground">{p.invoice?.invoiceNumber || "—"}</td>
                     <td className="p-3 text-right font-black text-emerald-700">{fmt(p.amount)}</td>
                     <td className="p-3">
-                      <span className="uppercase text-[10px] font-bold text-slate-700">{p.paymentMethod?.replaceAll("_", " ")}</span>
+                      <span className="uppercase text-[10px] font-bold text-muted-foreground">{p.paymentMethod?.replaceAll("_", " ")}</span>
                     </td>
                     <td className="p-3 text-center">
                       <BusinessStatusBadge status={p.status} />
@@ -184,7 +184,7 @@ export function CustomerDetailPage() {
       </section>
 
       {/* Credit Control & Exposure Card */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <SectionHeader title="Credit Control & Exposure" description="Credit allowance, payment period, and threshold status." />
           <span
@@ -222,7 +222,7 @@ export function CustomerDetailPage() {
       </section>
 
       {/* Contact and Business Details */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <SectionHeader title="Contact & Business Profile" description="Phone, GST, billing, and delivery address details." />
         <dl className="grid gap-5 md:grid-cols-2 pt-2">
           {data.phone && (
@@ -234,8 +234,8 @@ export function CustomerDetailPage() {
           )}
           {data.email && (
             <Row label="Email Address">
-              <a href={`mailto:${data.email}`} className="inline-flex items-center gap-1.5 text-slate-800 font-bold hover:underline">
-                <Mail size={15} className="text-slate-400" />
+              <a href={`mailto:${data.email}`} className="inline-flex items-center gap-1.5 text-foreground font-bold hover:underline">
+                <Mail size={15} className="text-muted-foreground" />
                 {data.email}
               </a>
             </Row>
@@ -257,9 +257,9 @@ export function CustomerDetailPage() {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="border-b border-slate-100 pb-3 last:border-0">
-      <dt className="text-[11px] font-black uppercase tracking-wider text-slate-500">{label}</dt>
-      <dd className="mt-1 break-words text-sm font-extrabold text-slate-900">{children}</dd>
+    <div className="border-b border-border pb-3 last:border-0">
+      <dt className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">{label}</dt>
+      <dd className="mt-1 break-words text-sm font-extrabold text-foreground">{children}</dd>
     </div>
   );
 }

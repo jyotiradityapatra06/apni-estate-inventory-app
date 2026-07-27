@@ -30,7 +30,7 @@ import { PageHeader } from "../../app/components/common/PageHeader";
 import { StatCard } from "../../app/components/common/Card";
 import { BusinessStatusBadge } from "../../app/components/common/BusinessStatusBadge";
 import { QuantityDisplay } from "../../app/components/common/BusinessPrimitives";
-import { LoadingSkeleton } from "../../app/components/common/FeedbackStates";
+import { EmptyState, LoadingSkeleton } from "../../app/components/common/FeedbackStates";
 import { godownApi } from "../../api/godown.api";
 import { inventoryApi, type InventoryItemData } from "../../api/inventory.api";
 import { useAuth } from "../../hooks/useAuth";
@@ -54,12 +54,14 @@ export function StockOverviewPage() {
   const [items, setItems] = useState<InventoryItemData[]>([]);
   const [godowns, setGodowns] = useState<Godown[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  useEffect(() => {
+  const load = () => {
     setLoading(true);
+    setError("");
     Promise.all([
       inventoryApi.getItems(),
       godownApi.getAll().catch(() => ({ data: [] })),
@@ -68,7 +70,12 @@ export function StockOverviewPage() {
         if (invRes?.data) setItems(invRes.data);
         if (godownRes?.data) setGodowns(godownRes.data.filter((g) => g.isActive));
       })
+      .catch((err) => setError(err instanceof Error ? err.message : "Could not load inventory."))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
   }, []);
 
   const categories = useMemo(
@@ -150,6 +157,34 @@ export function StockOverviewPage() {
     return <LoadingSkeleton />;
   }
 
+  if (error) {
+    return (
+      <EmptyState
+        title="Could not load inventory"
+        description={error}
+        action={<button onClick={load} className="min-h-11 rounded-xl bg-orange-600 px-5 font-bold text-white">Retry</button>}
+      />
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Stock Intelligence & Overview" description="Real-time inventory levels, stock valuation, godown distribution, and health alerts." />
+        <EmptyState
+          title="No inventory materials yet"
+          description="Add your first material to start tracking stock, valuation, and warehouse balances."
+          icon={Boxes}
+          action={hasPermission(user, "inventory:create") ? (
+            <button onClick={() => navigate("/materials/new")} className="min-h-11 rounded-xl bg-orange-600 px-5 font-bold text-white">
+              Add First Material
+            </button>
+          ) : undefined}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 pb-12">
       {/* 1. Page Header with Quick Actions */}
@@ -179,7 +214,7 @@ export function StockOverviewPage() {
             {hasPermission(user, "godowns:transfer") && (
               <button
                 onClick={() => navigate("/transfers/new")}
-                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                className="flex min-h-10 items-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground shadow-2xs hover:bg-muted transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 <ArrowLeftRight size={15} />
                 Stock Transfer
@@ -216,8 +251,8 @@ export function StockOverviewPage() {
       {/* 3. Recharts Analytics Section */}
       <div className="grid gap-4 md:grid-cols-2">
         {/* Category Quantity Donut Chart */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
-          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
+          <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
             <Boxes size={16} className="text-orange-500" />
             Stock Quantity Distribution by Category
           </h3>
@@ -244,7 +279,7 @@ export function StockOverviewPage() {
                 />
                 <Legend
                   wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }}
-                  formatter={(value) => <span className="font-bold text-slate-700 dark:text-slate-300">{value}</span>}
+                  formatter={(value) => <span className="font-bold text-muted-foreground dark:text-slate-300">{value}</span>}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -252,17 +287,17 @@ export function StockOverviewPage() {
         </div>
 
         {/* Category Value Bar Chart */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
-          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
+          <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
             <IndianRupee size={16} className="text-orange-500" />
             Stock Valuation Breakdown by Category
           </h3>
           <div className="h-64 w-full pt-1">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryValueDistribution} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#64748b" }} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "#64748b" }} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} />
                 <Tooltip
                   formatter={(val: number) => [fmt(val), "Valuation"]}
                   contentStyle={{ borderRadius: "12px", fontSize: "12px" }}
@@ -279,9 +314,9 @@ export function StockOverviewPage() {
       </div>
 
       {/* 4. Godown-wise Stock Breakdown Cards */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
-          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+        <div className="flex items-center justify-between border-b border-border pb-3 dark:border-slate-800">
+          <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
             <Warehouse size={16} className="text-orange-500" />
             Godown / Warehouse Live Stock Balances
           </h3>
@@ -294,16 +329,16 @@ export function StockOverviewPage() {
           {godownBreakdown.map((g) => (
             <div
               key={g.name}
-              className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-1.5 dark:border-slate-700 dark:bg-slate-800/60"
+              className="rounded-xl border border-border bg-muted/70 p-4 space-y-1.5 dark:border-slate-700 dark:bg-slate-800/60"
             >
-              <span className="text-[11px] font-black uppercase text-slate-500 block truncate dark:text-slate-400">
+              <span className="text-[11px] font-black uppercase text-muted-foreground block truncate dark:text-muted-foreground">
                 {g.name}
               </span>
               <div className="flex items-baseline justify-between">
-                <strong className="text-base font-black text-slate-900 dark:text-slate-100">
+                <strong className="text-base font-black text-foreground dark:text-slate-100">
                   {g.quantity.toLocaleString("en-IN")} units
                 </strong>
-                <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                <span className="text-xs font-bold text-muted-foreground dark:text-slate-300">
                   {fmt(g.value)}
                 </span>
               </div>
@@ -313,28 +348,28 @@ export function StockOverviewPage() {
       </div>
 
       {/* 5. Live Stock Level Table & Cards */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-slate-800">
-          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3 dark:border-slate-800">
+          <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">
             Inventory Stock Balances ({filteredItems.length})
           </h3>
 
           {/* Search & Filter Bar */}
           <div className="flex flex-wrap items-center gap-2.5">
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+              <Search size={14} className="absolute left-3 top-3 text-muted-foreground" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search stock..."
-                className="h-10 rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="h-10 rounded-xl border border-border bg-card pl-9 pr-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
             </div>
 
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="ALL">All Categories</option>
               {categories.map((cat) => (
@@ -345,7 +380,7 @@ export function StockOverviewPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="ALL">All Statuses</option>
               <option value="IN_STOCK">In Stock</option>
@@ -356,9 +391,9 @@ export function StockOverviewPage() {
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden overflow-hidden rounded-xl border border-slate-200 md:block dark:border-slate-800">
+        <div className="hidden overflow-hidden rounded-xl border border-border md:block dark:border-slate-800">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
+            <thead className="bg-muted text-muted-foreground border-b border-border dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
               <tr>
                 <th className="px-4 py-3.5 font-black uppercase">Material Name</th>
                 <th className="px-4 py-3.5 font-black uppercase">SKU / Category</th>
@@ -378,27 +413,27 @@ export function StockOverviewPage() {
                 return (
                   <tr
                     key={item.id}
-                    className="border-b last:border-0 border-slate-100 hover:bg-slate-50/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50"
+                    className="border-b last:border-0 border-border hover:bg-muted/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50"
                   >
                     <td className="px-4 py-3.5">
                       <Link
                         to={`/materials/${item.id}`}
-                        className="font-extrabold text-slate-900 hover:text-orange-600 transition-colors dark:text-slate-100 dark:hover:text-orange-400"
+                        className="font-extrabold text-foreground hover:text-orange-600 transition-colors dark:text-slate-100 dark:hover:text-orange-400"
                       >
                         {item.materialName}
                       </Link>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 font-semibold">
+                    <td className="px-4 py-3.5 text-muted-foreground dark:text-muted-foreground font-semibold">
                       <span>{item.sku}</span>
-                      <span className="text-[10px] text-slate-400 block">{item.category}</span>
+                      <span className="text-[10px] text-muted-foreground block">{item.category}</span>
                     </td>
-                    <td className="px-4 py-3.5 font-black text-slate-900 dark:text-slate-100">
+                    <td className="px-4 py-3.5 font-black text-foreground dark:text-slate-100">
                       <QuantityDisplay value={item.quantity} unit={item.unit} />
                     </td>
-                    <td className="px-4 py-3.5 font-bold text-slate-700 dark:text-slate-300">
+                    <td className="px-4 py-3.5 font-bold text-muted-foreground dark:text-slate-300">
                       {fmt(value)}
                     </td>
-                    <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 font-semibold">
+                    <td className="px-4 py-3.5 text-muted-foreground dark:text-muted-foreground font-semibold">
                       {godownName}
                     </td>
                     <td className="px-4 py-3.5">
@@ -428,29 +463,29 @@ export function StockOverviewPage() {
             return (
               <div
                 key={item.id}
-                className="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs space-y-3 dark:border-slate-800 dark:bg-slate-900"
+                className="rounded-xl border border-border bg-card p-4 shadow-2xs space-y-3 dark:border-slate-800 dark:bg-slate-900"
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <Link
                       to={`/materials/${item.id}`}
-                      className="font-extrabold text-sm text-slate-900 hover:text-orange-600 dark:text-slate-100"
+                      className="font-extrabold text-sm text-foreground hover:text-orange-600 dark:text-slate-100"
                     >
                       {item.materialName}
                     </Link>
-                    <span className="text-xs text-slate-500 block">{item.sku} • {item.category}</span>
+                    <span className="text-xs text-muted-foreground block">{item.sku} • {item.category}</span>
                   </div>
                   <BusinessStatusBadge status={status} />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-border dark:border-slate-800">
                   <div>
-                    <span className="text-[10px] uppercase text-slate-400 block font-bold">Quantity</span>
+                    <span className="text-[10px] uppercase text-muted-foreground block font-bold">Quantity</span>
                     <QuantityDisplay value={item.quantity} unit={item.unit} />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase text-slate-400 block font-bold">Stock Value</span>
-                    <strong className="text-slate-900 dark:text-slate-100">{fmt(value)}</strong>
+                    <span className="text-[10px] uppercase text-muted-foreground block font-bold">Stock Value</span>
+                    <strong className="text-foreground dark:text-slate-100">{fmt(value)}</strong>
                   </div>
                 </div>
               </div>

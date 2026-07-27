@@ -73,9 +73,9 @@ export default function SalesReturnDetailPage() {
   if (loading) return <div className="h-48 animate-pulse rounded-xl bg-slate-200" />;
   if (error || !data) {
     return (
-      <div className="rounded-xl border border-dashed bg-white p-10 text-center">
+      <div className="rounded-xl border border-dashed bg-card p-10 text-center">
         <h2 className="font-bold text-red-600">Error Loading Return</h2>
-        <p className="mt-1 text-sm text-slate-500">{error || "Sales return not found."}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{error || "Sales return not found."}</p>
         <button onClick={() => navigate("/sales-returns")} className="mt-4 min-h-11 rounded-lg border px-4 font-semibold">
           Back to List
         </button>
@@ -88,7 +88,7 @@ export default function SalesReturnDetailPage() {
       <div className="flex justify-between items-center print:hidden">
         <button
           onClick={() => navigate("/sales-returns")}
-          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-muted-foreground"
         >
           <ArrowLeft size={16} /> Back to Sales Returns
         </button>
@@ -96,7 +96,7 @@ export default function SalesReturnDetailPage() {
         <div className="flex gap-2">
           <button
             onClick={() => window.print()}
-            className="flex min-h-11 items-center gap-2 rounded-lg border bg-white px-4 font-semibold text-slate-700 hover:bg-slate-50"
+            className="flex min-h-11 items-center gap-2 rounded-lg border bg-card px-4 font-semibold text-muted-foreground hover:bg-muted"
           >
             <Printer size={18} /> Print Note
           </button>
@@ -123,15 +123,15 @@ export default function SalesReturnDetailPage() {
       </div>
 
       {/* Main Return Document */}
-      <div className="invoice-print-root rounded-xl border bg-white shadow-sm overflow-hidden print:border-none print:shadow-none">
-        <div className="px-8 py-6 border-b bg-slate-50/50 flex justify-between items-start print:bg-white print:px-0">
+      <div className="invoice-print-root rounded-xl border bg-card shadow-sm overflow-hidden print:border-none print:shadow-none">
+        <div className="px-8 py-6 border-b bg-muted/50 flex justify-between items-start print:bg-card print:px-0">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">SALES RETURN NOTE</h2>
-            <p className="text-slate-500 mt-1">Return No: {data.returnNumber}</p>
+            <h2 className="text-2xl font-bold text-foreground">SALES RETURN NOTE</h2>
+            <p className="text-muted-foreground mt-1">Return No: {data.returnNumber}</p>
           </div>
           <div className="text-right">
             <BusinessStatusBadge status={data.status} />
-            <p className="text-sm text-slate-500 mt-2">
+            <p className="text-sm text-muted-foreground mt-2">
               Date: {format(new Date(data.returnDate), "dd MMM yyyy")}
             </p>
           </div>
@@ -139,21 +139,21 @@ export default function SalesReturnDetailPage() {
 
         <div className="grid gap-6 md:grid-cols-2 p-8 print:px-0">
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Customer Details</h4>
-            <div className="font-semibold text-slate-800">{data.customer.name}</div>
-            <div className="text-slate-600 text-sm mt-1">{data.customer.phone}</div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Customer Details</h4>
+            <div className="font-semibold text-foreground">{data.customer.name}</div>
+            <div className="text-muted-foreground text-sm mt-1">{data.customer.phone}</div>
           </div>
 
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Invoice References</h4>
-            <div className="text-sm text-slate-800">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Invoice References</h4>
+            <div className="text-sm text-foreground">
               Against Invoice:{" "}
-              <Link to={`/invoices/${data.invoiceId}`} className="font-semibold text-blue-700 hover:underline print:no-underline print:text-slate-800">
+              <Link to={`/invoices/${data.invoiceId}`} className="font-semibold text-blue-700 hover:underline print:no-underline print:text-foreground">
                 {data.invoice.invoiceNumber}
               </Link>
             </div>
-            <div className="text-sm text-slate-600 mt-1">
-              Return Reason: <span className="font-medium text-slate-800">{data.reason}</span>
+            <div className="text-sm text-muted-foreground mt-1">
+              Return Reason: <span className="font-medium text-foreground">{data.reason}</span>
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@ export default function SalesReturnDetailPage() {
         <div className="border-t">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b print:bg-white">
+              <tr className="bg-muted text-xs font-bold text-muted-foreground uppercase tracking-wider border-b print:bg-card">
                 <th className="px-8 py-3">Material</th>
                 <th className="px-6 py-3 text-right">Returned Qty</th>
                 <th className="px-6 py-3 text-right">Rate</th>
@@ -172,17 +172,17 @@ export default function SalesReturnDetailPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {data.items.map((item: any) => (
-                <tr key={item.id} className="hover:bg-slate-50/50">
+                <tr key={item.id} className="hover:bg-muted/50">
                   <td className="px-8 py-4">
-                    <div className="font-semibold text-slate-900">{item.inventoryItem.materialName}</div>
-                    <div className="text-xs text-slate-500">SKU: {item.inventoryItem.sku} · Destination: {item.godown.name}</div>
+                    <div className="font-semibold text-foreground">{item.inventoryItem.materialName}</div>
+                    <div className="text-xs text-muted-foreground">SKU: {item.inventoryItem.sku} · Destination: {item.godown.name}</div>
                   </td>
                   <td className="px-6 py-4 text-right font-medium">
                     {Number(item.quantity)} {item.inventoryItem.unit}
                   </td>
                   <td className="px-6 py-4 text-right">{fmt(item.rate)}</td>
                   <td className="px-6 py-4 text-right">{Number(item.gstRate)}%</td>
-                  <td className="px-8 py-4 text-right font-bold text-slate-900">{fmt(item.lineTotal)}</td>
+                  <td className="px-8 py-4 text-right font-bold text-foreground">{fmt(item.lineTotal)}</td>
                 </tr>
               ))}
             </tbody>
@@ -190,11 +190,11 @@ export default function SalesReturnDetailPage() {
         </div>
 
         {/* Totals Summary */}
-        <div className="bg-slate-50/50 p-8 border-t flex justify-end print:bg-white print:px-0">
-          <div className="w-64 space-y-2 text-sm text-slate-600">
+        <div className="bg-muted/50 p-8 border-t flex justify-end print:bg-card print:px-0">
+          <div className="w-64 space-y-2 text-sm text-muted-foreground">
             <div className="flex justify-between">
               <span>Subtotal:</span>
-              <span className="font-medium text-slate-800">{fmt(data.subtotal)}</span>
+              <span className="font-medium text-foreground">{fmt(data.subtotal)}</span>
             </div>
             {Number(data.discountTotal) > 0 && (
               <div className="flex justify-between text-green-700">
@@ -204,13 +204,13 @@ export default function SalesReturnDetailPage() {
             )}
             <div className="flex justify-between">
               <span>Taxable Value:</span>
-              <span className="font-medium text-slate-800">{fmt(data.taxableTotal)}</span>
+              <span className="font-medium text-foreground">{fmt(data.taxableTotal)}</span>
             </div>
             <div className="flex justify-between">
               <span>GST Value:</span>
-              <span className="font-medium text-slate-800">{fmt(data.taxTotal)}</span>
+              <span className="font-medium text-foreground">{fmt(data.taxTotal)}</span>
             </div>
-            <div className="flex justify-between text-base font-bold text-slate-900 pt-2 border-t">
+            <div className="flex justify-between text-base font-bold text-foreground pt-2 border-t">
               <span>Refund Amount:</span>
               <span>{fmt(data.totalAmount)}</span>
             </div>
@@ -219,10 +219,10 @@ export default function SalesReturnDetailPage() {
 
         {/* Audit Log / Notes */}
         {(data.notes || data.completedBy || data.cancelledBy) && (
-          <div className="border-t p-8 bg-slate-50/30 text-xs text-slate-500 space-y-2 print:px-0">
+          <div className="border-t p-8 bg-muted/30 text-xs text-muted-foreground space-y-2 print:px-0">
             {data.notes && (
-              <div className="text-sm text-slate-600 mb-2">
-                <span className="font-semibold text-slate-700">Notes: </span>
+              <div className="text-sm text-muted-foreground mb-2">
+                <span className="font-semibold text-muted-foreground">Notes: </span>
                 {data.notes}
               </div>
             )}

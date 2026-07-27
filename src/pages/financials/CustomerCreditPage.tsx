@@ -23,13 +23,13 @@ export default function CustomerCreditPage() {
   if (!c) {
     return (
       <div className="space-y-4">
-        <Link to="/financials/receivables" className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer">
+        <Link to="/financials/receivables" className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer">
           <ArrowLeft size={14} />
           Back to Receivables
         </Link>
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center space-y-2">
-          <p className="font-extrabold text-base text-slate-900">No Pending Dues Found</p>
-          <p className="text-xs text-slate-400">This customer currently has zero outstanding balance.</p>
+        <div className="rounded-2xl border border-border bg-card p-8 text-center space-y-2">
+          <p className="font-extrabold text-base text-foreground">No Pending Dues Found</p>
+          <p className="text-xs text-muted-foreground">This customer currently has zero outstanding balance.</p>
         </div>
       </div>
     );
@@ -37,7 +37,7 @@ export default function CustomerCreditPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      <Link to="/financials/receivables" className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer">
+      <Link to="/financials/receivables" className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer">
         <ArrowLeft size={14} />
         Back to Receivables
       </Link>
@@ -65,19 +65,19 @@ export default function CustomerCreditPage() {
         <Stat l="Credit Limit" v={fmt(c.creditLimit)} helper="Max Credit Ceiling" />
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
-        <h2 className="text-base font-black text-slate-900 tracking-tight">Pending Invoice History</h2>
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-4">
+        <h2 className="text-base font-black text-foreground tracking-tight">Pending Invoice History</h2>
         <div className="space-y-2.5 pt-1">
           {c.invoices?.length ? (
             c.invoices.map((x: any) => (
               <div
                 key={x.id}
-                className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/60 p-4 hover:bg-orange-50/50 transition-colors"
+                className="flex items-center justify-between rounded-xl border border-border/80 bg-muted/60 p-4 hover:bg-orange-50/50 transition-colors"
               >
                 <div>
-                  <b className="text-sm font-black text-slate-900 block">{x.reference}</b>
-                  <span className="text-xs text-slate-500 font-semibold mt-0.5 block">
-                    Ageing: <strong className={x.ageDays > 60 ? "text-red-600 font-black" : "text-slate-800"}>{x.ageDays} days</strong>
+                  <b className="text-sm font-black text-foreground block">{x.reference}</b>
+                  <span className="text-xs text-muted-foreground font-semibold mt-0.5 block">
+                    Ageing: <strong className={x.ageDays > 60 ? "text-red-600 font-black" : "text-foreground"}>{x.ageDays} days</strong>
                   </span>
                 </div>
                 <div className="text-right">
@@ -86,7 +86,7 @@ export default function CustomerCreditPage() {
               </div>
             ))
           ) : (
-            <p className="text-xs font-semibold text-slate-400 py-4 text-center">No pending unpaid invoices for this customer.</p>
+            <p className="text-xs font-semibold text-muted-foreground py-4 text-center">No pending unpaid invoices for this customer.</p>
           )}
         </div>
       </section>
@@ -96,10 +96,10 @@ export default function CustomerCreditPage() {
 
 function Stat({ l, v, isRed = false, isGreen = false, helper }: { l: string; v: string; isRed?: boolean; isGreen?: boolean; helper?: string }) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs space-y-1">
-      <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">{l}</span>
-      <p className={`text-lg sm:text-xl font-black ${isRed ? "text-red-600" : isGreen ? "text-green-700" : "text-slate-900"}`}>{v}</p>
-      {helper && <span className="text-[10px] font-semibold text-slate-400 block">{helper}</span>}
+    <article className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs space-y-1">
+      <span className="text-[10px] font-black uppercase text-muted-foreground block tracking-wider">{l}</span>
+      <p className={`text-lg sm:text-xl font-black ${isRed ? "text-red-600" : isGreen ? "text-green-700" : "text-foreground"}`}>{v}</p>
+      {helper && <span className="text-[10px] font-semibold text-muted-foreground block">{helper}</span>}
     </article>
   );
 }

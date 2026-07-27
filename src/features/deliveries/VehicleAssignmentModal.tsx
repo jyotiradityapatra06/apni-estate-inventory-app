@@ -82,18 +82,18 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-slate-950/40 p-0 sm:p-4 animate-fade-in">
-      <div className="w-full max-w-lg rounded-t-2xl sm:rounded-2xl bg-white shadow-xl max-h-[90vh] overflow-y-auto flex flex-col">
+      <div className="w-full max-w-lg rounded-t-2xl sm:rounded-2xl bg-card shadow-xl max-h-[90vh] overflow-y-auto flex flex-col">
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 p-4 sm:p-5 sticky top-0 bg-white z-10">
+        <div className="flex items-center justify-between border-b border-border p-4 sm:p-5 sticky top-0 bg-card z-10">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-[#F97316]">
               <Truck size={18} />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
+              <h2 className="text-base sm:text-lg font-black text-foreground leading-tight">
                 {actionTitle}
               </h2>
-              <p className="text-[11px] font-semibold text-slate-400">
+              <p className="text-[11px] font-semibold text-muted-foreground">
                 Logistics & Driver Assignment for Dispatch
               </p>
             </div>
@@ -102,7 +102,7 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
           <button
             onClick={onClose}
             disabled={submitting}
-            className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -112,13 +112,13 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
         <form id="vehicle-form" onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 flex-1">
           {/* Transport / Vehicle Type */}
           <div>
-            <label className="block text-xs font-extrabold text-slate-700 mb-1">
+            <label className="block text-xs font-extrabold text-muted-foreground mb-1">
               Transport Type *
             </label>
             <select
               value={vehicleType}
               onChange={(e) => setVehicleType(e.target.value)}
-              className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:border-[#F97316] focus:outline-none cursor-pointer"
+              className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:border-[#F97316] focus:outline-none cursor-pointer"
             >
               {VEHICLE_TYPES.map((type) => (
                 <option key={type} value={type}>
@@ -130,7 +130,7 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
 
           {/* Vehicle Registration Number */}
           <div>
-            <label className="block text-xs font-extrabold text-slate-700 mb-1">
+            <label className="block text-xs font-extrabold text-muted-foreground mb-1">
               Vehicle Registration Number *
             </label>
             <div className="relative">
@@ -145,7 +145,7 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
                 className={`min-h-[44px] w-full rounded-xl border px-3 text-xs font-bold tracking-wider uppercase focus:outline-none ${
                   errors.vehicleNumber
                     ? "border-red-500 bg-red-50/20 text-red-900 focus:border-red-500"
-                    : "border-slate-200 bg-white text-slate-900 focus:border-[#F97316]"
+                    : "border-border bg-card text-foreground focus:border-[#F97316]"
                 }`}
               />
             </div>
@@ -159,7 +159,7 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
 
           {/* Driver Name */}
           <div>
-            <label className="block text-xs font-extrabold text-slate-700 mb-1">
+            <label className="block text-xs font-extrabold text-muted-foreground mb-1">
               Driver Name *
             </label>
             <div className="relative">
@@ -174,7 +174,7 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
                 className={`min-h-[44px] w-full rounded-xl border px-3 text-xs font-bold focus:outline-none ${
                   errors.driverName
                     ? "border-red-500 bg-red-50/20 text-red-900 focus:border-red-500"
-                    : "border-slate-200 bg-white text-slate-900 focus:border-[#F97316]"
+                    : "border-border bg-card text-foreground focus:border-[#F97316]"
                 }`}
               />
             </div>
@@ -188,7 +188,7 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
 
           {/* Driver Phone Number */}
           <div>
-            <label className="block text-xs font-extrabold text-slate-700 mb-1">
+            <label className="block text-xs font-extrabold text-muted-foreground mb-1">
               Driver Phone Number *
             </label>
             <div className="relative">
@@ -204,7 +204,7 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
                 className={`min-h-[44px] w-full rounded-xl border px-3 text-xs font-bold focus:outline-none ${
                   errors.driverPhone
                     ? "border-red-500 bg-red-50/20 text-red-900 focus:border-red-500"
-                    : "border-slate-200 bg-white text-slate-900 focus:border-[#F97316]"
+                    : "border-border bg-card text-foreground focus:border-[#F97316]"
                 }`}
               />
             </div>
@@ -218,12 +218,12 @@ export const VehicleAssignmentModal: React.FC<VehicleAssignmentModalProps> = ({
         </form>
 
         {/* Action Buttons */}
-        <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/50 flex gap-3">
+        <div className="p-4 sm:p-5 border-t border-border bg-muted/50 flex gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="min-h-[44px] flex-1 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="min-h-[44px] flex-1 rounded-xl border border-border bg-card text-xs font-bold text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
           >
             Cancel
           </button>

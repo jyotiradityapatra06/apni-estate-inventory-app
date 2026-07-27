@@ -56,7 +56,7 @@ export function GodownDetailPage() {
       {/* Back button */}
       <button 
         onClick={() => navigate("/godowns")} 
-        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer"
+        className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer"
       >
         <ArrowLeft size={14}/>
         Back to Godowns
@@ -70,7 +70,7 @@ export function GodownDetailPage() {
             {hasPermission(user, "godowns:transfer") && (
               <Link
                 to={`/transfers/new?from=${data.id}`}
-                className="flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+                className="flex min-h-10 items-center justify-center rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground shadow-sm hover:bg-muted transition-colors"
               >
                 <ArrowLeftRight size={14} className="mr-1.5" />
                 Transfer Stock
@@ -98,41 +98,41 @@ export function GodownDetailPage() {
       </div>
 
       {/* Godown Info card */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Location & Contact Details</h3>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Location & Contact Details</h3>
         <dl className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 text-sm">
           <div className="border-b last:border-0 pb-2">
-            <dt className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Address</dt>
-            <dd className="mt-1 font-semibold text-slate-800">{fullAddress || "—"}</dd>
+            <dt className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Address</dt>
+            <dd className="mt-1 font-semibold text-foreground">{fullAddress || "—"}</dd>
           </div>
           <div className="border-b last:border-0 pb-2">
-            <dt className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Contact Person</dt>
-            <dd className="mt-1 font-semibold text-slate-800">{data.contactPerson || "—"}</dd>
+            <dt className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Contact Person</dt>
+            <dd className="mt-1 font-semibold text-foreground">{data.contactPerson || "—"}</dd>
           </div>
           <div className="border-b last:border-0 pb-2">
-            <dt className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Phone Number</dt>
-            <dd className="mt-1 font-semibold text-slate-800">{data.phone || "—"}</dd>
+            <dt className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Phone Number</dt>
+            <dd className="mt-1 font-semibold text-foreground">{data.phone || "—"}</dd>
           </div>
           {data.notes && (
             <div className="sm:col-span-2 md:col-span-3 border-b last:border-0 pb-2">
-              <dt className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Internal Notes</dt>
-              <dd className="mt-1 font-semibold text-slate-800 italic">"{data.notes}"</dd>
+              <dt className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Internal Notes</dt>
+              <dd className="mt-1 font-semibold text-foreground italic">"{data.notes}"</dd>
             </div>
           )}
         </dl>
       </section>
 
       {/* Stock list */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Available Stock in warehouse</h3>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Available Stock in warehouse</h3>
         
         {/* Desktop list */}
-        <div className="hidden overflow-hidden rounded-xl border border-slate-100 md:block">
+        <div className="hidden overflow-hidden rounded-xl border border-border md:block">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b">
+            <thead className="bg-muted text-muted-foreground border-b">
               <tr>
                 {["Material", "Physical", "Reserved", "Available", "Minimum Level", "Status"].map((x) => (
-                  <th key={x} className="p-3 font-semibold text-slate-500 uppercase tracking-wider">
+                  <th key={x} className="p-3 font-semibold text-muted-foreground uppercase tracking-wider">
                     {x}
                   </th>
                 ))}
@@ -140,23 +140,23 @@ export function GodownDetailPage() {
             </thead>
             <tbody>
               {rows.map((b) => (
-                <tr key={b.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+                <tr key={b.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
                   <td className="p-3">
-                    <Link to={`/materials/${b.inventoryItem.id}`} className="font-bold text-slate-900 hover:text-orange-600 transition-colors">
+                    <Link to={`/materials/${b.inventoryItem.id}`} className="font-bold text-foreground hover:text-orange-600 transition-colors">
                       {b.inventoryItem.materialName}
                     </Link>
-                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">{b.inventoryItem.sku}</p>
+                    <p className="text-[10px] text-muted-foreground font-bold mt-0.5">{b.inventoryItem.sku}</p>
                   </td>
-                  <td className="text-slate-600 font-medium">
+                  <td className="text-muted-foreground font-medium">
                     {b.quantity} {b.inventoryItem.unit}
                   </td>
-                  <td className="text-slate-500 font-medium">
+                  <td className="text-muted-foreground font-medium">
                     {b.reservedQuantity} {b.inventoryItem.unit}
                   </td>
-                  <td className="font-black text-slate-900">
+                  <td className="font-black text-foreground">
                     {Math.max(0, b.quantity - b.reservedQuantity)} {b.inventoryItem.unit}
                   </td>
-                  <td className="text-slate-500 font-medium">
+                  <td className="text-muted-foreground font-medium">
                     {b.inventoryItem.minimumStockLevel || 0} {b.inventoryItem.unit}
                   </td>
                   <td>
@@ -171,18 +171,18 @@ export function GodownDetailPage() {
         {/* Mobile list */}
         <div className="grid gap-3 md:hidden">
           {rows.map((b) => (
-            <article key={b.id} className="rounded-xl border p-4 bg-slate-50/50 space-y-2 text-xs">
-              <Link to={`/materials/${b.inventoryItem.id}`} className="font-bold text-slate-900 hover:text-orange-600 transition-colors">
+            <article key={b.id} className="rounded-xl border p-4 bg-muted/50 space-y-2 text-xs">
+              <Link to={`/materials/${b.inventoryItem.id}`} className="font-bold text-foreground hover:text-orange-600 transition-colors">
                 {b.inventoryItem.materialName}
               </Link>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{b.inventoryItem.sku}</p>
-              <div className="flex justify-between items-baseline pt-2 border-t border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Available</span>
-                <b className="text-sm font-black text-slate-900">
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{b.inventoryItem.sku}</p>
+              <div className="flex justify-between items-baseline pt-2 border-t border-border">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase">Available</span>
+                <b className="text-sm font-black text-foreground">
                   {Math.max(0, b.quantity - b.reservedQuantity)} {b.inventoryItem.unit}
                 </b>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-[11px] text-muted-foreground font-medium">
                 Physical {b.quantity} · Reserved {b.reservedQuantity} · Min {b.inventoryItem.minimumStockLevel || 0}
               </p>
               <div className="pt-1">
@@ -191,32 +191,32 @@ export function GodownDetailPage() {
             </article>
           ))}
         </div>
-        {!rows.length && <p className="py-8 text-center text-slate-400 text-xs">No materials stored in this warehouse.</p>}
+        {!rows.length && <p className="py-8 text-center text-muted-foreground text-xs">No materials stored in this warehouse.</p>}
       </section>
 
       {/* Recent activity */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Warehouse Activity Logs</h3>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Warehouse Activity Logs</h3>
         <div className="space-y-3">
           {tx.slice(0, 10).map((x) => {
             const incoming = !["OUT", "TRANSFER_OUT"].includes(x.type);
             return (
-              <div key={x.id} className="flex justify-between gap-3 rounded-xl bg-slate-50/50 border border-slate-100 p-3 text-xs">
+              <div key={x.id} className="flex justify-between gap-3 rounded-xl bg-muted/50 border border-border p-3 text-xs">
                 <div>
-                  <b className="text-slate-900 font-bold uppercase tracking-wide">{x.type.replaceAll("_", " ")}</b>
-                  <p className="text-slate-600 font-medium mt-0.5">{x.inventoryItem?.materialName}</p>
-                  <p className="text-[10px] text-slate-400 font-medium mt-1">
+                  <b className="text-foreground font-bold uppercase tracking-wide">{x.type.replaceAll("_", " ")}</b>
+                  <p className="text-muted-foreground font-medium mt-0.5">{x.inventoryItem?.materialName}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium mt-1">
                     {x.reason || "Warehouse transaction"} · {new Date(x.createdAt).toLocaleString("en-IN")}
                   </p>
                 </div>
-                <b className={`font-black text-sm ${incoming ? "text-green-700" : "text-slate-800"}`}>
+                <b className={`font-black text-sm ${incoming ? "text-green-700" : "text-foreground"}`}>
                   {incoming ? "+" : "−"}
                   {x.quantity} {x.inventoryItem?.unit}
                 </b>
               </div>
             );
           })}
-          {!tx.length && <p className="py-5 text-center text-slate-400 text-xs">No recent transaction logs in this warehouse.</p>}
+          {!tx.length && <p className="py-5 text-center text-muted-foreground text-xs">No recent transaction logs in this warehouse.</p>}
         </div>
       </section>
     </div>

@@ -4,9 +4,9 @@ import { fmt } from "../../utils/currency";
 export function LedgerTable({ rows }: { rows: any[] }) {
   if (!rows || rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center space-y-2">
-        <p className="font-extrabold text-sm text-slate-900">No Ledger Transactions Logged</p>
-        <p className="text-xs text-slate-400">Transactions will automatically log when invoices, payments, or purchase bills are recorded.</p>
+      <div className="rounded-2xl border border-border bg-card p-8 text-center space-y-2">
+        <p className="font-extrabold text-sm text-foreground">No Ledger Transactions Logged</p>
+        <p className="text-xs text-muted-foreground">Transactions will automatically log when invoices, payments, or purchase bills are recorded.</p>
       </div>
     );
   }
@@ -14,12 +14,12 @@ export function LedgerTable({ rows }: { rows: any[] }) {
   return (
     <>
       {/* Desktop Table View (>=768px) */}
-      <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
+      <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
+          <thead className="bg-muted text-muted-foreground border-b border-border">
             <tr>
               {["Date", "Party Name", "Transaction Type", "Ref #", "Credit (Cash In)", "Debit (Cash Out)", "Created By"].map((x) => (
-                <th key={x} className="px-4 py-3.5 font-bold text-xs uppercase tracking-wider text-slate-500">
+                <th key={x} className="px-4 py-3.5 font-bold text-xs uppercase tracking-wider text-muted-foreground">
                   {x}
                 </th>
               ))}
@@ -31,20 +31,20 @@ export function LedgerTable({ rows }: { rows: any[] }) {
               const isDebit = Number(x.debitAmount || 0) > 0;
 
               return (
-                <tr key={x.id} className="border-b last:border-0 border-slate-100 hover:bg-slate-50/60 transition-colors">
-                  <td className="px-4 py-3.5 font-semibold text-slate-600">
+                <tr key={x.id} className="border-b last:border-0 border-border hover:bg-muted/60 transition-colors">
+                  <td className="px-4 py-3.5 font-semibold text-muted-foreground">
                     {new Date(x.transactionDate).toLocaleDateString("en-IN")}
                   </td>
                   <td className="px-4 py-3.5">
-                    <strong className="font-black text-slate-900 block">{x.party?.name || "General Ledger"}</strong>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">{x.partyType || "SYSTEM"}</span>
+                    <strong className="font-black text-foreground block">{x.party?.name || "General Ledger"}</strong>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">{x.partyType || "SYSTEM"}</span>
                   </td>
                   <td className="px-4 py-3.5">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-100 text-slate-800 border border-slate-200">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-muted text-foreground border border-border">
                       {x.transactionType ? x.transactionType.replaceAll("_", " ") : "TRANSACTION"}
                     </span>
                   </td>
-                  <td className="px-4 py-3.5 text-xs font-bold text-slate-500">
+                  <td className="px-4 py-3.5 text-xs font-bold text-muted-foreground">
                     {x.referenceNumber || x.referenceType || "—"}
                   </td>
                   <td className="px-4 py-3.5 font-black text-green-700">
@@ -65,7 +65,7 @@ export function LedgerTable({ rows }: { rows: any[] }) {
                       "—"
                     )}
                   </td>
-                  <td className="px-4 py-3.5 text-xs text-slate-500 font-semibold">{x.createdBy?.name || "System"}</td>
+                  <td className="px-4 py-3.5 text-xs text-muted-foreground font-semibold">{x.createdBy?.name || "System"}</td>
                 </tr>
               );
             })}
@@ -80,11 +80,11 @@ export function LedgerTable({ rows }: { rows: any[] }) {
           const isDebit = Number(x.debitAmount || 0) > 0;
 
           return (
-            <article key={x.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+            <article key={x.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <b className="text-sm font-black text-slate-900 block">{x.party?.name || "General Ledger"}</b>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase mt-0.5 block">
+                  <b className="text-sm font-black text-foreground block">{x.party?.name || "General Ledger"}</b>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase mt-0.5 block">
                     {new Date(x.transactionDate).toLocaleDateString("en-IN")} · {x.transactionType?.replaceAll("_", " ")}
                   </span>
                 </div>
@@ -99,11 +99,11 @@ export function LedgerTable({ rows }: { rows: any[] }) {
                   </span>
                 )}
                 {!isCredit && !isDebit && (
-                  <strong className="text-sm font-black text-slate-900">{fmt(x.amount || 0)}</strong>
+                  <strong className="text-sm font-black text-foreground">{fmt(x.amount || 0)}</strong>
                 )}
               </div>
 
-              <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 text-slate-500 font-semibold">
+              <div className="flex items-center justify-between text-xs pt-2 border-t border-border text-muted-foreground font-semibold">
                 <span>Ref: {x.referenceNumber || x.referenceType || "N/A"}</span>
                 <span>By: {x.createdBy?.name || "System"}</span>
               </div>

@@ -34,14 +34,14 @@ export const DeliveryChallanDocument: React.FC<DeliveryChallanDocumentProps> = (
   return (
     <div className="space-y-4">
       {/* Action Header (Hidden on Print) */}
-      <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm print:hidden">
+      <div className="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-sm print:hidden">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-[#F97316]">
             <FileText size={20} />
           </div>
           <div>
-            <h3 className="font-extrabold text-sm text-slate-900">Delivery Challan (DC)</h3>
-            <p className="text-xs text-slate-500">
+            <h3 className="font-extrabold text-sm text-foreground">Delivery Challan (DC)</h3>
+            <p className="text-xs text-muted-foreground">
               {isChallanGenerated ? (
                 <span className="font-bold text-green-700">Official Challan: {challanNo}</span>
               ) : (
@@ -61,63 +61,63 @@ export const DeliveryChallanDocument: React.FC<DeliveryChallanDocumentProps> = (
       </div>
 
       {/* Printable Document Container */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6 print:border-none print:shadow-none print:p-0 print:m-0 print:w-full">
+      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm space-y-6 print:border-none print:shadow-none print:p-0 print:m-0 print:w-full">
         {/* Document Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-slate-200 pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-border pb-6">
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-[#F97316]">
               APNI ESTATE Material Store
             </p>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight mt-0.5">
+            <h1 className="text-xl font-black text-foreground tracking-tight mt-0.5">
               {business?.name || "APNI ESTATE Building Supplies"}
             </h1>
             {business?.gstNumber && (
-              <p className="text-xs text-slate-500 font-semibold mt-1">
-                GSTIN: <span className="font-mono text-slate-800">{business.gstNumber}</span>
+              <p className="text-xs text-muted-foreground font-semibold mt-1">
+                GSTIN: <span className="font-mono text-foreground">{business.gstNumber}</span>
               </p>
             )}
             {business?.address && (
-              <p className="text-xs text-slate-500 mt-0.5 max-w-sm leading-relaxed">
+              <p className="text-xs text-muted-foreground mt-0.5 max-w-sm leading-relaxed">
                 {business.address}
               </p>
             )}
             {business?.phone && (
-              <p className="text-xs text-slate-500 font-medium mt-0.5">
+              <p className="text-xs text-muted-foreground font-medium mt-0.5">
                 Phone: {business.phone}
               </p>
             )}
           </div>
 
-          <div className="text-left sm:text-right border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 w-full sm:w-auto">
+          <div className="text-left sm:text-right border-t sm:border-t-0 pt-3 sm:pt-0 border-border w-full sm:w-auto">
             <span className="inline-block rounded-lg bg-[#0F172A] px-3 py-1 text-xs font-black text-white uppercase tracking-wider mb-2">
               DELIVERY CHALLAN
             </span>
 
             <div className="space-y-1 text-xs">
               <div className="flex sm:justify-end gap-2">
-                <span className="text-slate-400 font-bold">Challan No:</span>
+                <span className="text-muted-foreground font-bold">Challan No:</span>
                 {isChallanGenerated ? (
-                  <span className="font-black text-slate-900 font-mono">{challanNo}</span>
+                  <span className="font-black text-foreground font-mono">{challanNo}</span>
                 ) : (
                   <span className="font-bold text-amber-600 italic">Challan not generated yet</span>
                 )}
               </div>
 
               <div className="flex sm:justify-end gap-2">
-                <span className="text-slate-400 font-bold">Delivery Ref:</span>
-                <span className="font-bold text-slate-700 font-mono">{delivery.deliveryNumber}</span>
+                <span className="text-muted-foreground font-bold">Delivery Ref:</span>
+                <span className="font-bold text-muted-foreground font-mono">{delivery.deliveryNumber}</span>
               </div>
 
               {delivery.salesOrder?.orderNumber && (
                 <div className="flex sm:justify-end gap-2">
-                  <span className="text-slate-400 font-bold">Sales Order:</span>
-                  <span className="font-bold text-slate-700 font-mono">{delivery.salesOrder.orderNumber}</span>
+                  <span className="text-muted-foreground font-bold">Sales Order:</span>
+                  <span className="font-bold text-muted-foreground font-mono">{delivery.salesOrder.orderNumber}</span>
                 </div>
               )}
 
               <div className="flex sm:justify-end gap-2">
-                <span className="text-slate-400 font-bold">Date:</span>
-                <span className="font-bold text-slate-900">{formattedDate}</span>
+                <span className="text-muted-foreground font-bold">Date:</span>
+                <span className="font-bold text-foreground">{formattedDate}</span>
               </div>
             </div>
           </div>
@@ -126,71 +126,71 @@ export const DeliveryChallanDocument: React.FC<DeliveryChallanDocumentProps> = (
         {/* Customer & Delivery Site Info */}
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Customer / Billed To */}
-          <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-400 mb-2">
+          <div className="rounded-xl border border-border bg-muted/60 p-4 space-y-1">
+            <div className="flex items-center gap-1.5 text-xs font-black uppercase text-muted-foreground mb-2">
               <User size={14} className="text-[#F97316]" />
               <span>Customer Details</span>
             </div>
-            <strong className="text-sm font-bold text-slate-900 block">
+            <strong className="text-sm font-bold text-foreground block">
               {delivery.customerName || delivery.customer?.name}
             </strong>
             {(delivery.customerPhone || delivery.customer?.phone) && (
-              <p className="text-xs text-slate-600">Phone: {delivery.customerPhone || delivery.customer?.phone}</p>
+              <p className="text-xs text-muted-foreground">Phone: {delivery.customerPhone || delivery.customer?.phone}</p>
             )}
-            <p className="text-xs text-slate-500 leading-relaxed mt-1">
+            <p className="text-xs text-muted-foreground leading-relaxed mt-1">
               {delivery.customer?.billingAddress || delivery.deliveryAddress || "Address on record"}
             </p>
           </div>
 
           {/* Delivery Site / Shipping Address */}
-          <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-400 mb-2">
+          <div className="rounded-xl border border-border bg-muted/60 p-4 space-y-1">
+            <div className="flex items-center gap-1.5 text-xs font-black uppercase text-muted-foreground mb-2">
               <MapPin size={14} className="text-[#F97316]" />
               <span>Delivery Site Address</span>
             </div>
-            <p className="text-xs font-bold text-slate-800 leading-relaxed">
+            <p className="text-xs font-bold text-foreground leading-relaxed">
               {delivery.deliveryAddress || "Site address specified on order"}
             </p>
             {delivery.receiverName && (
-              <p className="text-xs text-slate-600 mt-2">
-                Site Receiver: <span className="font-bold text-slate-900">{delivery.receiverName}</span>
+              <p className="text-xs text-muted-foreground mt-2">
+                Site Receiver: <span className="font-bold text-foreground">{delivery.receiverName}</span>
               </p>
             )}
           </div>
         </div>
 
         {/* Logistics & Vehicle Information */}
-        <div className="rounded-xl border border-slate-200/80 bg-white p-4 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-400 mb-2">
+        <div className="rounded-xl border border-border/80 bg-card p-4 space-y-2">
+          <div className="flex items-center gap-1.5 text-xs font-black uppercase text-muted-foreground mb-2">
             <Truck size={14} className="text-[#F97316]" />
             <span>Transport & Logistics Assignment</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div>
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Vehicle No.</span>
-              <strong className="font-mono text-slate-900 text-sm">
+              <span className="text-muted-foreground font-semibold block text-[10px] uppercase">Vehicle No.</span>
+              <strong className="font-mono text-foreground text-sm">
                 {delivery.vehicleNumber || "Pending Assignment"}
               </strong>
             </div>
 
             <div>
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Vehicle Type</span>
-              <strong className="font-bold text-slate-800">
+              <span className="text-muted-foreground font-semibold block text-[10px] uppercase">Vehicle Type</span>
+              <strong className="font-bold text-foreground">
                 {delivery.vehicleType || "-"}
               </strong>
             </div>
 
             <div>
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Driver Name</span>
-              <strong className="font-bold text-slate-800">
+              <span className="text-muted-foreground font-semibold block text-[10px] uppercase">Driver Name</span>
+              <strong className="font-bold text-foreground">
                 {delivery.driverName || "-"}
               </strong>
             </div>
 
             <div>
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">Driver Phone</span>
-              <strong className="font-bold text-slate-800">
+              <span className="text-muted-foreground font-semibold block text-[10px] uppercase">Driver Phone</span>
+              <strong className="font-bold text-foreground">
                 {delivery.driverPhone || "-"}
               </strong>
             </div>
@@ -199,11 +199,11 @@ export const DeliveryChallanDocument: React.FC<DeliveryChallanDocumentProps> = (
 
         {/* Items Manifest Table */}
         <div className="space-y-2">
-          <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+          <h4 className="text-xs font-black uppercase text-muted-foreground tracking-wider">
             Material Dispatch Manifest
           </h4>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#0F172A] text-white text-[11px] uppercase font-bold">
                 <tr>
@@ -214,16 +214,16 @@ export const DeliveryChallanDocument: React.FC<DeliveryChallanDocumentProps> = (
                   <th className="py-2.5 px-3 text-right">Dispatched Qty</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-semibold text-slate-800">
+              <tbody className="divide-y divide-slate-100 font-semibold text-foreground">
                 {delivery.items && delivery.items.length > 0 ? (
                   delivery.items.map((item: any, idx: number) => (
-                    <tr key={item.id || idx} className="hover:bg-slate-50/50">
-                      <td className="py-2.5 px-3 text-slate-400 font-mono">{idx + 1}</td>
+                    <tr key={item.id || idx} className="hover:bg-muted/50">
+                      <td className="py-2.5 px-3 text-muted-foreground font-mono">{idx + 1}</td>
                       <td className="py-2.5 px-3">
-                        <strong className="font-bold text-slate-900 block">{item.materialName}</strong>
-                        {item.sku && <span className="text-[10px] text-slate-400 font-mono">SKU: {item.sku}</span>}
+                        <strong className="font-bold text-foreground block">{item.materialName}</strong>
+                        {item.sku && <span className="text-[10px] text-muted-foreground font-mono">SKU: {item.sku}</span>}
                       </td>
-                      <td className="py-2.5 px-3 text-slate-500">
+                      <td className="py-2.5 px-3 text-muted-foreground">
                         {item.godown?.name || delivery.godown?.name || "Central Store"}
                       </td>
                       <td className="py-2.5 px-3 text-right font-mono">
@@ -236,9 +236,9 @@ export const DeliveryChallanDocument: React.FC<DeliveryChallanDocumentProps> = (
                   ))
                 ) : (
                   <tr>
-                    <td className="py-2.5 px-3 text-slate-400 font-mono">1</td>
-                    <td className="py-2.5 px-3 font-bold text-slate-900">{delivery.materialName}</td>
-                    <td className="py-2.5 px-3 text-slate-500">{delivery.godown?.name || "Central Store"}</td>
+                    <td className="py-2.5 px-3 text-muted-foreground font-mono">1</td>
+                    <td className="py-2.5 px-3 font-bold text-foreground">{delivery.materialName}</td>
+                    <td className="py-2.5 px-3 text-muted-foreground">{delivery.godown?.name || "Central Store"}</td>
                     <td className="py-2.5 px-3 text-right font-mono">{formatQuantity(delivery.quantity, delivery.unit)}</td>
                     <td className="py-2.5 px-3 text-right font-mono text-green-700 font-bold">{formatQuantity(delivery.quantity, delivery.unit)}</td>
                   </tr>
@@ -250,24 +250,24 @@ export const DeliveryChallanDocument: React.FC<DeliveryChallanDocumentProps> = (
 
         {/* Delivery Notes if available */}
         {delivery.notes && (
-          <div className="rounded-xl bg-slate-50 p-3 border border-slate-100 text-xs">
-            <span className="font-bold text-slate-700 block mb-0.5">Special Instructions / Notes:</span>
-            <p className="text-slate-600">{delivery.notes}</p>
+          <div className="rounded-xl bg-muted p-3 border border-border text-xs">
+            <span className="font-bold text-muted-foreground block mb-0.5">Special Instructions / Notes:</span>
+            <p className="text-muted-foreground">{delivery.notes}</p>
           </div>
         )}
 
         {/* Footer & Signatures */}
-        <div className="pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-xs text-center font-bold">
+        <div className="pt-8 border-t border-border grid grid-cols-2 gap-8 text-xs text-center font-bold">
           <div className="space-y-12">
-            <div className="border-b border-slate-300 pb-1 mx-auto max-w-[200px]" />
-            <p className="text-slate-600 uppercase text-[10px] tracking-wider">
+            <div className="border-b border-border pb-1 mx-auto max-w-[200px]" />
+            <p className="text-muted-foreground uppercase text-[10px] tracking-wider">
               Receiver's Signature & Stamp
             </p>
           </div>
 
           <div className="space-y-12">
-            <div className="border-b border-slate-300 pb-1 mx-auto max-w-[200px]" />
-            <p className="text-slate-600 uppercase text-[10px] tracking-wider">
+            <div className="border-b border-border pb-1 mx-auto max-w-[200px]" />
+            <p className="text-muted-foreground uppercase text-[10px] tracking-wider">
               Authorized Signatory ({business?.name || "APNI ESTATE"})
             </p>
           </div>

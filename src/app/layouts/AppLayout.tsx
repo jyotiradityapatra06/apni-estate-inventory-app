@@ -23,7 +23,7 @@ export const AppLayout = () => {
       style={{
         fontFamily: "'Plus Jakarta Sans', sans-serif",
       }}
-      className="h-[100dvh] w-full overflow-hidden relative bg-[#F8FAFC] dark:bg-[#020617] text-slate-900 dark:text-slate-100 transition-colors duration-200"
+      className="h-[100dvh] w-full overflow-hidden relative bg-[#F8FAFC] dark:bg-[#020617] text-foreground dark:text-slate-100 transition-colors duration-200"
     >
       {/* Desktop / Tablet Left Sidebar */}
       <DesktopSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />

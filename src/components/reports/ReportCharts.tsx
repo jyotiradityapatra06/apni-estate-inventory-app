@@ -51,13 +51,13 @@ const human = (s: string) =>
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-md dark:border-slate-700 dark:bg-slate-800 text-xs">
-        <p className="font-black text-slate-900 dark:text-slate-100 mb-1">{label}</p>
+      <div className="rounded-xl border border-border bg-card p-3 shadow-md dark:border-slate-700 dark:bg-slate-800 text-xs">
+        <p className="font-black text-foreground dark:text-slate-100 mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={`item-${index}`} className="flex items-center gap-2 font-semibold">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
-            <span className="text-slate-500 dark:text-slate-400">{entry.name}:</span>
-            <strong className="text-slate-900 dark:text-slate-100">
+            <span className="text-muted-foreground dark:text-muted-foreground">{entry.name}:</span>
+            <strong className="text-foreground dark:text-slate-100">
               {typeof entry.value === "number" ? fmt(entry.value) : entry.value}
             </strong>
           </div>
@@ -78,22 +78,22 @@ export const LineChartComponent: React.FC<{
 }> = ({ title, data, dataKey = "total", nameKey = "name", color = "#ea580c" }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 space-y-3">
-        <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
+      <div className="rounded-2xl border border-border bg-card p-5 dark:border-slate-800 dark:bg-slate-900 space-y-3">
+        <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
         <ReportEmptyState title="No Trend Data" description="No line chart trend points available for this period." />
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
-      <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
+      <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
       <div className="h-64 w-full pt-1">
         <ResponsiveContainer width="100%" height="100%">
           <ReLineChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-            <XAxis dataKey={nameKey} tick={{ fontSize: 10, fill: "#64748b" }} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: "#64748b" }} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+            <XAxis dataKey={nameKey} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Line
               type="monotone"
@@ -120,22 +120,22 @@ export const BarChartComponent: React.FC<{
 }> = ({ title, data, dataKey = "total", nameKey = "name" }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 space-y-3">
-        <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
+      <div className="rounded-2xl border border-border bg-card p-5 dark:border-slate-800 dark:bg-slate-900 space-y-3">
+        <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
         <ReportEmptyState title="No Data Available" description="No breakdown data available for comparison." />
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
-      <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
+      <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
       <div className="h-64 w-full pt-1">
         <ResponsiveContainer width="100%" height="100%">
           <ReBarChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-            <XAxis dataKey={nameKey} tick={{ fontSize: 10, fill: "#64748b" }} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: "#64748b" }} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+            <XAxis dataKey={nameKey} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Bar dataKey={dataKey} name="Total" radius={[6, 6, 0, 0]}>
               {data.map((_, i) => (
@@ -158,16 +158,16 @@ export const DonutChartComponent: React.FC<{
 }> = ({ title, data, dataKey = "total", nameKey = "name" }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 space-y-3">
-        <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
+      <div className="rounded-2xl border border-border bg-card p-5 dark:border-slate-800 dark:bg-slate-900 space-y-3">
+        <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
         <ReportEmptyState title="No Contribution Data" description="No revenue contribution items found." />
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
-      <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
+      <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">{title}</h3>
       <div className="h-64 w-full pt-1">
         <ResponsiveContainer width="100%" height="100%">
           <RePieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
@@ -188,7 +188,7 @@ export const DonutChartComponent: React.FC<{
             <Tooltip content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }}
-              formatter={(value) => <span className="font-bold text-slate-700 dark:text-slate-300">{value}</span>}
+              formatter={(value) => <span className="font-bold text-muted-foreground dark:text-slate-300">{value}</span>}
             />
           </RePieChart>
         </ResponsiveContainer>

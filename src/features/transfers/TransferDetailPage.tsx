@@ -78,7 +78,7 @@ export function TransferDetailPage() {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => window.print()} 
-              className="flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors"
+              className="flex min-h-11 items-center justify-center rounded-lg border border-border bg-card px-4 text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
             >
               <Printer size={15} className="mr-1.5" />
               Print Challan
@@ -106,20 +106,20 @@ export function TransferDetailPage() {
         }
       />
 
-      <section className="rounded-xl border bg-white p-5">
+      <section className="rounded-xl border bg-card p-5">
         <SectionHeader title="Transfer Information" />
         <dl className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 text-sm">
           <Row label="From Godown">
             <Link to={`/godowns/${data.sourceGodown.id}`} className="font-bold text-blue-700 hover:underline">
               {data.sourceGodown.name}
             </Link>
-            <p className="text-xs text-slate-500">{data.sourceGodown.godownCode}</p>
+            <p className="text-xs text-muted-foreground">{data.sourceGodown.godownCode}</p>
           </Row>
           <Row label="To Godown">
             <Link to={`/godowns/${data.destinationGodown.id}`} className="font-bold text-blue-700 hover:underline">
               {data.destinationGodown.name}
             </Link>
-            <p className="text-xs text-slate-500">{data.destinationGodown.godownCode}</p>
+            <p className="text-xs text-muted-foreground">{data.destinationGodown.godownCode}</p>
           </Row>
           <Row label="Transfer Date">
             {new Date(data.transferDate || data.createdAt).toLocaleString("en-IN")}
@@ -154,15 +154,15 @@ export function TransferDetailPage() {
         </dl>
       </section>
 
-      <section className="rounded-xl border bg-white p-5">
+      <section className="rounded-xl border bg-card p-5">
         <SectionHeader title="Stock Impact" />
         <div className="mt-4 space-y-3">
           {data.items.map((i) => (
-            <article key={i.inventoryItem.id} className="rounded-xl border p-4 bg-white">
+            <article key={i.inventoryItem.id} className="rounded-xl border p-4 bg-card">
               <Link to={`/materials/${i.inventoryItem.id}`} className="font-bold text-blue-700 hover:underline">
                 {i.inventoryItem.materialName}
               </Link>
-              <p className="text-xs text-slate-500">{i.inventoryItem.sku}</p>
+              <p className="text-xs text-muted-foreground">{i.inventoryItem.sku}</p>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-red-50 p-3">
                   <p className="text-xs font-semibold text-red-700">{data.sourceGodown.name}</p>
@@ -184,39 +184,39 @@ export function TransferDetailPage() {
     </div>
 
       {/* 10. Printable Delivery/Transfer Challan (A4 Print-only template) */}
-      <article className="invoice-print-root hidden print:block bg-white p-8 text-xs">
+      <article className="invoice-print-root hidden print:block bg-card p-8 text-xs">
         <header className="flex justify-between border-b pb-6">
           <div>
-            <h2 className="text-lg font-black text-slate-900 tracking-tight">{business?.name || "APNI ESTATE"}</h2>
-            {business?.address && <p className="max-w-md text-xs text-slate-500 mt-1 leading-relaxed">{business.address}</p>}
-            {business?.phone && <p className="text-xs text-slate-500 mt-1">Phone: {business.phone}</p>}
+            <h2 className="text-lg font-black text-foreground tracking-tight">{business?.name || "APNI ESTATE"}</h2>
+            {business?.address && <p className="max-w-md text-xs text-muted-foreground mt-1 leading-relaxed">{business.address}</p>}
+            {business?.phone && <p className="text-xs text-muted-foreground mt-1">Phone: {business.phone}</p>}
           </div>
           <div className="text-right">
-            <h3 className="text-base font-black text-slate-800 tracking-wider uppercase">DELIVERY CHALLAN</h3>
-            <p className="font-bold text-sm text-slate-700 mt-1">{data.transferNumber}</p>
-            <p className="text-xs text-slate-500 mt-1">Date: {new Date(data.transferDate || data.createdAt).toLocaleDateString("en-IN")}</p>
+            <h3 className="text-base font-black text-foreground tracking-wider uppercase">DELIVERY CHALLAN</h3>
+            <p className="font-bold text-sm text-muted-foreground mt-1">{data.transferNumber}</p>
+            <p className="text-xs text-muted-foreground mt-1">Date: {new Date(data.transferDate || data.createdAt).toLocaleDateString("en-IN")}</p>
           </div>
         </header>
 
         <section className="grid gap-5 border-b py-6 grid-cols-2 text-xs">
           <div>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Source Warehouse (From)</span>
-            <p className="font-bold text-slate-900 text-sm mt-1">{data.sourceGodown.name}</p>
-            <p className="text-slate-500 mt-0.5">{data.sourceGodown.godownCode}</p>
+            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Source Warehouse (From)</span>
+            <p className="font-bold text-foreground text-sm mt-1">{data.sourceGodown.name}</p>
+            <p className="text-muted-foreground mt-0.5">{data.sourceGodown.godownCode}</p>
           </div>
           <div>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Destination Warehouse (To)</span>
-            <p className="font-bold text-slate-900 text-sm mt-1">{data.destinationGodown.name}</p>
-            <p className="text-slate-500 mt-0.5">{data.destinationGodown.godownCode}</p>
+            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Destination Warehouse (To)</span>
+            <p className="font-bold text-foreground text-sm mt-1">{data.destinationGodown.name}</p>
+            <p className="text-muted-foreground mt-0.5">{data.destinationGodown.godownCode}</p>
           </div>
         </section>
 
-        <div className="mt-6 overflow-hidden rounded-xl border border-slate-100">
+        <div className="mt-6 overflow-hidden rounded-xl border border-border">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b">
+            <thead className="bg-muted text-muted-foreground border-b">
               <tr>
                 {["Material Item", "SKU Code", "Quantity", "Unit"].map((v) => (
-                  <th key={v} className="p-3 font-semibold text-slate-500 uppercase tracking-wider">{v}</th>
+                  <th key={v} className="p-3 font-semibold text-muted-foreground uppercase tracking-wider">{v}</th>
                 ))}
               </tr>
             </thead>
@@ -224,24 +224,24 @@ export function TransferDetailPage() {
               {data.items.map((i) => (
                 <tr key={i.inventoryItem.id} className="border-b last:border-0">
                   <td className="p-3">
-                    <span className="block font-bold text-slate-900">{i.inventoryItem.materialName}</span>
+                    <span className="block font-bold text-foreground">{i.inventoryItem.materialName}</span>
                   </td>
-                  <td className="text-slate-600 font-medium">{i.inventoryItem.sku}</td>
-                  <td className="text-slate-600 font-medium">{i.quantity}</td>
-                  <td className="text-slate-500 font-medium">{i.inventoryItem.unit}</td>
+                  <td className="text-muted-foreground font-medium">{i.inventoryItem.sku}</td>
+                  <td className="text-muted-foreground font-medium">{i.quantity}</td>
+                  <td className="text-muted-foreground font-medium">{i.inventoryItem.unit}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <footer className="mt-12 flex justify-between text-xs text-slate-500">
+        <footer className="mt-12 flex justify-between text-xs text-muted-foreground">
           <div>
             <p>Notes: {data.notes || "No special transfer instructions."}</p>
             <p className="mt-1">Prepared By: {data.createdBy?.name || "System"}</p>
           </div>
           <div className="text-right">
-            <p className="font-bold text-slate-700">Receiver's Signature</p>
+            <p className="font-bold text-muted-foreground">Receiver's Signature</p>
           </div>
         </footer>
       </article>
@@ -252,8 +252,8 @@ export function TransferDetailPage() {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-xs font-bold uppercase text-slate-400">{label}</dt>
-      <dd className="mt-1 font-semibold text-slate-800">{children}</dd>
+      <dt className="text-xs font-bold uppercase text-muted-foreground">{label}</dt>
+      <dd className="mt-1 font-semibold text-foreground">{children}</dd>
     </div>
   );
 }

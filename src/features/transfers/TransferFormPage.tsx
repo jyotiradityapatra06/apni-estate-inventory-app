@@ -79,7 +79,7 @@ export function TransferFormPage() {
   };
 
   const inputClass =
-    "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
+    "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 
   return (
     <form onSubmit={next} className="mx-auto max-w-3xl space-y-6 pb-28">
@@ -95,12 +95,12 @@ export function TransferFormPage() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-5">
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-5">
         <SectionHeader title="Transfer Details" description="Select source godown, material, destination, and transfer quantity." />
 
         <div className="grid gap-5 md:grid-cols-2">
           {/* Source Godown */}
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
             From Godown (Source)
             <select
               required
@@ -122,7 +122,7 @@ export function TransferFormPage() {
           </label>
 
           {/* Material Selection */}
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
             Select Material
             <select
               required
@@ -143,7 +143,7 @@ export function TransferFormPage() {
           </label>
 
           {/* Destination Godown */}
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
             To Godown (Destination)
             <select
               required
@@ -163,7 +163,7 @@ export function TransferFormPage() {
           </label>
 
           {/* Transfer Quantity */}
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
             Transfer Quantity {balance ? `(${balance.inventoryItem.unit})` : ""}
             <input
               required
@@ -175,13 +175,13 @@ export function TransferFormPage() {
               placeholder={`Max ${available} ${balance ? balance.inventoryItem.unit : ""}`}
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
-              className="mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-base font-black text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
+              className="mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-base font-black text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
             />
           </label>
 
           {/* Source Balance Stat Cards */}
           {balance && (
-            <div className="grid grid-cols-3 gap-3 rounded-xl bg-slate-50 border border-slate-100 p-4 text-center md:col-span-2">
+            <div className="grid grid-cols-3 gap-3 rounded-xl bg-muted border border-border p-4 text-center md:col-span-2">
               <Stat label="Physical Stock" value={`${balance.quantity} ${balance.inventoryItem.unit}`} />
               <Stat label="Reserved Stock" value={`${balance.reservedQuantity} ${balance.inventoryItem.unit}`} />
               <Stat label="Net Available" value={`${available} ${balance.inventoryItem.unit}`} isGreen />
@@ -189,25 +189,25 @@ export function TransferFormPage() {
           )}
 
           {/* Notes */}
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700 md:col-span-2">
+          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground md:col-span-2">
             Notes / Transfer Reason (Optional)
             <textarea
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Site supply transfer or warehouse rebalancing"
-              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
+              className="mt-1.5 w-full rounded-xl border border-border bg-card p-3 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
             />
           </label>
         </div>
       </section>
 
       {/* Footer Actions */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-white p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-card p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
         <button
           type="button"
           onClick={() => nav(-1)}
-          className="min-h-[48px] flex-1 rounded-xl border border-slate-200 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 md:flex-none md:px-6"
+          className="min-h-[48px] flex-1 rounded-xl border border-border text-xs sm:text-sm font-extrabold text-muted-foreground hover:bg-muted md:flex-none md:px-6"
         >
           Cancel
         </button>
@@ -219,18 +219,18 @@ export function TransferFormPage() {
       {/* Confirmation Modal */}
       {review && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/50 backdrop-blur-xs sm:items-center sm:p-4">
-          <div className="w-full rounded-t-2xl bg-white p-6 sm:max-w-md sm:rounded-2xl space-y-5 shadow-2xl">
+          <div className="w-full rounded-t-2xl bg-card p-6 sm:max-w-md sm:rounded-2xl space-y-5 shadow-2xl">
             <div className="flex items-center gap-3 border-b pb-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-[#F97316]">
                 <ArrowLeftRight size={20} />
               </div>
               <div>
                 <p className="text-xs font-black uppercase text-[#F97316]">Confirmation</p>
-                <h2 className="text-lg font-black text-slate-900">Confirm Stock Transfer</h2>
+                <h2 className="text-lg font-black text-foreground">Confirm Stock Transfer</h2>
               </div>
             </div>
 
-            <dl className="space-y-3 rounded-xl bg-slate-50 p-4 text-xs sm:text-sm">
+            <dl className="space-y-3 rounded-xl bg-muted p-4 text-xs sm:text-sm">
               <Row label="Material" value={balance?.inventoryItem.materialName || ""} />
               <Row label="Transfer Quantity" value={`${amount} ${balance?.inventoryItem.unit || ""}`} highlight />
               <Row label="From Godown" value={src?.name || ""} />
@@ -241,7 +241,7 @@ export function TransferFormPage() {
               <button
                 type="button"
                 onClick={() => setReview(false)}
-                className="flex-1 min-h-[48px] rounded-xl border border-slate-200 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                className="flex-1 min-h-[48px] rounded-xl border border-border text-xs sm:text-sm font-extrabold text-muted-foreground hover:bg-muted cursor-pointer"
               >
                 Back to Edit
               </button>
@@ -264,8 +264,8 @@ export function TransferFormPage() {
 function Stat({ label, value, isGreen = false }: { label: string; value: string; isGreen?: boolean }) {
   return (
     <div>
-      <span className="text-[10px] font-black uppercase text-slate-400 block">{label}</span>
-      <strong className={`text-xs sm:text-sm font-black mt-0.5 block ${isGreen ? "text-green-700" : "text-slate-900"}`}>
+      <span className="text-[10px] font-black uppercase text-muted-foreground block">{label}</span>
+      <strong className={`text-xs sm:text-sm font-black mt-0.5 block ${isGreen ? "text-green-700" : "text-foreground"}`}>
         {value}
       </strong>
     </div>
@@ -275,8 +275,8 @@ function Stat({ label, value, isGreen = false }: { label: string; value: string;
 function Row({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex justify-between items-center">
-      <dt className="text-xs font-extrabold text-slate-500 uppercase">{label}:</dt>
-      <dd className={`font-black ${highlight ? "text-base text-orange-600" : "text-slate-900"}`}>{value}</dd>
+      <dt className="text-xs font-extrabold text-muted-foreground uppercase">{label}:</dt>
+      <dd className={`font-black ${highlight ? "text-base text-orange-600" : "text-foreground"}`}>{value}</dd>
     </div>
   );
 }

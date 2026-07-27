@@ -75,12 +75,12 @@ export function SalesOrderListPage() {
 
   const filtersPanel = (
     <div className="space-y-3">
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Order Status
+      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Order Status
         <select 
           aria-label="Order status" 
           value={draftStatus} 
           onChange={(e) => setDraftStatus(e.target.value)} 
-          className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
         >
           <option value="ALL">All statuses</option>
           {["DRAFT", "CONFIRMED", "PARTIALLY_INVOICED", "INVOICED", "PARTIALLY_DELIVERED", "FULFILLED", "CANCELLED"].map((x) => (
@@ -90,7 +90,7 @@ export function SalesOrderListPage() {
       </label>
 
       <div className="grid grid-cols-2 gap-2">
-        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">From Date
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">From Date
           <input 
             type="date" 
             value={draftFrom} 
@@ -98,7 +98,7 @@ export function SalesOrderListPage() {
             className="mt-1.5 h-10 w-full rounded-lg border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           />
         </label>
-        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">To Date
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">To Date
           <input 
             type="date" 
             value={draftTo} 
@@ -146,7 +146,7 @@ export function SalesOrderListPage() {
             {hasPermission(user, "customers:create") && (
               <button 
                 onClick={() => navigate("/customers/new")} 
-                className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors cursor-pointer"
+                className="flex min-h-10 items-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground shadow-sm hover:bg-muted transition-colors cursor-pointer"
               >
                 <Plus size={14}/>
                 Add Customer
@@ -166,16 +166,16 @@ export function SalesOrderListPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-border bg-card p-3 shadow-sm space-y-3">
         <div className="flex gap-2">
           <div className="relative min-w-0 flex-1">
-            <Search className="absolute left-3 top-2.5 text-slate-400" size={18}/>
+            <Search className="absolute left-3 top-2.5 text-muted-foreground" size={18}/>
             <input 
               aria-label="Search sales orders" 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
               placeholder="Order number, customer or phone" 
-              className="h-10 w-full rounded-lg border border-slate-200 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="h-10 w-full rounded-lg border border-border pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
             />
           </div>
           <button 
@@ -185,7 +185,7 @@ export function SalesOrderListPage() {
               setDraftTo(to);
               setFilterOpen(true);
             }} 
-            className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer shrink-0"
+            className="flex min-h-10 items-center gap-2 rounded-lg border border-border px-4 text-xs font-bold text-muted-foreground hover:bg-muted md:hidden cursor-pointer shrink-0"
           >
             <Filter size={15}/>
             Filters
@@ -204,7 +204,7 @@ export function SalesOrderListPage() {
             aria-label="Order status" 
             value={status} 
             onChange={(e) => setStatus(e.target.value)} 
-            className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            className="h-10 rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           >
             <option value="ALL">All statuses</option>
             {["DRAFT", "CONFIRMED", "PARTIALLY_INVOICED", "INVOICED", "PARTIALLY_DELIVERED", "FULFILLED", "CANCELLED"].map((x) => (
@@ -228,7 +228,7 @@ export function SalesOrderListPage() {
           {(search || status !== "ALL" || from || to) && (
             <button 
               onClick={() => { setSearch(""); setStatus("ALL"); setFrom(""); setTo(""); }} 
-              className="font-bold text-xs text-slate-700 hover:bg-slate-50 px-4 h-10 border rounded-lg cursor-pointer"
+              className="font-bold text-xs text-muted-foreground hover:bg-muted px-4 h-10 border rounded-lg cursor-pointer"
             >
               Clear
             </button>
@@ -256,36 +256,36 @@ export function SalesOrderListPage() {
       ) : (
         <>
           {/* Desktop Table View (>=768px) */}
-          <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block shadow-sm">
+          <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600 border-b">
+              <thead className="bg-muted text-muted-foreground border-b">
                 <tr>
                   {["Order Number", "Date", "Customer", "Items", "Total", "Status", "Created By"].map((x) => (
-                    <th key={x} className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-slate-500">{x}</th>
+                    <th key={x} className="px-4 py-3.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">{x}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {visible.map((o) => (
-                  <tr key={o.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+                  <tr key={o.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
                     <td className="px-4 py-3.5">
                       <Link to={`/sales-orders/${o.id}`} className="font-bold text-orange-600 hover:text-orange-700 hover:underline">
                         {o.orderNumber}
                       </Link>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-600 font-medium">
+                    <td className="px-4 py-3.5 text-muted-foreground font-medium">
                       {new Date(o.orderDate).toLocaleDateString("en-IN")}
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className="block font-bold text-slate-900">{o.customerName}</span>
-                      <span className="text-xs text-slate-500">{o.customerPhone}</span>
+                      <span className="block font-bold text-foreground">{o.customerName}</span>
+                      <span className="text-xs text-muted-foreground">{o.customerPhone}</span>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-600 font-medium">{o.items.length} items</td>
-                    <td className="px-4 py-3.5 font-black text-slate-950">{fmt(o.totalAmount)}</td>
+                    <td className="px-4 py-3.5 text-muted-foreground font-medium">{o.items.length} items</td>
+                    <td className="px-4 py-3.5 font-black text-foreground">{fmt(o.totalAmount)}</td>
                     <td className="px-4 py-3.5">
                       <BusinessStatusBadge status={o.status}/>
                     </td>
-                    <td className="px-4 py-3.5 text-slate-500 font-medium">{o.createdBy?.name || "—"}</td>
+                    <td className="px-4 py-3.5 text-muted-foreground font-medium">{o.createdBy?.name || "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -317,7 +317,7 @@ export function SalesOrderListPage() {
                   <>
                     <button
                       onClick={() => navigate(`/sales-orders/${o.id}`)}
-                      className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                      className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                     >
                       View Order
                     </button>

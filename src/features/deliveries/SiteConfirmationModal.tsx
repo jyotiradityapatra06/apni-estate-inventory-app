@@ -144,18 +144,18 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-slate-950/40 p-0 sm:p-4 animate-fade-in">
-      <div className="w-full max-w-xl rounded-t-2xl sm:rounded-2xl bg-white shadow-xl max-h-[92vh] overflow-y-auto flex flex-col">
+      <div className="w-full max-w-xl rounded-t-2xl sm:rounded-2xl bg-card shadow-xl max-h-[92vh] overflow-y-auto flex flex-col">
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 p-4 sm:p-5 sticky top-0 bg-white z-10">
+        <div className="flex items-center justify-between border-b border-border p-4 sm:p-5 sticky top-0 bg-card z-10">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green-50 text-green-700">
               <PackageCheck size={20} />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
+              <h2 className="text-base sm:text-lg font-black text-foreground leading-tight">
                 Site Delivery Confirmation
               </h2>
-              <p className="text-[11px] font-semibold text-slate-400">
+              <p className="text-[11px] font-semibold text-muted-foreground">
                 Log Receiver Signature & Received Quantities
               </p>
             </div>
@@ -164,7 +164,7 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
           <button
             onClick={onClose}
             disabled={submitting}
-            className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-muted-foreground transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -181,12 +181,12 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
 
           {/* Receiver Information */}
           <div className="space-y-3">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
               Receiver & Site Verification
             </h3>
 
             <div>
-              <label className="block text-xs font-extrabold text-slate-700 mb-1">
+              <label className="block text-xs font-extrabold text-muted-foreground mb-1">
                 Receiver Name (Site Supervisor / Customer) *
               </label>
               <input
@@ -200,7 +200,7 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
                 className={`min-h-[44px] w-full rounded-xl border px-3 text-xs font-bold focus:outline-none ${
                   errors.receiverName
                     ? "border-red-500 bg-red-50/20 text-red-900 focus:border-red-500"
-                    : "border-slate-200 bg-white text-slate-900 focus:border-green-600"
+                    : "border-border bg-card text-foreground focus:border-green-600"
                 }`}
               />
               {errors.receiverName && (
@@ -213,7 +213,7 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
 
             {/* POD Reference */}
             <div>
-              <label className="block text-xs font-extrabold text-slate-700 mb-1">
+              <label className="block text-xs font-extrabold text-muted-foreground mb-1">
                 Proof of Delivery (POD) Reference (Optional)
               </label>
               <input
@@ -221,14 +221,14 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
                 value={proofReference}
                 onChange={(e) => setProofReference(e.target.value)}
                 placeholder="e.g. Gate Pass #4412 / Signature Slip"
-                className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:border-green-600 focus:outline-none"
+                className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:border-green-600 focus:outline-none"
               />
             </div>
           </div>
 
           {/* Item Acceptance Section */}
           <div className="space-y-3">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
               Material Quantities Acceptance
             </h3>
 
@@ -242,19 +242,19 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
                   <div
                     key={item.id}
                     className={`rounded-2xl border p-4 space-y-3 transition-colors ${
-                      itemError ? "border-red-300 bg-red-50/20" : "border-slate-200/80 bg-slate-50/50"
+                      itemError ? "border-red-300 bg-red-50/20" : "border-border/80 bg-muted/50"
                     }`}
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <strong className="text-sm font-extrabold text-slate-900 block">{item.materialName}</strong>
-                        <span className="text-[11px] font-semibold text-slate-500">
+                        <strong className="text-sm font-extrabold text-foreground block">{item.materialName}</strong>
+                        <span className="text-[11px] font-semibold text-muted-foreground">
                           Godown: {item.godown?.name || "Central Store"}
                         </span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Dispatched</span>
-                        <strong className="text-xs font-black text-slate-900">
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground block">Dispatched</span>
+                        <strong className="text-xs font-black text-foreground">
                           {formatQuantity(dispatched, item.unit)}
                         </strong>
                       </div>
@@ -263,7 +263,7 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
                     {/* Numeric Input Keypad Controls */}
                     <div className="grid grid-cols-2 gap-3 pt-1">
                       <div>
-                        <label className="block text-[11px] font-extrabold text-slate-700 mb-1">
+                        <label className="block text-[11px] font-extrabold text-muted-foreground mb-1">
                           Received Qty ({item.unit}) *
                         </label>
                         <input
@@ -272,12 +272,12 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
                           step="any"
                           value={state.received}
                           onChange={(e) => handleItemChange(item.id, "received", e.target.value)}
-                          className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:border-green-600 focus:outline-none"
+                          className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:border-green-600 focus:outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-extrabold text-slate-700 mb-1">
+                        <label className="block text-[11px] font-extrabold text-muted-foreground mb-1">
                           Rejected Qty ({item.unit})
                         </label>
                         <input
@@ -286,7 +286,7 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
                           step="any"
                           value={state.rejected}
                           onChange={(e) => handleItemChange(item.id, "rejected", e.target.value)}
-                          className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-red-600 focus:border-red-500 focus:outline-none"
+                          className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-red-600 focus:border-red-500 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -301,7 +301,7 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
                 );
               })
             ) : (
-              <div className="py-6 text-center text-xs font-bold text-slate-400 border border-dashed rounded-xl">
+              <div className="py-6 text-center text-xs font-bold text-muted-foreground border border-dashed rounded-xl">
                 No items available for confirmation
               </div>
             )}
@@ -309,7 +309,7 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
 
           {/* Delivery Notes */}
           <div>
-            <label className="block text-xs font-extrabold text-slate-700 mb-1">
+            <label className="block text-xs font-extrabold text-muted-foreground mb-1">
               Delivery Remarks / Site Notes (Optional)
             </label>
             <textarea
@@ -317,7 +317,7 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
               value={deliveryNotes}
               onChange={(e) => setDeliveryNotes(e.target.value)}
               placeholder="e.g. Unloaded safely at Tower B site..."
-              className="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs font-medium text-slate-900 focus:border-green-600 focus:outline-none"
+              className="w-full rounded-xl border border-border bg-card p-3 text-xs font-medium text-foreground focus:border-green-600 focus:outline-none"
             />
           </div>
 
@@ -330,12 +330,12 @@ export const SiteConfirmationModal: React.FC<SiteConfirmationModalProps> = ({
         </form>
 
         {/* Sticky Action Footer */}
-        <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/60 flex gap-3 sticky bottom-0">
+        <div className="p-4 sm:p-5 border-t border-border bg-muted/60 flex gap-3 sticky bottom-0">
           <button
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="min-h-[44px] flex-1 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="min-h-[44px] flex-1 rounded-xl border border-border bg-card text-xs font-bold text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
           >
             Cancel
           </button>

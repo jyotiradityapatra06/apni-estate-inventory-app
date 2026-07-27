@@ -15,8 +15,8 @@ const badgeStyles: Record<BadgeVariant, {
   border?: string;
 }> = {
   default: {
-    bg: "bg-slate-100",
-    text: "text-slate-700",
+    bg: "bg-muted",
+    text: "text-muted-foreground",
     dot: "bg-slate-400"
   },
   success: {
@@ -40,9 +40,9 @@ const badgeStyles: Record<BadgeVariant, {
     dot: "bg-blue-500"
   },
   neutral: {
-    bg: "bg-gray-100",
-    text: "text-gray-600",
-    dot: "bg-gray-400"
+    bg: "bg-muted",
+    text: "text-muted-foreground",
+    dot: "bg-muted-foreground"
   }
 };
 

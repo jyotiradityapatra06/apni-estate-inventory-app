@@ -19,7 +19,7 @@ const empty: GodownInput = {
   isActive: true,
 };
 
-const cls = "mt-2 min-h-12 w-full rounded-lg border px-3 text-base bg-white";
+const cls = "mt-2 min-h-12 w-full rounded-lg border px-3 text-base bg-card";
 const phoneRegex = /^(?:\+91[ -]?)?[6-9]\d{9}$/;
 
 export function GodownFormPage({ mode }: { mode: "create" | "edit" }) {
@@ -84,7 +84,7 @@ export function GodownFormPage({ mode }: { mode: "create" | "edit" }) {
         description="Add storage-location and contact details. Stock is managed separately."
       />
       {error && <p className="rounded-lg bg-red-50 p-3 font-semibold text-red-800" role="alert">{error}</p>}
-      <section className="rounded-xl border bg-white p-5">
+      <section className="rounded-xl border bg-card p-5">
         <SectionHeader title="Godown Details" />
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <label className="text-sm font-semibold">
@@ -168,7 +168,7 @@ export function GodownFormPage({ mode }: { mode: "create" | "edit" }) {
                 type="checkbox"
                 checked={!!form.isDefault}
                 onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
-                className="h-5 w-5 rounded border-slate-300"
+                className="h-5 w-5 rounded border-border"
               />
               Default Godown
             </label>
@@ -178,7 +178,7 @@ export function GodownFormPage({ mode }: { mode: "create" | "edit" }) {
                   type="checkbox"
                   checked={!!form.isActive}
                   onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                  className="h-5 w-5 rounded border-slate-300"
+                  className="h-5 w-5 rounded border-border"
                 />
                 Active
               </label>
@@ -195,7 +195,7 @@ export function GodownFormPage({ mode }: { mode: "create" | "edit" }) {
           </label>
         </div>
       </section>
-      <div className="fixed inset-x-0 bottom-[72px] z-30 flex gap-3 border-t bg-white p-3 md:static md:justify-end md:border-0 md:bg-transparent">
+      <div className="fixed inset-x-0 bottom-[72px] z-30 flex gap-3 border-t bg-card p-3 md:static md:justify-end md:border-0 md:bg-transparent">
         <button
           type="button"
           onClick={() => nav(-1)}

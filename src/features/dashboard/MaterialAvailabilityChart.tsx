@@ -24,11 +24,11 @@ export const MaterialAvailabilityChart: React.FC<MaterialAvailabilityChartProps>
 
   if (validMaterials.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+      <div className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card dark:bg-slate-900 p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-border dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <Package size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Top Materials by Availability</h3>
+            <h3 className="font-extrabold text-sm text-foreground dark:text-white">Top Materials by Availability</h3>
           </div>
         </div>
 
@@ -37,8 +37,8 @@ export const MaterialAvailabilityChart: React.FC<MaterialAvailabilityChartProps>
             <Package size={24} />
           </div>
           <div>
-            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">No materials available yet</h4>
-            <p className="text-xs text-slate-400 dark:text-slate-400 mt-1 max-w-[260px] mx-auto">
+            <h4 className="font-extrabold text-sm text-foreground dark:text-white">No materials available yet</h4>
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1 max-w-[260px] mx-auto">
               Add materials to visualize your inventory distribution.
             </p>
           </div>
@@ -65,11 +65,11 @@ export const MaterialAvailabilityChart: React.FC<MaterialAvailabilityChartProps>
   }));
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+    <div className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="flex items-center justify-between border-b border-border dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <Package size={18} className="text-[#F97316]" />
-          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Top Materials by Availability</h3>
+          <h3 className="font-extrabold text-sm text-foreground dark:text-white">Top Materials by Availability</h3>
         </div>
         <button
           onClick={() => navigate("/materials")}

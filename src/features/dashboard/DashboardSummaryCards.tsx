@@ -24,7 +24,7 @@ export function DashboardSummaryCards({ dashboard }: { dashboard: DashboardData 
     return (
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className="h-[110px] animate-pulse rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900" />
+          <div key={index} className="h-[110px] animate-pulse rounded-xl border border-border dark:border-slate-800 bg-card dark:bg-slate-900" />
         ))}
       </div>
     );

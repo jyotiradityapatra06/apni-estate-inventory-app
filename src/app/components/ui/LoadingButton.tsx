@@ -27,7 +27,7 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
   const variantStyles = {
     primary: "bg-orange-600 hover:bg-orange-700 text-white shadow-sm disabled:bg-orange-400",
     secondary: "bg-slate-900 hover:bg-slate-800 text-white shadow-sm disabled:bg-slate-700",
-    outline: "border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 disabled:bg-slate-50",
+    outline: "border border-border bg-card hover:bg-muted text-muted-foreground disabled:bg-muted",
     danger: "bg-red-600 hover:bg-red-700 text-white shadow-sm disabled:bg-red-400"
   };
 

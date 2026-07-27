@@ -23,7 +23,7 @@ const empty: CustomerInput = {
 };
 
 const cls =
-  "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
+  "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 const phonePattern = /^(?:\+91[ -]?)?[6-9]\d{9}$/;
 const gstPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 const stateCodePattern = /^[0-9]{2}$/;
@@ -118,10 +118,10 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
         </p>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <SectionHeader title="Basic Information" description="Name, primary phone, email, GSTIN, and location details." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Customer Name *
             <input
               ref={first}
@@ -132,7 +132,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Phone Number *
             <input
               required
@@ -143,7 +143,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Email Address
             <input
               type="email"
@@ -153,7 +153,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             GSTIN / Tax ID
             <input
               maxLength={15}
@@ -163,7 +163,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             State Name
             <input
               placeholder="e.g. Maharashtra"
@@ -172,7 +172,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               className={cls}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             GST State Code
             <input
               maxLength={2}
@@ -186,10 +186,10 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <SectionHeader title="Address Details" description="Billing and site delivery locations." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Billing Address
             <textarea
               rows={3}
@@ -199,7 +199,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               className={`${cls} min-h-24 p-3`}
             />
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Site / Delivery Address
             <textarea
               rows={3}
@@ -212,10 +212,10 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <SectionHeader title="Credit Settings & Balances" description="Configure credit limits, payment terms, and initial outstanding balance." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Credit Limit (₹)
             <input
               type="number"
@@ -227,10 +227,10 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               onChange={(e) => set("creditLimit", Number(e.target.value))}
               className={cls}
             />
-            <span className="text-[10px] text-slate-400 font-bold normal-case mt-1 block">Set 0 for unlimited credit sales.</span>
+            <span className="text-[10px] text-muted-foreground font-bold normal-case mt-1 block">Set 0 for unlimited credit sales.</span>
           </label>
 
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Credit Period (Days)
             <input
               type="number"
@@ -241,10 +241,10 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
               onChange={(e) => set("creditDays", Number(e.target.value))}
               className={cls}
             />
-            <span className="text-[10px] text-slate-400 font-bold normal-case mt-1 block">Payment due terms in days.</span>
+            <span className="text-[10px] text-muted-foreground font-bold normal-case mt-1 block">Payment due terms in days.</span>
           </label>
 
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block md:col-span-2">
             Opening Outstanding Balance (₹)
             <input
               type="number"
@@ -258,27 +258,27 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
             />
           </label>
 
-          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-2">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted p-4 md:col-span-2">
             <div>
-              <span className="text-xs font-black text-slate-900 block">Allow Credit Sales</span>
-              <span className="text-[11px] text-slate-500 font-semibold block">Enable or disable credit sales transactions for this customer.</span>
+              <span className="text-xs font-black text-foreground block">Allow Credit Sales</span>
+              <span className="text-[11px] text-muted-foreground font-semibold block">Enable or disable credit sales transactions for this customer.</span>
             </div>
             <input
               type="checkbox"
               checked={form.allowCredit !== false}
               onChange={(e) => set("allowCredit", e.target.checked)}
-              className="h-5 w-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
+              className="h-5 w-5 rounded border-border text-orange-500 focus:ring-orange-500 cursor-pointer"
             />
           </div>
         </div>
       </section>
 
       {/* Footer Actions */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-white p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-card p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
         <button
           type="button"
           onClick={() => nav(-1)}
-          className="min-h-[48px] flex-1 rounded-xl border border-slate-200 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 md:flex-none md:px-6 cursor-pointer"
+          className="min-h-[48px] flex-1 rounded-xl border border-border text-xs sm:text-sm font-extrabold text-muted-foreground hover:bg-muted md:flex-none md:px-6 cursor-pointer"
         >
           Cancel
         </button>

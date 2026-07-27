@@ -7,6 +7,7 @@ import { fmt } from "../../utils/currency";
 import { useAuth } from "../../hooks/useAuth";
 import { hasPermission } from "../../utils/permissions";
 import { PageHeader } from "../../app/components/common/PageHeader";
+import { EmptyState } from "../../app/components/common/FeedbackStates";
 
 export default function PaymentsPage() {
   const nav = useNavigate();
@@ -22,18 +23,22 @@ export default function PaymentsPage() {
   const [methodFilter, setMethodFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  useEffect(() => {
+  const load = () => {
     setLoading(true);
+    setError("");
     paymentApi
       .getAll()
       .then((r) => {
         setData(r.data || []);
-        setLoading(false);
       })
       .catch((e: any) => {
         setError(e.message || "Failed to load customer payments");
-        setLoading(false);
-      });
+      })
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
   }, []);
 
   const filteredPayments = useMemo(() => {
@@ -95,43 +100,41 @@ export default function PaymentsPage() {
         }
       />
 
-      {error && <div className="rounded-xl bg-red-50 p-4 text-red-800 text-sm font-bold border border-red-200">{error}</div>}
-
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Total Received</span>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">Total Received</span>
           <strong className="text-xl sm:text-2xl font-black text-emerald-700 mt-1 block">{fmt(summary.totalAmount)}</strong>
-          <span className="text-[10px] font-semibold text-slate-500 mt-0.5 block">{summary.postedCount} posted receipts</span>
+          <span className="text-[10px] font-semibold text-muted-foreground mt-0.5 block">{summary.postedCount} posted receipts</span>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Total Transactions</span>
-          <strong className="text-xl sm:text-2xl font-black text-slate-900 mt-1 block">{summary.totalCount}</strong>
-          <span className="text-[10px] font-semibold text-slate-500 mt-0.5 block">All payment records</span>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">Total Transactions</span>
+          <strong className="text-xl sm:text-2xl font-black text-foreground mt-1 block">{summary.totalCount}</strong>
+          <span className="text-[10px] font-semibold text-muted-foreground mt-0.5 block">All payment records</span>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Active Receipts</span>
-          <strong className="text-xl sm:text-2xl font-black text-slate-900 mt-1 block">{summary.postedCount}</strong>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">Active Receipts</span>
+          <strong className="text-xl sm:text-2xl font-black text-foreground mt-1 block">{summary.postedCount}</strong>
           <span className="text-[10px] font-semibold text-emerald-600 mt-0.5 block">Valid payments</span>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Reversals</span>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">Reversals</span>
           <strong className="text-xl sm:text-2xl font-black text-red-600 mt-1 block">{summary.reversedCount}</strong>
-          <span className="text-[10px] font-semibold text-slate-500 mt-0.5 block">Reversed payments</span>
+          <span className="text-[10px] font-semibold text-muted-foreground mt-0.5 block">Reversed payments</span>
         </div>
       </div>
 
       {/* Filter Control Toolbar */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-3">
+      <section className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3">
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-5">
           {/* Search */}
           <div className="relative md:col-span-2">
-            <Search className="absolute left-3.5 top-3 text-slate-400" size={18} />
+            <Search className="absolute left-3.5 top-3 text-muted-foreground" size={18} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search customer, code, or receipt #..."
-              className="w-full rounded-xl border border-slate-200 pl-10 pr-4 h-11 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full rounded-xl border border-border pl-10 pr-4 h-11 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
             />
           </div>
 
@@ -140,7 +143,7 @@ export default function PaymentsPage() {
             <select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
-              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="h-11 w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
             >
               <option value="ALL">All Methods</option>
               <option value="CASH">Cash</option>
@@ -157,7 +160,7 @@ export default function PaymentsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="h-11 w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
             >
               <option value="ALL">All Statuses</option>
               <option value="POSTED">POSTED (Active)</option>
@@ -175,7 +178,7 @@ export default function PaymentsPage() {
                 setFromDate("");
                 setToDate("");
               }}
-              className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
+              className="h-11 w-full rounded-xl border border-border bg-muted hover:bg-muted px-3 text-xs font-bold text-muted-foreground transition-colors cursor-pointer"
             >
               Clear Filters
             </button>
@@ -183,20 +186,20 @@ export default function PaymentsPage() {
         </div>
 
         {/* Optional Date Range Row */}
-        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-100 text-xs">
-          <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Filter by Date Range:</span>
+        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border text-xs">
+          <span className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">Filter by Date Range:</span>
           <input
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            className="h-9 rounded-lg border border-slate-200 px-2.5 text-xs text-slate-700 focus:outline-none"
+            className="h-9 rounded-lg border border-border px-2.5 text-xs text-muted-foreground focus:outline-none"
           />
-          <span className="text-slate-400">to</span>
+          <span className="text-muted-foreground">to</span>
           <input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            className="h-9 rounded-lg border border-slate-200 px-2.5 text-xs text-slate-700 focus:outline-none"
+            className="h-9 rounded-lg border border-border px-2.5 text-xs text-muted-foreground focus:outline-none"
           />
         </div>
       </section>
@@ -204,17 +207,32 @@ export default function PaymentsPage() {
       {/* Payment History Viewport */}
       {loading ? (
         <div className="h-64 animate-pulse rounded-2xl bg-slate-200" role="status" aria-label="Loading payment history" />
+      ) : error ? (
+        <EmptyState
+          title="Could not load payments"
+          description={error}
+          action={<button onClick={load} className="min-h-11 rounded-xl bg-orange-600 px-5 font-bold text-white">Retry</button>}
+        />
       ) : filteredPayments.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-500 space-y-2">
-          <p className="font-bold text-base text-slate-800">No payment records found</p>
-          <p className="text-xs text-slate-500">Try clearing or adjusting your search filters.</p>
-        </div>
+        <EmptyState
+          title={data.length ? "No matching payment records" : "No customer payments yet"}
+          description={data.length ? "Clear or adjust the filters to see other payment records." : "Record your first customer payment to update receivables and the ledger."}
+          action={data.length ? (
+            <button onClick={() => { setSearch(""); setMethodFilter("ALL"); setStatusFilter("ALL"); setFromDate(""); setToDate(""); }} className="min-h-11 rounded-xl border px-5 font-bold">
+              Clear Filters
+            </button>
+          ) : user && hasPermission(user, "sales:manage") ? (
+            <button onClick={() => nav("/payments/new")} className="min-h-11 rounded-xl bg-orange-600 px-5 font-bold text-white">
+              Record First Payment
+            </button>
+          ) : undefined}
+        />
       ) : (
         <>
           {/* Desktop Table Viewport (>=768px) */}
-          <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs md:block">
+          <div className="hidden overflow-hidden rounded-2xl border border-border bg-card shadow-xs md:block">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold uppercase tracking-wider">
+              <thead className="bg-muted text-muted-foreground border-b border-border font-bold uppercase tracking-wider">
                 <tr>
                   <th className="p-3.5">Payment Number</th>
                   <th className="p-3.5">Customer</th>
@@ -227,28 +245,28 @@ export default function PaymentsPage() {
                   <th className="p-3.5 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-semibold text-slate-800">
+              <tbody className="divide-y divide-slate-100 font-semibold text-foreground">
                 {filteredPayments.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="p-3.5 font-bold text-slate-900">
+                  <tr key={p.id} className="hover:bg-muted/70 transition-colors">
+                    <td className="p-3.5 font-bold text-foreground">
                       <Link to={`/payments/${p.id}`} className="hover:text-orange-600 transition-colors">
                         {p.paymentNumber}
                       </Link>
                     </td>
                     <td className="p-3.5">
-                      <p className="font-extrabold text-slate-900">{p.customer?.name || "—"}</p>
-                      {p.customer?.customerCode && <p className="text-[10px] text-slate-400 font-bold">{p.customer.customerCode}</p>}
+                      <p className="font-extrabold text-foreground">{p.customer?.name || "—"}</p>
+                      {p.customer?.customerCode && <p className="text-[10px] text-muted-foreground font-bold">{p.customer.customerCode}</p>}
                     </td>
-                    <td className="p-3.5 font-semibold text-slate-700">{p.invoice?.invoiceNumber || "—"}</td>
+                    <td className="p-3.5 font-semibold text-muted-foreground">{p.invoice?.invoiceNumber || "—"}</td>
                     <td className="p-3.5 text-right font-black text-emerald-700 text-sm">{fmt(p.amount)}</td>
                     <td className="p-3.5">
-                      <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-700">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[10px] font-bold uppercase text-muted-foreground">
                         {p.paymentMethod?.replaceAll("_", " ")}
                       </span>
-                      {p.referenceNumber && <p className="text-[10px] text-slate-400 mt-0.5">Ref: {p.referenceNumber}</p>}
+                      {p.referenceNumber && <p className="text-[10px] text-muted-foreground mt-0.5">Ref: {p.referenceNumber}</p>}
                     </td>
-                    <td className="p-3.5 text-slate-600">{new Date(p.paymentDate).toLocaleDateString("en-IN")}</td>
-                    <td className="p-3.5 text-slate-600">{p.receivedBy?.name || "—"}</td>
+                    <td className="p-3.5 text-muted-foreground">{new Date(p.paymentDate).toLocaleDateString("en-IN")}</td>
+                    <td className="p-3.5 text-muted-foreground">{p.receivedBy?.name || "—"}</td>
                     <td className="p-3.5 text-center">
                       <BusinessStatusBadge status={p.status} />
                     </td>
@@ -256,7 +274,7 @@ export default function PaymentsPage() {
                       <div className="flex items-center justify-center gap-2">
                         <Link
                           to={`/payments/${p.id}`}
-                          className="min-h-8 inline-flex items-center gap-1 rounded-lg border border-slate-200 hover:bg-slate-50 px-2.5 text-[10px] font-bold text-slate-700 transition-colors"
+                          className="min-h-8 inline-flex items-center gap-1 rounded-lg border border-border hover:bg-muted px-2.5 text-[10px] font-bold text-muted-foreground transition-colors"
                           title="View Payment Details"
                         >
                           <Eye size={12} /> View
@@ -279,37 +297,37 @@ export default function PaymentsPage() {
           {/* Mobile Card Viewport (<768px) */}
           <div className="space-y-3.5 md:hidden">
             {filteredPayments.map((p) => (
-              <div key={p.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-3">
-                <div className="flex justify-between items-start border-b border-slate-100 pb-2">
+              <div key={p.id} className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3">
+                <div className="flex justify-between items-start border-b border-border pb-2">
                   <div>
-                    <Link to={`/payments/${p.id}`} className="text-base font-extrabold text-slate-900 hover:text-orange-600">
+                    <Link to={`/payments/${p.id}`} className="text-base font-extrabold text-foreground hover:text-orange-600">
                       {p.paymentNumber}
                     </Link>
-                    <p className="text-xs font-bold text-slate-700 mt-0.5">{p.customer?.name}</p>
+                    <p className="text-xs font-bold text-muted-foreground mt-0.5">{p.customer?.name}</p>
                   </div>
                   <BusinessStatusBadge status={p.status} />
                 </div>
 
-                <div className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
+                <div className="flex justify-between items-center bg-muted p-2.5 rounded-xl border border-border text-xs">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Amount Received</span>
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground block">Amount Received</span>
                     <strong className="text-lg font-black text-emerald-700">{fmt(p.amount)}</strong>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Payment Mode</span>
-                    <span className="font-extrabold text-slate-800 uppercase">{p.paymentMethod?.replaceAll("_", " ")}</span>
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground block">Payment Mode</span>
+                    <span className="font-extrabold text-foreground uppercase">{p.paymentMethod?.replaceAll("_", " ")}</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-[11px] font-medium text-slate-600">
-                  <p>Invoice: <strong className="text-slate-900">{p.invoice?.invoiceNumber || "—"}</strong></p>
+                <div className="grid grid-cols-2 gap-2 text-[11px] font-medium text-muted-foreground">
+                  <p>Invoice: <strong className="text-foreground">{p.invoice?.invoiceNumber || "—"}</strong></p>
                   <p className="text-right">Date: <strong>{new Date(p.paymentDate).toLocaleDateString("en-IN")}</strong></p>
                 </div>
 
-                <div className="flex gap-2 pt-2 border-t border-slate-100">
+                <div className="flex gap-2 pt-2 border-t border-border">
                   <Link
                     to={`/payments/${p.id}`}
-                    className="flex-1 min-h-10 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="flex-1 min-h-10 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors"
                   >
                     <Eye size={14} /> Details
                   </Link>

@@ -74,12 +74,12 @@ export default function PurchaseOrdersPage() {
 
   const filtersPanel = (
     <div className="space-y-3">
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Order Status
+      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Order Status
         <select 
           aria-label="Purchase status" 
           value={draftStatus} 
           onChange={(e) => setDraftStatus(e.target.value)} 
-          className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
         >
           <option value="ALL">All statuses</option>
           {["DRAFT", "SENT", "PARTIALLY_RECEIVED", "RECEIVED", "CANCELLED"].map((x) => (
@@ -88,12 +88,12 @@ export default function PurchaseOrdersPage() {
         </select>
       </label>
 
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Payment Status
+      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Payment Status
         <select 
           aria-label="Payment status" 
           value={draftPayment} 
           onChange={(e) => setDraftPayment(e.target.value)} 
-          className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
         >
           <option value="ALL">All payments</option>
           {["UNPAID", "PARTIAL", "PAID"].map((x) => (
@@ -102,12 +102,12 @@ export default function PurchaseOrdersPage() {
         </select>
       </label>
 
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Supplier
+      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Supplier
         <select 
           aria-label="Supplier filter" 
           value={draftSupplier} 
           onChange={(e) => setDraftSupplier(e.target.value)} 
-          className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
         >
           <option value="ALL">All suppliers</option>
           {Array.from(new Map(data.map((x) => [x.supplierId, x.supplierName])).entries()).map(([id, name]) => (
@@ -117,7 +117,7 @@ export default function PurchaseOrdersPage() {
       </label>
 
       <div className="grid grid-cols-2 gap-2">
-        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">From Date
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">From Date
           <input 
             type="date" 
             value={draftFrom} 
@@ -126,7 +126,7 @@ export default function PurchaseOrdersPage() {
           />
         </label>
 
-        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">To Date
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">To Date
           <input 
             type="date" 
             value={draftTo} 
@@ -192,16 +192,16 @@ export default function PurchaseOrdersPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
         <div className="flex gap-2.5">
           <div className="relative min-w-0 flex-1">
-            <Search className="absolute left-3.5 top-3 text-slate-400" size={18}/>
+            <Search className="absolute left-3.5 top-3 text-muted-foreground" size={18}/>
             <input 
               aria-label="Search purchases" 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
               placeholder="Search by purchase PO number, supplier name or phone…" 
-              className="h-11 w-full rounded-xl border border-slate-200 pl-10 pr-4 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
+              className="h-11 w-full rounded-xl border border-border pl-10 pr-4 text-sm sm:text-base font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-muted-foreground"
             />
           </div>
           <button 
@@ -213,7 +213,7 @@ export default function PurchaseOrdersPage() {
               setDraftTo(to);
               setFilterOpen(true);
             }} 
-            className="flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-200 px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer shrink-0"
+            className="flex min-h-[44px] items-center gap-2 rounded-xl border border-border px-4 text-xs font-bold text-muted-foreground hover:bg-muted md:hidden cursor-pointer shrink-0"
           >
             <Filter size={15}/>
             Filters
@@ -231,7 +231,7 @@ export default function PurchaseOrdersPage() {
             aria-label="Purchase status" 
             value={status} 
             onChange={(e) => setStatus(e.target.value)} 
-            className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            className="h-10 rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           >
             <option value="ALL">All statuses</option>
             {["DRAFT", "SENT", "PARTIALLY_RECEIVED", "RECEIVED", "CANCELLED"].map((x) => (
@@ -242,7 +242,7 @@ export default function PurchaseOrdersPage() {
             aria-label="Payment status" 
             value={payment} 
             onChange={(e) => setPayment(e.target.value)} 
-            className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            className="h-10 rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           >
             <option value="ALL">All payments</option>
             {["UNPAID", "PARTIAL", "PAID"].map((x) => (
@@ -253,7 +253,7 @@ export default function PurchaseOrdersPage() {
             aria-label="Supplier filter" 
             value={supplier} 
             onChange={(e) => setSupplier(e.target.value)} 
-            className="h-10 rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            className="h-10 rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           >
             <option value="ALL">All suppliers</option>
             {Array.from(new Map(data.map((x) => [x.supplierId, x.supplierName])).entries()).map(([id, name]) => (
@@ -283,7 +283,7 @@ export default function PurchaseOrdersPage() {
                 setFrom("");
                 setTo("");
               }} 
-              className="h-10 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              className="h-10 rounded-lg border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer"
             >
               Clear Filters
             </button>

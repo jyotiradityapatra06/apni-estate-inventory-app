@@ -51,11 +51,11 @@ export default function PayablesPage() {
   });
 
   const filtersPanel = (
-    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Payable Status
+    <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">Payable Status
       <select 
         value={draftStatus} 
         onChange={(e) => setDraftStatus(e.target.value)} 
-        className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+        className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
       >
         <option value="ALL">All Supplier Accounts</option>
         <option value="PENDING">Pending Payables Only</option>
@@ -67,7 +67,7 @@ export default function PayablesPage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Back button */}
-      <Link to="/financials/payments" className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer">
+      <Link to="/financials/payments" className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer">
         <ArrowLeft size={14}/>
         Back to Finance
       </Link>
@@ -75,9 +75,9 @@ export default function PayablesPage() {
       <PageHeader title="Payables" description="Supplier amounts your business needs to pay." />
 
       {/* Mobile Finance Summary */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-400">Payables Summary</span>
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
+        <div className="flex items-center justify-between border-b border-border pb-2">
+          <span className="text-xs font-black uppercase tracking-wider text-muted-foreground">Payables Summary</span>
           {s.overdue > 0 && (
             <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-black text-red-600 border border-red-100">
               Overdue: {fmt(s.overdue)}
@@ -86,43 +86,43 @@ export default function PayablesPage() {
         </div>
         <div className="grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
           <div className="p-2.5 bg-red-50/50 rounded-xl border border-red-100">
-            <span className="text-[9px] uppercase font-bold text-slate-400 block">Total Payable</span>
+            <span className="text-[9px] uppercase font-bold text-muted-foreground block">Total Payable</span>
             <strong className="text-base font-black text-red-600 mt-0.5 block">{fmt(s.totalPayable)}</strong>
           </div>
-          <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-            <span className="text-[9px] uppercase font-bold text-slate-400 block">Due This Week</span>
-            <strong className="text-base font-black text-slate-900 mt-0.5 block">{fmt(s.dueThisWeek)}</strong>
+          <div className="p-2.5 bg-muted rounded-xl border border-border">
+            <span className="text-[9px] uppercase font-bold text-muted-foreground block">Due This Week</span>
+            <strong className="text-base font-black text-foreground mt-0.5 block">{fmt(s.dueThisWeek)}</strong>
           </div>
-          <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-            <span className="text-[9px] uppercase font-bold text-slate-400 block">Overdue</span>
-            <strong className="text-base font-black text-slate-900 mt-0.5 block">{fmt(s.overdue)}</strong>
+          <div className="p-2.5 bg-muted rounded-xl border border-border">
+            <span className="text-[9px] uppercase font-bold text-muted-foreground block">Overdue</span>
+            <strong className="text-base font-black text-foreground mt-0.5 block">{fmt(s.overdue)}</strong>
           </div>
-          <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-            <span className="text-[9px] uppercase font-bold text-slate-400 block">Pending Suppliers</span>
-            <strong className="text-base font-black text-slate-900 mt-0.5 block">{s.suppliersPending}</strong>
+          <div className="p-2.5 bg-muted rounded-xl border border-border">
+            <span className="text-[9px] uppercase font-bold text-muted-foreground block">Pending Suppliers</span>
+            <strong className="text-base font-black text-foreground mt-0.5 block">{s.suppliersPending}</strong>
           </div>
         </div>
       </div>
 
       <AgeingReport rows={d.ageing} />
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b pb-3">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Supplier Outstanding Payables</h3>
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Supplier Outstanding Payables</h3>
           
           <div className="flex gap-2.5">
             <div className="relative min-w-0 flex-1 sm:w-80">
-              <Search className="absolute left-3.5 top-3 text-slate-400" size={18}/>
+              <Search className="absolute left-3.5 top-3 text-muted-foreground" size={18}/>
               <input 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
                 placeholder="Search supplier name, phone, or GSTIN…" 
-                className="w-full rounded-xl border border-slate-200 pl-10 pr-4 h-11 text-sm sm:text-base font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400"
+                className="w-full rounded-xl border border-border pl-10 pr-4 h-11 text-sm sm:text-base font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-muted-foreground"
               />
             </div>
             <button 
               onClick={() => { setDraftStatus(statusFilter); setFilterOpen(true); }} 
-              className="flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer shrink-0"
+              className="flex min-h-9 items-center gap-1.5 rounded-lg border border-border px-3 text-xs font-bold text-muted-foreground hover:bg-muted md:hidden cursor-pointer shrink-0"
             >
               <Filter size={14}/>
               Filter
@@ -133,18 +133,18 @@ export default function PayablesPage() {
         
         {filteredSuppliers.length === 0 ? (
           <div className="py-8 text-center space-y-2">
-            <p className="font-extrabold text-sm text-slate-900">No pending supplier payments</p>
-            <p className="text-xs text-slate-400">All supplier PO accounts are settled and up to date.</p>
+            <p className="font-extrabold text-sm text-foreground">No pending supplier payments</p>
+            <p className="text-xs text-muted-foreground">All supplier PO accounts are settled and up to date.</p>
           </div>
         ) : (
           <>
             {/* Desktop Table Viewport (>=768px) */}
-            <div className="hidden overflow-hidden rounded-xl border border-slate-100 md:block">
+            <div className="hidden overflow-hidden rounded-xl border border-border md:block">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-600 border-b">
+                <thead className="bg-muted text-muted-foreground border-b">
                   <tr>
                     {["Supplier", "Purchase Volume", "Amount Paid", "Pending Payable", "Payment Terms", "Actions"].map((h) => (
-                      <th key={h} className="p-3 font-semibold text-slate-500 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="p-3 font-semibold text-muted-foreground uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -157,17 +157,17 @@ export default function PayablesPage() {
                     const pendingPO = supplierPurchases.find(p => Number(p.balanceDue) > 0);
 
                     return (
-                      <tr key={x.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+                      <tr key={x.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
                         <td className="p-3">
-                          <Link className="font-bold text-slate-900 hover:text-orange-600 transition-colors" to={`/suppliers/${x.id}`}>
+                          <Link className="font-bold text-foreground hover:text-orange-600 transition-colors" to={`/suppliers/${x.id}`}>
                             {x.name}
                           </Link>
-                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{x.phone || "No contact logged"}</p>
+                          <p className="text-[10px] text-muted-foreground font-bold mt-0.5">{x.phone || "No contact logged"}</p>
                         </td>
-                        <td className="text-slate-600 font-semibold">{fmt(totalPurchased)}</td>
+                        <td className="text-muted-foreground font-semibold">{fmt(totalPurchased)}</td>
                         <td className="text-green-700 font-semibold">{fmt(totalPaid)}</td>
                         <td className="font-black text-red-600">{fmt(outstandingPayable)}</td>
-                        <td className="text-slate-500 font-medium">{x.paymentTerms || "30 Days"}</td>
+                        <td className="text-muted-foreground font-medium">{x.paymentTerms || "30 Days"}</td>
                         <td className="p-3">
                           <div className="flex gap-2">
                             {outstandingPayable > 0 && pendingPO && (
@@ -180,7 +180,7 @@ export default function PayablesPage() {
                             )}
                             <Link 
                               to={`/suppliers/${x.id}`} 
-                              className="min-h-8 inline-flex items-center rounded-lg border border-slate-200 hover:bg-slate-50 px-3 text-[10px] font-bold text-slate-700 transition-colors"
+                              className="min-h-8 inline-flex items-center rounded-lg border border-border hover:bg-muted px-3 text-[10px] font-bold text-muted-foreground transition-colors"
                             >
                               View Transactions
                             </Link>
@@ -208,7 +208,7 @@ export default function PayablesPage() {
                     title={x.name}
                     subtitle={`Phone: ${x.phone || "No contact"}`}
                     badge={
-                      <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-700">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-muted text-muted-foreground">
                         {x.paymentTerms || "30 Days"}
                       </span>
                     }
@@ -234,7 +234,7 @@ export default function PayablesPage() {
                         )}
                         <button 
                           onClick={() => navigate(`/suppliers/${x.id}`)} 
-                          className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                          className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                         >
                           View Supplier
                         </button>

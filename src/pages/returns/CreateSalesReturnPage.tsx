@@ -22,17 +22,19 @@ export default function CreateSalesReturnPage() {
   
   const [returnItems, setReturnItems] = useState<Record<string, { quantity: number; godownId: string }>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [loadingOptions, setLoadingOptions] = useState(true);
   const [loadingInvoice, setLoadingInvoice] = useState(false);
 
   useEffect(() => {
-    // Fetch all issued invoices
-    invoiceApi.getAll().then((res) => {
-      setInvoices(res.data.filter((x: any) => x.status === "ISSUED"));
-    });
-    // Fetch active godowns
-    godownApi.getAll().then((res) => {
-      setGodowns(res.data.filter((x: any) => x.isActive));
-    });
+    Promise.all([invoiceApi.getAll(), godownApi.getAll()])
+      .then(([invoiceResponse, godownResponse]) => {
+        setInvoices(invoiceResponse.data.filter((x: any) => x.status === "ISSUED"));
+        setGodowns(godownResponse.data.filter((x: any) => x.isActive));
+      })
+      .catch((error) => {
+        toast.error(error instanceof Error ? error.message : "Could not load return options.");
+      })
+      .finally(() => setLoadingOptions(false));
   }, []);
 
   useEffect(() => {
@@ -104,6 +106,7 @@ export default function CreateSalesReturnPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     if (!selectedInvoiceId) return toast.error("Please select an invoice.");
     if (!reason.trim()) return toast.error("Please provide a return reason.");
 
@@ -141,7 +144,7 @@ export default function CreateSalesReturnPage() {
     <div className="space-y-6 pb-12 max-w-4xl">
       <button
         onClick={() => navigate("/sales-returns")}
-        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-muted-foreground"
       >
         <ArrowLeft size={16} /> Back to Sales Returns
       </button>
@@ -149,15 +152,15 @@ export default function CreateSalesReturnPage() {
       <PageHeader title="Create Sales Return" description="Issue a credit return draft against an issued invoice." />
 
       <form onSubmit={submit} className="space-y-6">
-        <div className="rounded-xl border bg-white p-6 space-y-4 shadow-sm">
+        <div className="rounded-xl border bg-card p-6 space-y-4 shadow-sm">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">Select Invoice</label>
+            <label className="block text-sm font-semibold text-muted-foreground mb-1">Select Invoice</label>
             <select
               aria-label="Select invoice select"
               value={selectedInvoiceId}
               onChange={(e) => setSelectedInvoiceId(e.target.value)}
-              className="h-12 w-full rounded-lg border bg-white px-3"
-              disabled={loadingInvoice}
+              className="h-12 w-full rounded-lg border bg-card px-3"
+              disabled={loadingOptions || loadingInvoice}
             >
               <option value="">Select an Invoice...</option>
               {invoices.map((inv) => (
@@ -170,7 +173,7 @@ export default function CreateSalesReturnPage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Return Reason *</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-1">Return Reason *</label>
               <input
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -180,7 +183,7 @@ export default function CreateSalesReturnPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Notes</label>
+              <label className="block text-sm font-semibold text-muted-foreground mb-1">Notes</label>
               <input
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -191,17 +194,17 @@ export default function CreateSalesReturnPage() {
           </div>
         </div>
 
-        {loadingInvoice && <div className="h-32 animate-pulse rounded-xl bg-slate-100" />}
+        {loadingInvoice && <div className="h-32 animate-pulse rounded-xl bg-muted" />}
 
         {invoiceDetails && !loadingInvoice && (
-          <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
-            <div className="px-6 py-4 bg-slate-50 border-b">
-              <h3 className="font-semibold text-slate-800">Invoice Items</h3>
+          <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+            <div className="px-6 py-4 bg-muted border-b">
+              <h3 className="font-semibold text-foreground">Invoice Items</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="bg-slate-100/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b">
+                  <tr className="bg-muted/50 text-xs font-bold text-muted-foreground uppercase tracking-wider border-b">
                     <th className="px-6 py-3">Material</th>
                     <th className="px-6 py-3 text-right">Sold Qty</th>
                     <th className="px-6 py-3 text-right">Remaining Returnable</th>
@@ -213,10 +216,10 @@ export default function CreateSalesReturnPage() {
                   {invoiceDetails.items.map((item: any) => {
                     const retData = returnItems[item.id] || { quantity: 0, godownId: "" };
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/50">
+                      <tr key={item.id} className="hover:bg-muted/50">
                         <td className="px-6 py-4">
-                          <div className="font-semibold text-slate-900">{item.materialName}</div>
-                          <div className="text-xs text-slate-500">SKU: {item.sku}</div>
+                          <div className="font-semibold text-foreground">{item.materialName}</div>
+                          <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
                         </td>
                         <td className="px-6 py-4 text-right font-medium">
                           {Number(item.quantity)} {item.unit}
@@ -243,7 +246,7 @@ export default function CreateSalesReturnPage() {
                             aria-label={`Destination godown for ${item.materialName}`}
                             value={retData.godownId}
                             onChange={(e) => handleGodownChange(item.id, e.target.value)}
-                            className="h-10 w-full min-w-[150px] rounded border bg-white px-2"
+                            className="h-10 w-full min-w-[150px] rounded border bg-card px-2"
                           >
                             <option value="">Select Godown...</option>
                             {godowns.map((g) => (
@@ -266,7 +269,7 @@ export default function CreateSalesReturnPage() {
           <button
             type="button"
             onClick={() => navigate("/sales-returns")}
-            className="h-12 px-6 rounded-lg border font-semibold hover:bg-slate-50"
+            className="h-12 px-6 rounded-lg border font-semibold hover:bg-muted"
           >
             Cancel
           </button>
@@ -275,7 +278,7 @@ export default function CreateSalesReturnPage() {
             disabled={submitting || !selectedInvoiceId}
             className="flex h-12 px-6 items-center gap-2 rounded-lg bg-blue-700 font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
           >
-            <Save size={18} /> Create Draft Return
+            <Save size={18} /> {submitting ? "Creating Draft…" : "Create Draft Return"}
           </button>
         </div>
       </form>

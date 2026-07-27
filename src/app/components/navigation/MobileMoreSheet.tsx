@@ -41,10 +41,10 @@ export function MobileMoreSheet({ open, onClose, onNotifications }: { open: bool
         aria-label="Close More menu" 
         onClick={onClose} 
       />
-      <section className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-3xl bg-white dark:bg-[#0F172A] shadow-2xl animate-in slide-in-from-bottom duration-250 border-t border-slate-200 dark:border-slate-800">
+      <section className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-3xl bg-card dark:bg-[#0F172A] shadow-2xl animate-in slide-in-from-bottom duration-250 border-t border-border dark:border-slate-800">
         
         {/* Header & User Profile Banner */}
-        <div className="border-b border-slate-200 dark:border-slate-800 bg-[#0F172A] p-4 text-white rounded-t-3xl shrink-0">
+        <div className="border-b border-border dark:border-slate-800 bg-[#0F172A] p-4 text-white rounded-t-3xl shrink-0">
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F97316] text-white font-black text-sm shadow-md">
@@ -59,7 +59,7 @@ export function MobileMoreSheet({ open, onClose, onNotifications }: { open: bool
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] font-semibold text-slate-400 truncate mt-0.5">
+                <p className="text-[11px] font-semibold text-muted-foreground truncate mt-0.5">
                   {business?.name || "APNI ESTATE Material Store"}
                 </p>
               </div>
@@ -74,7 +74,7 @@ export function MobileMoreSheet({ open, onClose, onNotifications }: { open: bool
           </div>
 
           <div className="flex items-center justify-between pt-2.5 text-xs text-slate-300">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               GST: {business?.gstNumber || "Unregistered"}
             </span>
             <button 
@@ -91,8 +91,8 @@ export function MobileMoreSheet({ open, onClose, onNotifications }: { open: bool
         {/* Scrollable Navigation Grid */}
         <div className="overflow-y-auto px-4 py-4 space-y-5 scroll-smooth-mobile">
           {/* Theme Toggle Bar */}
-          <div className="flex items-center justify-between p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/40">
-            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Appearance Theme</span>
+          <div className="flex items-center justify-between p-3 rounded-2xl border border-border dark:border-slate-800 bg-muted/80 dark:bg-slate-800/40">
+            <span className="text-xs font-bold text-foreground dark:text-slate-200">Appearance Theme</span>
             <ThemeToggle showLabel />
           </div>
 
@@ -101,7 +101,7 @@ export function MobileMoreSheet({ open, onClose, onNotifications }: { open: bool
             if (!grouped.length) return null;
             return (
               <section key={group} className="space-y-1.5">
-                <h3 className="px-1 text-[10px] font-black uppercase tracking-wider text-slate-400">{group}</h3>
+                <h3 className="px-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">{group}</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {grouped.map((item) => {
                     const Icon = item.icon;
@@ -109,7 +109,7 @@ export function MobileMoreSheet({ open, onClose, onNotifications }: { open: bool
                       <button 
                         key={item.id} 
                         onClick={() => go(item.path)} 
-                        className="flex min-h-[48px] items-center gap-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/60 px-3 text-left text-xs font-bold text-slate-800 dark:text-slate-200 transition-all hover:bg-slate-100 dark:hover:bg-slate-800 press-active cursor-pointer"
+                        className="flex min-h-[48px] items-center gap-2.5 rounded-2xl border border-border dark:border-slate-800 bg-muted/60 dark:bg-slate-800/60 px-3 text-left text-xs font-bold text-foreground dark:text-slate-200 transition-all hover:bg-muted dark:hover:bg-slate-800 press-active cursor-pointer"
                       >
                         <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 dark:bg-orange-950/60 text-[#F97316] shrink-0">
                           <Icon size={16} />
@@ -125,16 +125,16 @@ export function MobileMoreSheet({ open, onClose, onNotifications }: { open: bool
         </div>
         
         {/* Footer Actions */}
-        <div className="border-t border-slate-200 dark:border-slate-800 p-4 shrink-0 space-y-2 pb-[max(16px,env(safe-area-inset-bottom))] bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="border-t border-border dark:border-slate-800 p-4 shrink-0 space-y-2 pb-[max(16px,env(safe-area-inset-bottom))] bg-muted/50 dark:bg-slate-900/50">
           <button 
             onClick={() => go("#notifications")} 
-            className="flex min-h-[48px] w-full items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-4 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 cursor-pointer press-active"
+            className="flex min-h-[48px] w-full items-center justify-between rounded-2xl border border-border dark:border-slate-800 bg-card dark:bg-slate-800 px-4 text-xs font-bold text-muted-foreground dark:text-slate-200 hover:bg-muted dark:hover:bg-slate-700/80 cursor-pointer press-active"
           >
             <div className="flex items-center gap-2.5">
-              <Bell size={16} className="text-slate-500 dark:text-slate-400" />
+              <Bell size={16} className="text-muted-foreground dark:text-muted-foreground" />
               <span>Notifications & Alerts</span>
             </div>
-            <ChevronRight size={16} className="text-slate-400" />
+            <ChevronRight size={16} className="text-muted-foreground" />
           </button>
 
           <button 

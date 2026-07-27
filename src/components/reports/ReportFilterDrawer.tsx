@@ -52,7 +52,7 @@ export function ReportFilterDrawer({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="flex min-h-[44px] w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 text-xs font-extrabold text-slate-800 shadow-xs hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 cursor-pointer"
+        className="flex min-h-[44px] w-full items-center justify-between rounded-xl border border-border bg-card px-4 text-xs font-extrabold text-foreground shadow-xs hover:bg-muted dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 cursor-pointer"
       >
         <div className="flex items-center gap-2">
           <SlidersHorizontal size={16} className="text-orange-600" />
@@ -74,19 +74,19 @@ export function ReportFilterDrawer({
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl border-t border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-800 dark:bg-slate-900 space-y-4 animate-in slide-in-from-bottom duration-200">
+          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl border-t border-border bg-card p-5 shadow-2xl dark:border-slate-800 dark:bg-slate-900 space-y-4 animate-in slide-in-from-bottom duration-200">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
+            <div className="flex items-center justify-between border-b border-border pb-3 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Filter size={18} className="text-orange-600" />
-                <h3 className="font-extrabold text-slate-900 text-sm tracking-tight dark:text-slate-100">
+                <h3 className="font-extrabold text-foreground text-sm tracking-tight dark:text-slate-100">
                   Report Filters
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 cursor-pointer"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-slate-200 dark:bg-slate-800 dark:text-muted-foreground cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -96,11 +96,11 @@ export function ReportFilterDrawer({
             <div className="space-y-3.5 text-xs font-semibold">
               {/* Date Presets */}
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-slate-400 block">Date Quick Preset</label>
+                <label className="text-[10px] font-black uppercase text-muted-foreground block">Date Quick Preset</label>
                 <select
                   aria-label="Date preset"
                   onChange={(e) => preset(e.target.value)}
-                  className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
+                  className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-extrabold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">Custom Date Range</option>
                   <option value="today">Today</option>
@@ -114,47 +114,47 @@ export function ReportFilterDrawer({
               {/* From & To Dates */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 block">From Date</label>
+                  <label className="text-[10px] font-black uppercase text-muted-foreground block">From Date</label>
                   <input
                     aria-label="From date"
                     type="date"
                     value={from}
                     onChange={(e) => setFrom(e.target.value)}
-                    className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
+                    className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-extrabold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-400 block">To Date</label>
+                  <label className="text-[10px] font-black uppercase text-muted-foreground block">To Date</label>
                   <input
                     aria-label="To date"
                     type="date"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
-                    className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
+                    className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-extrabold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               {/* Status Filter */}
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-slate-400 block">Status Filter</label>
+                <label className="text-[10px] font-black uppercase text-muted-foreground block">Status Filter</label>
                 <input
                   aria-label="Status filter"
                   value={status}
                   onChange={(e) => setStatus(e.target.value.toUpperCase())}
                   placeholder="e.g. PAID, PENDING, OVERDUE"
-                  className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
+                  className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder:text-muted-foreground dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
                 />
               </div>
 
               {/* Invoice Type */}
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-slate-400 block">Invoice Bill Type</label>
+                <label className="text-[10px] font-black uppercase text-muted-foreground block">Invoice Bill Type</label>
                 <select
                   aria-label="Invoice type"
                   value={invoiceType}
                   onChange={(e) => setInvoiceType(e.target.value)}
-                  className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
+                  className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">All Bill Types (GST & Non-GST)</option>
                   <option value="GST">GST Tax Invoice Only</option>
@@ -164,12 +164,12 @@ export function ReportFilterDrawer({
 
               {/* Payment Mode */}
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-slate-400 block">Payment Mode</label>
+                <label className="text-[10px] font-black uppercase text-muted-foreground block">Payment Mode</label>
                 <select
                   aria-label="Payment mode"
                   value={paymentMode}
                   onChange={(e) => setPaymentMode(e.target.value)}
-                  className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
+                  className="min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">All Payment Modes</option>
                   <option value="CASH">Cash</option>
@@ -186,7 +186,7 @@ export function ReportFilterDrawer({
               <button
                 type="button"
                 onClick={handleReset}
-                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-slate-200 text-xs font-extrabold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-border text-xs font-extrabold text-muted-foreground hover:bg-muted dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer"
               >
                 <RotateCcw size={14} />
                 Reset

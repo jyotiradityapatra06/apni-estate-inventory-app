@@ -84,7 +84,7 @@ export function MaterialListPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => navigate("/inventory")}
-              className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+              className="flex min-h-10 items-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground shadow-2xs hover:bg-muted transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             >
               <Boxes size={15} />
               Stock Overview
@@ -127,21 +127,21 @@ export function MaterialListPage() {
       </div>
 
       {/* 3. Search & Filter Bar */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-slate-800">
-          <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3 dark:border-slate-800">
+          <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100">
             Material Master Catalogue ({filteredMaterials.length})
           </h3>
 
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Search input */}
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-3 text-slate-400" />
+              <Search size={14} className="absolute left-3 top-3 text-muted-foreground" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search name, SKU, HSN..."
-                className="h-10 rounded-xl border border-slate-200 bg-white pl-9 pr-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="h-10 rounded-xl border border-border bg-card pl-9 pr-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
             </div>
 
@@ -149,7 +149,7 @@ export function MaterialListPage() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="ALL">All Categories</option>
               {categories.map((c) => (
@@ -161,7 +161,7 @@ export function MaterialListPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="ALL">All Statuses</option>
               <option value="ACTIVE">Active Only</option>
@@ -186,9 +186,9 @@ export function MaterialListPage() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden overflow-hidden rounded-xl border border-slate-200 md:block dark:border-slate-800">
+            <div className="hidden overflow-hidden rounded-xl border border-border md:block dark:border-slate-800">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
+                <thead className="bg-muted text-muted-foreground border-b border-border dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
                   <tr>
                     <th className="px-4 py-3.5 font-black uppercase">Material Name</th>
                     <th className="px-4 py-3.5 font-black uppercase">SKU</th>
@@ -205,32 +205,32 @@ export function MaterialListPage() {
                   {filteredMaterials.map((item) => (
                     <tr
                       key={item.id}
-                      className="border-b last:border-0 border-slate-100 hover:bg-slate-50/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50"
+                      className="border-b last:border-0 border-border hover:bg-muted/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50"
                     >
                       <td className="px-4 py-3.5">
                         <Link
                           to={`/materials/${item.id}`}
-                          className="font-extrabold text-slate-900 hover:text-orange-600 transition-colors dark:text-slate-100 dark:hover:text-orange-400"
+                          className="font-extrabold text-foreground hover:text-orange-600 transition-colors dark:text-slate-100 dark:hover:text-orange-400"
                         >
                           {item.materialName}
                         </Link>
                       </td>
-                      <td className="px-4 py-3.5 font-mono text-slate-700 font-bold dark:text-slate-300">
+                      <td className="px-4 py-3.5 font-mono text-muted-foreground font-bold dark:text-slate-300">
                         {item.sku}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 font-semibold">
+                      <td className="px-4 py-3.5 text-muted-foreground dark:text-muted-foreground font-semibold">
                         {item.category}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 font-medium">
+                      <td className="px-4 py-3.5 text-muted-foreground dark:text-muted-foreground font-medium">
                         {item.hsnCode || "—"}
                       </td>
-                      <td className="px-4 py-3.5 font-bold text-slate-800 dark:text-slate-200">
+                      <td className="px-4 py-3.5 font-bold text-foreground dark:text-slate-200">
                         {item.taxRate !== undefined && item.taxRate !== null ? `${item.taxRate}%` : "—"}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400 font-semibold uppercase">
+                      <td className="px-4 py-3.5 text-muted-foreground dark:text-muted-foreground font-semibold uppercase">
                         {item.unit}
                       </td>
-                      <td className="px-4 py-3.5 font-bold text-slate-800 dark:text-slate-200">
+                      <td className="px-4 py-3.5 font-bold text-foreground dark:text-slate-200">
                         {item.reorderLevel} {item.unit}
                       </td>
                       <td className="px-4 py-3.5">
@@ -238,7 +238,7 @@ export function MaterialListPage() {
                           className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${
                             item.isActive
                               ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-                              : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                              : "bg-slate-200 text-muted-foreground dark:bg-slate-700 dark:text-slate-300"
                           }`}
                         >
                           {item.isActive ? "Active" : "Inactive"}
@@ -248,7 +248,7 @@ export function MaterialListPage() {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             to={`/materials/${item.id}`}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-orange-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-orange-600 hover:bg-muted dark:hover:bg-slate-800"
                             title="View Material Details"
                           >
                             <Eye size={15} />
@@ -256,7 +256,7 @@ export function MaterialListPage() {
                           {canUpdate && (
                             <Link
                               to={`/materials/${item.id}/edit`}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+                              className="p-1.5 rounded-lg text-muted-foreground hover:text-blue-600 hover:bg-muted dark:hover:bg-slate-800"
                               title="Edit Material"
                             >
                               <Edit3 size={15} />
@@ -265,7 +265,7 @@ export function MaterialListPage() {
                           {canDelete && (
                             <button
                               onClick={() => handleDelete(item)}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                              className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-600 hover:bg-muted dark:hover:bg-slate-800 cursor-pointer"
                               title="Delete Material"
                             >
                               <Trash2 size={15} />
@@ -284,41 +284,41 @@ export function MaterialListPage() {
               {filteredMaterials.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs space-y-3 dark:border-slate-800 dark:bg-slate-900"
+                  className="rounded-xl border border-border bg-card p-4 shadow-2xs space-y-3 dark:border-slate-800 dark:bg-slate-900"
                 >
                   <div className="flex items-start justify-between">
                     <div>
                       <Link
                         to={`/materials/${item.id}`}
-                        className="font-extrabold text-sm text-slate-900 hover:text-orange-600 dark:text-slate-100"
+                        className="font-extrabold text-sm text-foreground hover:text-orange-600 dark:text-slate-100"
                       >
                         {item.materialName}
                       </Link>
-                      <span className="text-xs text-slate-500 block font-mono">{item.sku} • {item.category}</span>
+                      <span className="text-xs text-muted-foreground block font-mono">{item.sku} • {item.category}</span>
                     </div>
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                        item.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-700"
+                        item.isActive ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-muted-foreground"
                       }`}
                     >
                       {item.isActive ? "Active" : "Inactive"}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
+                  <div className="grid grid-cols-3 gap-2 text-xs pt-1 border-t border-border dark:border-slate-800">
                     <div>
-                      <span className="text-[10px] uppercase text-slate-400 block font-bold">HSN Code</span>
-                      <strong className="text-slate-800 dark:text-slate-200">{item.hsnCode || "—"}</strong>
+                      <span className="text-[10px] uppercase text-muted-foreground block font-bold">HSN Code</span>
+                      <strong className="text-foreground dark:text-slate-200">{item.hsnCode || "—"}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase text-slate-400 block font-bold">GST Rate</span>
-                      <strong className="text-slate-800 dark:text-slate-200">
+                      <span className="text-[10px] uppercase text-muted-foreground block font-bold">GST Rate</span>
+                      <strong className="text-foreground dark:text-slate-200">
                         {item.taxRate !== undefined && item.taxRate !== null ? `${item.taxRate}%` : "—"}
                       </strong>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase text-slate-400 block font-bold">Reorder Level</span>
-                      <strong className="text-slate-800 dark:text-slate-200">{item.reorderLevel} {item.unit}</strong>
+                      <span className="text-[10px] uppercase text-muted-foreground block font-bold">Reorder Level</span>
+                      <strong className="text-foreground dark:text-slate-200">{item.reorderLevel} {item.unit}</strong>
                     </div>
                   </div>
                 </div>

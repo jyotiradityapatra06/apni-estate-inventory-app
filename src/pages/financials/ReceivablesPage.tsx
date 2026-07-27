@@ -74,12 +74,12 @@ export default function ReceivablesPage() {
 
   const filtersPanel = (
     <div className="space-y-4">
-      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+      <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
         Ageing Bracket
         <select
           value={draftAgeing}
           onChange={(e) => setDraftAgeing(e.target.value)}
-          className="mt-1.5 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          className="mt-1.5 h-10 w-full rounded-lg border bg-card px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
         >
           <option value="ALL">All Ageing Brackets</option>
           <option value="0_30">0-30 Days (Current)</option>
@@ -94,7 +94,7 @@ export default function ReceivablesPage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Back button */}
-      <Link to="/financials/payments" className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer">
+      <Link to="/financials/payments" className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer">
         <ArrowLeft size={14} />
         Back to Finance
       </Link>
@@ -103,10 +103,10 @@ export default function ReceivablesPage() {
 
       {/* Enhanced Collection KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Total Receivable</span>
-          <strong className="text-xl sm:text-2xl font-black text-slate-900 mt-1 block">{fmt(s.totalReceivable)}</strong>
-          <span className="text-[10px] font-semibold text-slate-500 mt-0.5 block">{s.customersPending || 0} customers pending</span>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">Total Receivable</span>
+          <strong className="text-xl sm:text-2xl font-black text-foreground mt-1 block">{fmt(s.totalReceivable)}</strong>
+          <span className="text-[10px] font-semibold text-muted-foreground mt-0.5 block">{s.customersPending || 0} customers pending</span>
         </div>
 
         <div className="rounded-2xl border border-red-200 bg-red-50/40 p-4 shadow-xs">
@@ -115,16 +115,16 @@ export default function ReceivablesPage() {
           <span className="text-[10px] font-bold text-red-700 mt-0.5 block">{s.overduePercentage || 0}% of total receivables</span>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Due Today</span>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">Due Today</span>
           <strong className="text-xl sm:text-2xl font-black text-amber-700 mt-1 block">{fmt(s.dueToday)}</strong>
-          <span className="text-[10px] font-semibold text-slate-500 mt-0.5 block">Requires immediate action</span>
+          <span className="text-[10px] font-semibold text-muted-foreground mt-0.5 block">Requires immediate action</span>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Pending Customers</span>
-          <strong className="text-xl sm:text-2xl font-black text-slate-900 mt-1 block">{s.customersPending || 0}</strong>
-          <span className="text-[10px] font-semibold text-slate-500 mt-0.5 block">Accounts with balance</span>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
+          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">Pending Customers</span>
+          <strong className="text-xl sm:text-2xl font-black text-foreground mt-1 block">{s.customersPending || 0}</strong>
+          <span className="text-[10px] font-semibold text-muted-foreground mt-0.5 block">Accounts with balance</span>
         </div>
 
         <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4 shadow-xs col-span-2 sm:col-span-1">
@@ -137,25 +137,25 @@ export default function ReceivablesPage() {
       <AgeingReport rows={d.ageing} />
 
       {/* Customer Accounts Table Section */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b pb-3">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Customer Collection Accounts</h3>
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Customer Collection Accounts</h3>
 
           <div className="flex flex-wrap gap-2.5">
             <div className="relative min-w-0 flex-1 sm:w-72">
-              <Search className="absolute left-3.5 top-3 text-slate-400" size={18} />
+              <Search className="absolute left-3.5 top-3 text-muted-foreground" size={18} />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search name, phone, or code…"
-                className="w-full rounded-xl border border-slate-200 pl-10 pr-4 h-11 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                className="w-full rounded-xl border border-border pl-10 pr-4 h-11 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 focus:outline-none"
+              className="h-11 rounded-xl border border-border bg-card px-3 text-xs font-bold text-muted-foreground focus:outline-none"
             >
               <option value="ALL">All Collection Statuses</option>
               <option value="CURRENT">Current</option>
@@ -169,7 +169,7 @@ export default function ReceivablesPage() {
                 setDraftAgeing(ageingFilter);
                 setFilterOpen(true);
               }}
-              className="flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 md:hidden cursor-pointer shrink-0"
+              className="flex min-h-9 items-center gap-1.5 rounded-lg border border-border px-3 text-xs font-bold text-muted-foreground hover:bg-muted md:hidden cursor-pointer shrink-0"
             >
               <Filter size={14} />
               Filter
@@ -180,18 +180,18 @@ export default function ReceivablesPage() {
 
         {filteredCustomers.length === 0 ? (
           <div className="py-10 text-center space-y-2">
-            <p className="font-bold text-sm text-slate-900">No pending customer accounts match criteria</p>
-            <p className="text-xs text-slate-400">All customer accounts in this filter are fully settled.</p>
+            <p className="font-bold text-sm text-foreground">No pending customer accounts match criteria</p>
+            <p className="text-xs text-muted-foreground">All customer accounts in this filter are fully settled.</p>
           </div>
         ) : (
           <>
             {/* Desktop Table Viewport (>=768px) */}
-            <div className="hidden overflow-hidden rounded-xl border border-slate-100 md:block">
+            <div className="hidden overflow-hidden rounded-xl border border-border md:block">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-600 border-b">
+                <thead className="bg-muted text-muted-foreground border-b">
                   <tr>
                     {["Customer", "Total Billed", "Amount Paid", "Pending Dues", "Ageing", "Status", "Actions"].map((h) => (
-                      <th key={h} className="p-3.5 font-bold text-slate-500 uppercase tracking-wider">
+                      <th key={h} className="p-3.5 font-bold text-muted-foreground uppercase tracking-wider">
                         {h}
                       </th>
                     ))}
@@ -204,14 +204,14 @@ export default function ReceivablesPage() {
                     const ageDays = c.invoices[0]?.ageDays || 0;
 
                     return (
-                      <tr key={c.id} className="hover:bg-slate-50/60 transition-colors font-semibold text-slate-800">
+                      <tr key={c.id} className="hover:bg-muted/60 transition-colors font-semibold text-foreground">
                         <td className="p-3.5">
-                          <Link className="font-bold text-slate-900 hover:text-orange-600 transition-colors" to={`/customers/${c.id}`}>
+                          <Link className="font-bold text-foreground hover:text-orange-600 transition-colors" to={`/customers/${c.id}`}>
                             {c.name}
                           </Link>
-                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{c.phone || "No phone"} {c.customerCode ? `• ${c.customerCode}` : ""}</p>
+                          <p className="text-[10px] text-muted-foreground font-bold mt-0.5">{c.phone || "No phone"} {c.customerCode ? `• ${c.customerCode}` : ""}</p>
                         </td>
-                        <td className="p-3.5 text-slate-600">{fmt(totalInvoiceAmt)}</td>
+                        <td className="p-3.5 text-muted-foreground">{fmt(totalInvoiceAmt)}</td>
                         <td className="p-3.5 text-emerald-700 font-bold">{fmt(totalPaidAmt)}</td>
                         <td className="p-3.5 font-black text-red-600 text-sm">{fmt(c.amountDue)}</td>
                         <td className="p-3.5">{getAgeingBadge(ageDays)}</td>
@@ -228,7 +228,7 @@ export default function ReceivablesPage() {
                             )}
                             <Link
                               to={`/financials/customers/${c.id}`}
-                              className="min-h-8 inline-flex items-center rounded-lg border border-slate-200 hover:bg-slate-50 px-3 text-[10px] font-bold text-slate-700 transition-colors"
+                              className="min-h-8 inline-flex items-center rounded-lg border border-border hover:bg-muted px-3 text-[10px] font-bold text-muted-foreground transition-colors"
                             >
                               View Ledger
                             </Link>
@@ -281,7 +281,7 @@ export default function ReceivablesPage() {
                         )}
                         <button
                           onClick={() => navigate(`/financials/customers/${c.id}`)}
-                          className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+                          className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                         >
                           View Ledger
                         </button>

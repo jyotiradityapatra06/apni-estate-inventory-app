@@ -55,7 +55,7 @@ export function SalesOrderDetailPage() {
       {/* Back link */}
       <button 
         onClick={() => navigate("/sales-orders")} 
-        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer"
+        className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer"
       >
         <ArrowLeft size={14}/>
         Back to Sales Orders
@@ -69,7 +69,7 @@ export function SalesOrderDetailPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button 
               onClick={() => window.print()} 
-              className="flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors"
+              className="flex min-h-10 items-center justify-center rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer transition-colors"
             >
               <Printer size={14} className="mr-1.5" />
               Print Order
@@ -96,7 +96,7 @@ export function SalesOrderDetailPage() {
             {canCancel && (
               <button 
                 onClick={() => setAction("cancel")} 
-                className="flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-white px-4 text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+                className="flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-card px-4 text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
               >
                 <Ban size={14} className="mr-1.5" />
                 Cancel Order
@@ -107,8 +107,8 @@ export function SalesOrderDetailPage() {
       />
 
       {/* Customer Info Card */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Customer Information</h3>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Customer Information</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 text-xs">
           <Info label="Customer Name" icon={User}>
             <Link to={`/customers/${data.customerId}`} className="font-bold text-orange-600 hover:text-orange-700 hover:underline">
@@ -116,7 +116,7 @@ export function SalesOrderDetailPage() {
             </Link>
           </Info>
           <Info label="Phone" icon={Phone}>
-            <a href={`tel:${data.customerPhone}`} className="font-semibold text-slate-700">
+            <a href={`tel:${data.customerPhone}`} className="font-semibold text-muted-foreground">
               {data.customerPhone}
             </a>
           </Info>
@@ -128,36 +128,36 @@ export function SalesOrderDetailPage() {
       </section>
 
       {/* Items list */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Material line items</h3>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Material line items</h3>
         
         {/* Desktop list */}
-        <div className="hidden overflow-hidden rounded-xl border border-slate-100 md:block">
+        <div className="hidden overflow-hidden rounded-xl border border-border md:block">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b">
+            <thead className="bg-muted text-muted-foreground border-b">
               <tr>
                 {["Material", "Godown / Warehouse", "Quantity", "Rate", "Discount", "GST", "Reserved", "Delivered", "Line Total"].map((x) => (
-                  <th key={x} className="p-3 font-semibold text-slate-500 uppercase tracking-wider">{x}</th>
+                  <th key={x} className="p-3 font-semibold text-muted-foreground uppercase tracking-wider">{x}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {data.items.map((x) => (
-                <tr key={x.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+                <tr key={x.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
                   <td className="p-3">
-                    <Link to={`/materials/${x.inventoryItemId}`} className="font-bold text-slate-900 hover:text-orange-600 transition-colors">
+                    <Link to={`/materials/${x.inventoryItemId}`} className="font-bold text-foreground hover:text-orange-600 transition-colors">
                       {x.materialName}
                     </Link>
-                    <p className="text-[10px] text-slate-400 font-bold mt-0.5">{x.sku}</p>
+                    <p className="text-[10px] text-muted-foreground font-bold mt-0.5">{x.sku}</p>
                   </td>
-                  <td className="text-slate-600 font-medium">{x.godown.name}</td>
-                  <td className="text-slate-600 font-medium">{formatQuantity(x.quantity, x.unit)}</td>
-                  <td className="text-slate-600 font-medium">{fmt(x.rate)}</td>
-                  <td className="text-slate-500 font-medium">{x.discountRate}%</td>
-                  <td className="text-slate-500 font-medium">{x.gstRate}%</td>
-                  <td className="text-slate-600 font-semibold">{formatQuantity(x.reservedQuantity, x.unit)}</td>
-                  <td className="text-slate-600 font-semibold">{formatQuantity(x.deliveredQuantity, x.unit)}</td>
-                  <td className="font-black text-slate-950">{fmt(x.lineTotal)}</td>
+                  <td className="text-muted-foreground font-medium">{x.godown.name}</td>
+                  <td className="text-muted-foreground font-medium">{formatQuantity(x.quantity, x.unit)}</td>
+                  <td className="text-muted-foreground font-medium">{fmt(x.rate)}</td>
+                  <td className="text-muted-foreground font-medium">{x.discountRate}%</td>
+                  <td className="text-muted-foreground font-medium">{x.gstRate}%</td>
+                  <td className="text-muted-foreground font-semibold">{formatQuantity(x.reservedQuantity, x.unit)}</td>
+                  <td className="text-muted-foreground font-semibold">{formatQuantity(x.deliveredQuantity, x.unit)}</td>
+                  <td className="font-black text-foreground">{fmt(x.lineTotal)}</td>
                 </tr>
               ))}
             </tbody>
@@ -167,19 +167,19 @@ export function SalesOrderDetailPage() {
         {/* Mobile list */}
         <div className="grid gap-3 md:hidden">
           {data.items.map((x) => (
-            <article key={x.id} className="rounded-xl bg-slate-50/60 p-4 border border-slate-100 space-y-2 text-xs">
-              <Link to={`/materials/${x.inventoryItemId}`} className="font-bold text-slate-900 hover:text-orange-600 transition-colors">
+            <article key={x.id} className="rounded-xl bg-muted/60 p-4 border border-border space-y-2 text-xs">
+              <Link to={`/materials/${x.inventoryItemId}`} className="font-bold text-foreground hover:text-orange-600 transition-colors">
                 {x.materialName}
               </Link>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{x.godown.name} · {x.sku}</p>
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{x.godown.name} · {x.sku}</p>
               
-              <div className="grid grid-cols-2 gap-2 text-[11px] pt-2 border-t border-slate-100">
+              <div className="grid grid-cols-2 gap-2 text-[11px] pt-2 border-t border-border">
                 <Info label="Ordered">{formatQuantity(x.quantity, x.unit)}</Info>
                 <Info label="Reserved">{formatQuantity(x.reservedQuantity, x.unit)}</Info>
                 <Info label="Fulfilled">{formatQuantity(x.deliveredQuantity, x.unit)}</Info>
                 <Info label="Remaining">{formatQuantity(Math.max(0, Number(x.quantity) - Number(x.deliveredQuantity)), x.unit)}</Info>
                 <Info label="Rate">{fmt(x.rate)}</Info>
-                <Info label="Line Total"><span className="font-black text-slate-900">{fmt(x.lineTotal)}</span></Info>
+                <Info label="Line Total"><span className="font-black text-foreground">{fmt(x.lineTotal)}</span></Info>
               </div>
             </article>
           ))}
@@ -187,7 +187,7 @@ export function SalesOrderDetailPage() {
       </section>
 
       {/* Totals panel */}
-      <section className="ml-auto max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-2">
+      <section className="ml-auto max-w-md rounded-2xl border border-border bg-card p-5 shadow-sm space-y-2">
         <Row label="Subtotal" value={fmt(data.subtotal)}/>
         <Row label="Discount" value={fmt(data.discountTotal)}/>
         <Row label="Taxable Amount" value={fmt(data.taxableTotal)}/>
@@ -199,19 +199,19 @@ export function SalesOrderDetailPage() {
 
       {/* References */}
       {(data.invoices?.length || data.deliveries?.length) ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3 text-xs">
-          <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Linked References</h3>
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3 text-xs">
+          <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Linked References</h3>
           <div className="space-y-2">
             {data.invoices?.map(x => (
-              <div key={x.id} className="flex justify-between items-center bg-slate-50 p-2 rounded-xl">
-                <span className="font-bold text-slate-800">Invoice: {x.invoiceNumber}</span>
-                <span className="font-semibold text-slate-500">{x.status} · {fmt(x.totalAmount)}</span>
+              <div key={x.id} className="flex justify-between items-center bg-muted p-2 rounded-xl">
+                <span className="font-bold text-foreground">Invoice: {x.invoiceNumber}</span>
+                <span className="font-semibold text-muted-foreground">{x.status} · {fmt(x.totalAmount)}</span>
               </div>
             ))}
             {data.deliveries?.map(x => (
-              <div key={x.id} className="flex justify-between items-center bg-slate-50 p-2 rounded-xl">
-                <span className="font-bold text-slate-800">Delivery challan: {x.deliveryNumber}</span>
-                <span className="font-semibold text-slate-500">{x.status}</span>
+              <div key={x.id} className="flex justify-between items-center bg-muted p-2 rounded-xl">
+                <span className="font-bold text-foreground">Delivery challan: {x.deliveryNumber}</span>
+                <span className="font-semibold text-muted-foreground">{x.status}</span>
               </div>
             ))}
           </div>
@@ -219,36 +219,36 @@ export function SalesOrderDetailPage() {
       ) : null}
 
       {/* Status Timeline */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 max-w-md">
-        <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider border-b pb-3">Order Status Timeline</h3>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4 max-w-md">
+        <h3 className="font-bold text-foreground text-sm uppercase tracking-wider border-b pb-3">Order Status Timeline</h3>
         
-        <div className="relative border-l border-slate-100 pl-5 space-y-4 text-xs">
+        <div className="relative border-l border-border pl-5 space-y-4 text-xs">
           <div className="relative">
-            <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-green-600" />
-            <p className="font-bold text-slate-900">Order Created</p>
-            <p className="text-slate-400 text-[10px] mt-0.5">{new Date(data.createdAt).toLocaleString("en-IN")}</p>
+            <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-green-600" />
+            <p className="font-bold text-foreground">Order Created</p>
+            <p className="text-muted-foreground text-[10px] mt-0.5">{new Date(data.createdAt).toLocaleString("en-IN")}</p>
           </div>
           
           {data.confirmedAt && (
             <div className="relative">
-              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-green-600" />
-              <p className="font-bold text-slate-900">Order Confirmed (Stock Reserved)</p>
-              <p className="text-slate-400 text-[10px] mt-0.5">{new Date(data.confirmedAt).toLocaleString("en-IN")}</p>
+              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-green-600" />
+              <p className="font-bold text-foreground">Order Confirmed (Stock Reserved)</p>
+              <p className="text-muted-foreground text-[10px] mt-0.5">{new Date(data.confirmedAt).toLocaleString("en-IN")}</p>
             </div>
           )}
 
           {data.cancelledAt && (
             <div className="relative">
-              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-red-500" />
+              <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-red-500" />
               <p className="font-bold text-red-600">Order Cancelled</p>
-              <p className="text-slate-400 text-[10px] mt-0.5">{new Date(data.cancelledAt).toLocaleString("en-IN")}</p>
+              <p className="text-muted-foreground text-[10px] mt-0.5">{new Date(data.cancelledAt).toLocaleString("en-IN")}</p>
             </div>
           )}
 
           <div className="relative">
-            <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-white border-slate-400" />
-            <p className="font-bold text-slate-500">Last System Update</p>
-            <p className="text-slate-400 text-[10px] mt-0.5">{new Date(data.updatedAt).toLocaleString("en-IN")}</p>
+            <div className="absolute -left-[24.5px] top-0.5 h-2.5 w-2.5 rounded-full border bg-card border-slate-400" />
+            <p className="font-bold text-muted-foreground">Last System Update</p>
+            <p className="text-muted-foreground text-[10px] mt-0.5">{new Date(data.updatedAt).toLocaleString("en-IN")}</p>
           </div>
         </div>
       </section>
@@ -268,36 +268,36 @@ export function SalesOrderDetailPage() {
       />
 
       {/* 10. Printable Sales Order (A4 Print-only template) */}
-      <article className="invoice-print-root hidden print:block bg-white p-8 text-xs">
+      <article className="invoice-print-root hidden print:block bg-card p-8 text-xs">
         <header className="flex justify-between border-b pb-6">
           <div>
-            <h2 className="text-lg font-black text-slate-900 tracking-tight">{business?.name || "APNI ESTATE"}</h2>
-            {business?.address && <p className="max-w-md text-xs text-slate-500 mt-1 leading-relaxed">{business.address}</p>}
-            {business?.phone && <p className="text-xs text-slate-500 mt-1">Phone: {business.phone}</p>}
-            {business?.gstNumber && <p className="text-xs text-slate-700 font-bold mt-1 uppercase">GSTIN: {business.gstNumber}</p>}
+            <h2 className="text-lg font-black text-foreground tracking-tight">{business?.name || "APNI ESTATE"}</h2>
+            {business?.address && <p className="max-w-md text-xs text-muted-foreground mt-1 leading-relaxed">{business.address}</p>}
+            {business?.phone && <p className="text-xs text-muted-foreground mt-1">Phone: {business.phone}</p>}
+            {business?.gstNumber && <p className="text-xs text-muted-foreground font-bold mt-1 uppercase">GSTIN: {business.gstNumber}</p>}
           </div>
           <div className="text-right">
-            <h3 className="text-base font-black text-slate-800 tracking-wider uppercase">SALES ORDER</h3>
-            <p className="font-bold text-sm text-slate-700 mt-1">{data.orderNumber}</p>
-            <p className="text-xs text-slate-500 mt-1">Date: {new Date(data.orderDate).toLocaleDateString("en-IN")}</p>
+            <h3 className="text-base font-black text-foreground tracking-wider uppercase">SALES ORDER</h3>
+            <p className="font-bold text-sm text-muted-foreground mt-1">{data.orderNumber}</p>
+            <p className="text-xs text-muted-foreground mt-1">Date: {new Date(data.orderDate).toLocaleDateString("en-IN")}</p>
           </div>
         </header>
 
         <section className="grid gap-5 border-b py-6 grid-cols-2 text-xs">
           <div>
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Customer</span>
-            <p className="font-bold text-slate-900 text-sm mt-1">{data.customerName}</p>
-            <p className="text-slate-600 mt-0.5">{data.customerPhone}</p>
-            {data.customerGstin && <p className="font-bold text-slate-700 mt-1 uppercase">GSTIN: {data.customerGstin}</p>}
+            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Customer</span>
+            <p className="font-bold text-foreground text-sm mt-1">{data.customerName}</p>
+            <p className="text-muted-foreground mt-0.5">{data.customerPhone}</p>
+            {data.customerGstin && <p className="font-bold text-muted-foreground mt-1 uppercase">GSTIN: {data.customerGstin}</p>}
           </div>
         </section>
 
-        <div className="mt-6 overflow-hidden rounded-xl border border-slate-100">
+        <div className="mt-6 overflow-hidden rounded-xl border border-border">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b">
+            <thead className="bg-muted text-muted-foreground border-b">
               <tr>
                 {["Material Item", "Qty", "Rate", "Discount", "GST %", "Line Total"].map((v) => (
-                  <th key={v} className="p-3 font-semibold text-slate-500 uppercase tracking-wider">{v}</th>
+                  <th key={v} className="p-3 font-semibold text-muted-foreground uppercase tracking-wider">{v}</th>
                 ))}
               </tr>
             </thead>
@@ -305,14 +305,14 @@ export function SalesOrderDetailPage() {
               {data.items.map((i) => (
                 <tr key={i.id} className="border-b last:border-0">
                   <td className="p-3">
-                    <span className="block font-bold text-slate-900">{i.materialName}</span>
-                    <span className="text-[10px] text-slate-400 font-medium">{i.sku}</span>
+                    <span className="block font-bold text-foreground">{i.materialName}</span>
+                    <span className="text-[10px] text-muted-foreground font-medium">{i.sku}</span>
                   </td>
-                  <td className="text-slate-600 font-medium">{formatQuantity(i.quantity, i.unit)}</td>
-                  <td className="text-slate-600 font-medium">{fmt(i.rate)}</td>
-                  <td className="text-slate-500 font-medium">{i.discountRate}%</td>
-                  <td className="text-slate-500 font-medium">{i.gstRate}%</td>
-                  <td className="font-black text-slate-950">{fmt(i.lineTotal)}</td>
+                  <td className="text-muted-foreground font-medium">{formatQuantity(i.quantity, i.unit)}</td>
+                  <td className="text-muted-foreground font-medium">{fmt(i.rate)}</td>
+                  <td className="text-muted-foreground font-medium">{i.discountRate}%</td>
+                  <td className="text-muted-foreground font-medium">{i.gstRate}%</td>
+                  <td className="font-black text-foreground">{fmt(i.lineTotal)}</td>
                 </tr>
               ))}
             </tbody>
@@ -335,9 +335,9 @@ export function SalesOrderDetailPage() {
 function Info({ label, icon: Icon, children }: { label: string; icon?: any; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{label}</span>
-      <div className="flex items-center gap-1.5 font-semibold text-slate-800 break-words mt-0.5">
-        {Icon && <Icon size={12} className="text-slate-400 shrink-0" />}
+      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">{label}</span>
+      <div className="flex items-center gap-1.5 font-semibold text-foreground break-words mt-0.5">
+        {Icon && <Icon size={12} className="text-muted-foreground shrink-0" />}
         {children}
       </div>
     </div>
@@ -346,9 +346,9 @@ function Info({ label, icon: Icon, children }: { label: string; icon?: any; chil
 
 function Row({ label, value, large = false }: { label: string; value: string; large?: boolean }) {
   return (
-    <div className={`flex justify-between gap-3 py-1 ${large ? "text-lg font-black text-slate-900" : "text-xs font-semibold text-slate-500"}`}>
+    <div className={`flex justify-between gap-3 py-1 ${large ? "text-lg font-black text-foreground" : "text-xs font-semibold text-muted-foreground"}`}>
       <span>{label}</span>
-      <b className={large ? "text-[#F97316]" : "text-slate-900"}>{value}</b>
+      <b className={large ? "text-[#F97316]" : "text-foreground"}>{value}</b>
     </div>
   );
 }

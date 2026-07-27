@@ -49,7 +49,7 @@ export const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
       {/* Slide-Up Drawer Container */}
       <div
         className={cn(
-          "relative z-10 w-full max-h-[85dvh] flex flex-col rounded-t-3xl bg-white shadow-2xl animate-in slide-in-from-bottom duration-200",
+          "relative z-10 w-full max-h-[85dvh] flex flex-col rounded-t-3xl bg-card shadow-2xl animate-in slide-in-from-bottom duration-200",
           className
         )}
       >
@@ -57,14 +57,14 @@ export const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
         <div className="mx-auto mt-2.5 h-1.5 w-12 rounded-full bg-slate-200 shrink-0" />
 
         {/* Drawer Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 shrink-0">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3.5 shrink-0">
           <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 text-[#F97316]">
               <Filter size={16} />
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-black text-slate-900 tracking-tight leading-none">
+                <h2 className="text-base font-black text-foreground tracking-tight leading-none">
                   {title}
                 </h2>
                 {activeFilterCount > 0 && (
@@ -73,7 +73,7 @@ export const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
                   </span>
                 )}
               </div>
-              {subtitle && <p className="text-[11px] font-semibold text-slate-400 mt-0.5">{subtitle}</p>}
+              {subtitle && <p className="text-[11px] font-semibold text-muted-foreground mt-0.5">{subtitle}</p>}
             </div>
           </div>
 
@@ -81,7 +81,7 @@ export const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close filters"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
           >
             <X size={16} />
           </button>
@@ -93,12 +93,12 @@ export const MobileFilterDrawer: React.FC<MobileFilterDrawerProps> = ({
         </div>
 
         {/* Sticky Drawer Footer Actions */}
-        <div className="border-t border-slate-100 p-4 shrink-0 bg-slate-50/50 pb-[max(16px,env(safe-area-inset-bottom))] flex items-center gap-3">
+        <div className="border-t border-border p-4 shrink-0 bg-muted/50 pb-[max(16px,env(safe-area-inset-bottom))] flex items-center gap-3">
           {onReset && (
             <button
               type="button"
               onClick={onReset}
-              className="flex min-h-[48px] flex-1 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 active:scale-95 transition-transform cursor-pointer"
+              className="flex min-h-[48px] flex-1 items-center justify-center gap-1.5 rounded-2xl border border-border bg-card text-xs font-bold text-muted-foreground hover:bg-muted active:scale-95 transition-transform cursor-pointer"
             >
               <RotateCcw size={14} />
               <span>{resetLabel}</span>

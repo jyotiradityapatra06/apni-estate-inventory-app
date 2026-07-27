@@ -40,14 +40,14 @@ export function PaymentModal({
   };
 
   const inputClass =
-    "mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
+    "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/50 sm:items-center sm:p-4">
-      <div className="w-full rounded-t-2xl bg-white p-5 sm:max-w-md sm:rounded-2xl space-y-4 shadow-xl">
+      <div className="w-full rounded-t-2xl bg-card p-5 sm:max-w-md sm:rounded-2xl space-y-4 shadow-xl">
         <div>
-          <h2 className="text-lg font-black text-slate-900 tracking-tight">Record Supplier Payment</h2>
-          <p className="mt-1 text-xs font-bold text-slate-500">
+          <h2 className="text-lg font-black text-foreground tracking-tight">Record Supplier Payment</h2>
+          <p className="mt-1 text-xs font-bold text-muted-foreground">
             Remaining Payable Balance: <strong className="text-red-600 font-black">{fmt(balance)}</strong>
           </p>
         </div>
@@ -58,7 +58,7 @@ export function PaymentModal({
           </p>
         )}
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Payment Amount (₹) *
           <input
             required
@@ -70,11 +70,11 @@ export function PaymentModal({
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="mt-1.5 min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-base font-black text-slate-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
+            className="mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-base font-black text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none"
           />
         </label>
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Payment Mode *
           <select value={mode} onChange={(e) => setMode(e.target.value)} className={inputClass}>
             {["CASH", "UPI", "BANK", "CHEQUE", "OTHER"].map((x) => (
@@ -85,16 +85,16 @@ export function PaymentModal({
           </select>
         </label>
 
-        <label className="block text-xs font-black uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Payment Date *
           <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
         </label>
 
-        <div className="flex gap-3 pt-3 border-t border-slate-100">
+        <div className="flex gap-3 pt-3 border-t border-border">
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[48px] flex-1 rounded-xl border border-slate-200 text-xs sm:text-sm font-extrabold text-slate-700 hover:bg-slate-50 cursor-pointer"
+            className="min-h-[48px] flex-1 rounded-xl border border-border text-xs sm:text-sm font-extrabold text-muted-foreground hover:bg-muted cursor-pointer"
           >
             Cancel
           </button>

@@ -12,7 +12,7 @@ import type { Supplier } from "../../types/supplier.types";
 
 type Line = { inventoryItemId: string; godownId: string; quantity: string; rate: string; discountRate: string; gstRate: string };
 const blank = (): Line => ({ inventoryItemId: "", godownId: "", quantity: "", rate: "", discountRate: "0", gstRate: "0" });
-const cls = "mt-2 min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none";
+const cls = "mt-2 min-h-[44px] w-full rounded-xl border border-border bg-card px-3 text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none";
 
 export function PurchaseForm() {
   const nav = useNavigate();
@@ -125,10 +125,10 @@ export function PurchaseForm() {
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-4">
         <SectionHeader title="Supplier and Expected Delivery" description="Select vendor and set estimated delivery arrival date." />
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Supplier Vendor *
             <select value={supplierId} onChange={e => setSupplierId(e.target.value)} className={cls}>
               <option value="">Choose supplier vendor…</option>
@@ -139,7 +139,7 @@ export function PurchaseForm() {
               ))}
             </select>
           </label>
-          <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Expected Delivery Date
             <input type="date" value={date} onChange={e => setDate(e.target.value)} className={cls} />
           </label>
@@ -150,27 +150,27 @@ export function PurchaseForm() {
           const sel = suppliers.find(s => s.id === supplierId);
           if (!sel) return null;
           return (
-            <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-4 space-y-2 text-xs">
+            <div className="rounded-xl bg-muted border border-border/80 p-4 space-y-2 text-xs">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-black text-sm text-slate-900">{sel.name} {sel.companyName ? `(${sel.companyName})` : ""}</span>
+                <span className="font-black text-sm text-foreground">{sel.name} {sel.companyName ? `(${sel.companyName})` : ""}</span>
                 {sel.gstin && (
                   <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-extrabold text-[10px] uppercase border border-blue-100">
                     GSTIN: {sel.gstin}
                   </span>
                 )}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-slate-600 pt-1">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-muted-foreground pt-1">
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Phone</span>
-                  <strong className="text-slate-900 font-bold block">{sel.phone}</strong>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground block">Phone</span>
+                  <strong className="text-foreground font-bold block">{sel.phone}</strong>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Current Payable Dues</span>
-                  <strong className="font-black text-slate-900 block">{fmt(sel.openingPayable || 0)}</strong>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground block">Current Payable Dues</span>
+                  <strong className="font-black text-foreground block">{fmt(sel.openingPayable || 0)}</strong>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Payment Terms</span>
-                  <strong className="text-slate-900 font-bold block">{sel.paymentTerms || "Standard"}</strong>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground block">Payment Terms</span>
+                  <strong className="text-foreground font-bold block">{sel.paymentTerms || "Standard"}</strong>
                 </div>
               </div>
             </div>
@@ -192,8 +192,8 @@ export function PurchaseForm() {
           const g = m?.godownStocks || [];
           const v = calc(x);
           return (
-            <article key={i} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <article key={i} className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-border pb-2.5">
                 <span className="text-xs font-black uppercase tracking-wider text-orange-600">Material Item #{i + 1}</span>
                 {items.length > 1 && (
                   <button aria-label="Remove Material" onClick={() => setItems(a => a.filter((_, n) => n !== i))} className="text-red-600 hover:bg-red-50 p-1.5 rounded-lg cursor-pointer">
@@ -203,7 +203,7 @@ export function PurchaseForm() {
               </div>
 
               <div className="grid gap-3 md:grid-cols-6">
-                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block md:col-span-2">
                   Material Item *
                   <select
                     value={x.inventoryItemId}
@@ -233,7 +233,7 @@ export function PurchaseForm() {
                     ))}
                   </select>
                 </label>
-                <label className="text-xs font-black text-slate-700 uppercase tracking-wider block md:col-span-2">
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block md:col-span-2">
                   Destination Godown *
                   <select value={x.godownId} onChange={e => set(i, "godownId", e.target.value)} className={cls}>
                     <option value="">Choose Godown warehouse…</option>
@@ -249,8 +249,8 @@ export function PurchaseForm() {
                 <Field label="Discount %" value={x.discountRate} set={v => set(i, "discountRate", v)} />
                 <Field label="GST Tax %" value={x.gstRate} set={v => set(i, "gstRate", v)} />
                 <div className="rounded-xl bg-orange-50/60 p-3 md:col-span-2 border border-orange-100 flex flex-col justify-center">
-                  <span className="text-[10px] text-slate-400 font-black uppercase block">Calculated Line Total</span>
-                  <b className="text-base font-black text-slate-900 mt-0.5 block">{fmt(v.total)}</b>
+                  <span className="text-[10px] text-muted-foreground font-black uppercase block">Calculated Line Total</span>
+                  <b className="text-base font-black text-foreground mt-0.5 block">{fmt(v.total)}</b>
                 </div>
               </div>
             </article>
@@ -266,8 +266,8 @@ export function PurchaseForm() {
         </button>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
-        <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+      <section className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm">
+        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
           Notes & Delivery Terms
           <textarea value={notes} onChange={e => setNotes(e.target.value)} className={`${cls} min-h-24 p-3`} />
         </label>
@@ -287,16 +287,16 @@ export function PurchaseForm() {
         <button
           disabled={busy}
           onClick={() => save(false)}
-          className="flex-1 min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer press-active"
+          className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
         >
-          Save Draft
+          {busy ? "Saving…" : "Save Draft"}
         </button>
         <button
           disabled={busy}
           onClick={() => save(true)}
           className="flex-1 min-h-[44px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs font-bold text-white cursor-pointer press-active"
         >
-          Send PO
+          {busy ? "Sending…" : "Send PO"}
         </button>
       </MobileStickyFooter>
 
@@ -305,16 +305,16 @@ export function PurchaseForm() {
         <button
           disabled={busy}
           onClick={() => save(false)}
-          className="min-h-11 rounded-xl border border-slate-200 px-5 text-sm font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+          className="min-h-11 rounded-xl border border-border px-5 text-sm font-bold text-muted-foreground hover:bg-muted cursor-pointer"
         >
-          Save Draft
+          {busy ? "Saving…" : "Save Draft"}
         </button>
         <button
           disabled={busy}
           onClick={() => save(true)}
           className="min-h-11 rounded-xl bg-orange-600 hover:bg-orange-700 px-6 text-sm font-bold text-white cursor-pointer"
         >
-          Send Purchase Order
+          {busy ? "Sending…" : "Send Purchase Order"}
         </button>
       </div>
     </div>
@@ -323,7 +323,7 @@ export function PurchaseForm() {
 
 function Field({ label, value, set }: { label: string; value: string; set: (v: string) => void }) {
   return (
-    <label className="text-xs font-black text-slate-700 uppercase tracking-wider block">
+    <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
       {label}
       <input type="number" inputMode="decimal" min="0" step="0.001" placeholder="0.00" value={value} onChange={e => set(e.target.value)} className={cls} />
     </label>

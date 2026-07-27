@@ -23,11 +23,11 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
 
   if (!materials || materials.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+      <div className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card dark:bg-slate-900 p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-border dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <DollarSign size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Inventory Value Trend</h3>
+            <h3 className="font-extrabold text-sm text-foreground dark:text-white">Inventory Value Trend</h3>
           </div>
         </div>
 
@@ -35,8 +35,8 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 dark:bg-orange-950/60 text-[#F97316]">
             <Landmark size={24} />
           </div>
-          <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Not enough inventory history yet</h4>
-          <p className="text-xs text-slate-400 dark:text-slate-400 max-w-[280px] mx-auto">
+          <h4 className="font-extrabold text-sm text-foreground dark:text-white">Not enough inventory history yet</h4>
+          <p className="text-xs text-muted-foreground dark:text-muted-foreground max-w-[280px] mx-auto">
             Continue adding stock transactions to see inventory value trends over time.
           </p>
         </div>
@@ -90,15 +90,15 @@ export const InventoryValueTrendChart: React.FC<InventoryValueTrendChartProps> =
   const trendData = trendDataReversed.reverse();
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+    <div className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-border dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <DollarSign size={18} className="text-[#F97316]" />
-          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Inventory Value Trend</h3>
+          <h3 className="font-extrabold text-sm text-foreground dark:text-white">Inventory Value Trend</h3>
         </div>
         <div className="text-right">
-          <span className="text-[10px] font-bold text-slate-400 uppercase block">Current Stock Value</span>
-          <strong className="text-sm font-black text-slate-900 dark:text-white">{fmt(currentValuation)}</strong>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase block">Current Stock Value</span>
+          <strong className="text-sm font-black text-foreground dark:text-white">{fmt(currentValuation)}</strong>
         </div>
       </div>
 

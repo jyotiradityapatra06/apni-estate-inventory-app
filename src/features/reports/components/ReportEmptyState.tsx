@@ -19,16 +19,16 @@ export const ReportEmptyState: React.FC<ReportEmptyStateProps> = ({
   icon: Icon = FileSpreadsheet,
 }) => {
   return (
-    <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 p-8 text-center sm:p-12 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
+    <div className="rounded-2xl border border-dashed border-border bg-muted/50 p-8 text-center sm:p-12 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100/80 text-orange-600 dark:bg-orange-950/50 dark:text-orange-400">
         <Icon size={28} />
       </div>
 
       <div className="max-w-md mx-auto space-y-1.5">
-        <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide dark:text-slate-100">
+        <h3 className="text-sm font-black text-foreground uppercase tracking-wide dark:text-slate-100">
           {title}
         </h3>
-        <p className="text-xs text-slate-500 leading-relaxed dark:text-slate-400 font-medium">
+        <p className="text-xs text-muted-foreground leading-relaxed dark:text-muted-foreground font-medium">
           {description}
         </p>
       </div>
@@ -51,7 +51,7 @@ export const ReportEmptyState: React.FC<ReportEmptyStateProps> = ({
         <div className="pt-2">
           <button
             onClick={onAction}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-white border border-slate-200 px-4 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-100 transition-colors cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-card border border-border px-4 text-xs font-bold text-muted-foreground shadow-2xs hover:bg-muted transition-colors cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             <RefreshCw size={14} />
             {actionText}

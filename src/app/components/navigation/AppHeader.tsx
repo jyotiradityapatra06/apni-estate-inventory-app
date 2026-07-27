@@ -222,7 +222,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
   return (
     <header
-      className="sticky top-0 z-45 flex h-14 md:h-16 flex-shrink-0 items-center justify-between px-3 md:px-6 select-none bg-white dark:bg-[#0F172A] border-b border-slate-200 dark:border-slate-800 transition-colors duration-200"
+      className="sticky top-0 z-45 flex h-14 md:h-16 flex-shrink-0 items-center justify-between px-3 md:px-6 select-none bg-card dark:bg-[#0F172A] border-b border-border dark:border-slate-800 transition-colors duration-200"
     >
       {/* Mobile Compact Business Header (md:hidden) */}
       <div className="flex items-center gap-2 md:hidden min-w-0">
@@ -231,7 +231,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <h1 className="truncate text-xs font-black text-slate-900 dark:text-white leading-tight">
+            <h1 className="truncate text-xs font-black text-foreground dark:text-white leading-tight">
               {business?.name || "APNI ESTATE"}
             </h1>
             {user?.role && (
@@ -240,7 +240,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
               </span>
             )}
           </div>
-          <p className="text-[10px] font-bold text-slate-400 truncate mt-0.5">
+          <p className="text-[10px] font-bold text-muted-foreground truncate mt-0.5">
             {title} · Supplier ERP
           </p>
         </div>
@@ -249,7 +249,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
       {/* Desktop Page Title (hidden md:block) */}
       <div className="hidden md:block">
         <h1
-          className="max-w-[190px] truncate text-[18px] font-bold text-slate-900 dark:text-white md:max-w-none lg:text-xl"
+          className="max-w-[190px] truncate text-[18px] font-bold text-foreground dark:text-white md:max-w-none lg:text-xl"
         >
           {title}
         </h1>
@@ -257,10 +257,10 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
       {/* Mobile Search Overlay Input Bar */}
       {mobileSearchOpen && (
-        <div className="fixed inset-x-0 top-0 z-50 bg-white p-3 shadow-xl border-b border-slate-200 md:hidden animate-fade-in">
+        <div className="fixed inset-x-0 top-0 z-50 bg-card p-3 shadow-xl border-b border-border md:hidden animate-fade-in">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-3 text-slate-400" />
+              <Search size={16} className="absolute left-3 top-3 text-muted-foreground" />
               <input
                 type="text"
                 autoFocus
@@ -270,7 +270,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
                   setSearchQuery(e.target.value);
                   void performSearch(e.target.value);
                 }}
-                className="w-full rounded-xl bg-slate-100 py-2 pl-9 pr-3 text-xs font-semibold text-slate-900 outline-none focus:ring-2 focus:ring-orange-500/20"
+                className="w-full rounded-xl bg-muted py-2 pl-9 pr-3 text-xs font-semibold text-foreground outline-none focus:ring-2 focus:ring-orange-500/20"
               />
             </div>
             <button
@@ -279,31 +279,31 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
                 setSearchQuery("");
                 setSearchResults({ materials: [], customers: [], suppliers: [], invoices: [], orders: [] });
               }}
-              className="px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+              className="px-3 py-2 text-xs font-bold text-muted-foreground hover:bg-muted rounded-lg cursor-pointer"
             >
               Cancel
             </button>
           </div>
 
           {searchQuery.length >= 2 && (
-            <div className="mt-3 max-h-[60dvh] overflow-y-auto space-y-3 pt-2 border-t border-slate-100 text-xs">
+            <div className="mt-3 max-h-[60dvh] overflow-y-auto space-y-3 pt-2 border-t border-border text-xs">
               {!hasSearchResults && (
-                <p className="text-slate-400 italic py-2 text-center">No matching records found.</p>
+                <p className="text-muted-foreground italic py-2 text-center">No matching records found.</p>
               )}
 
               {searchResults.materials.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Materials</h4>
+                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Materials</h4>
                   <div className="space-y-1">
                     {searchResults.materials.map(m => (
                       <Link 
                         key={m.id} 
                         to={`/materials/${m.id}`} 
                         onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
-                        className="flex justify-between items-center p-2 bg-slate-50 rounded-xl font-bold text-slate-800"
+                        className="flex justify-between items-center p-2 bg-muted rounded-xl font-bold text-foreground"
                       >
                         <span>{m.materialName}</span>
-                        <span className="text-[10px] text-slate-400">{m.sku}</span>
+                        <span className="text-[10px] text-muted-foreground">{m.sku}</span>
                       </Link>
                     ))}
                   </div>
@@ -312,17 +312,17 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
               {searchResults.suppliers.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Suppliers</h4>
+                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Suppliers</h4>
                   <div className="space-y-1">
                     {searchResults.suppliers.map(s => (
                       <Link 
                         key={s.id} 
                         to={`/suppliers/${s.id}`} 
                         onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
-                        className="flex justify-between items-center p-2 bg-slate-50 rounded-xl font-bold text-slate-800"
+                        className="flex justify-between items-center p-2 bg-muted rounded-xl font-bold text-foreground"
                       >
                         <span>{s.name}</span>
-                        <span className="text-[10px] text-slate-400">{s.phone}</span>
+                        <span className="text-[10px] text-muted-foreground">{s.phone}</span>
                       </Link>
                     ))}
                   </div>
@@ -331,17 +331,17 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
               {searchResults.invoices.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Invoices</h4>
+                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Invoices</h4>
                   <div className="space-y-1">
                     {searchResults.invoices.map(i => (
                       <Link 
                         key={i.id} 
                         to={`/invoices/${i.id}`} 
                         onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
-                        className="flex justify-between items-center p-2 bg-slate-50 rounded-xl font-bold text-slate-800"
+                        className="flex justify-between items-center p-2 bg-muted rounded-xl font-bold text-foreground"
                       >
                         <span>{i.invoiceNumber}</span>
-                        <span className="text-[10px] text-slate-400">{i.customerName}</span>
+                        <span className="text-[10px] text-muted-foreground">{i.customerName}</span>
                       </Link>
                     ))}
                   </div>
@@ -361,7 +361,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
           type="button"
           onClick={() => setMobileSearchOpen(true)}
           aria-label="Open search"
-          className="flex h-10 w-10 md:hidden cursor-pointer items-center justify-center rounded-full bg-slate-100 text-slate-700 active:scale-95 transition-transform"
+          className="flex h-10 w-10 md:hidden cursor-pointer items-center justify-center rounded-full bg-muted text-muted-foreground active:scale-95 transition-transform"
         >
           <Search size={16} />
         </button>
@@ -391,36 +391,36 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
           />
 
           {searchQuery.length >= 2 && (
-            <div className="absolute left-0 mt-2 w-[350px] bg-white border border-slate-200 rounded-2xl shadow-2xl p-4 z-50 text-xs space-y-3 max-h-[400px] overflow-y-auto">
+            <div className="absolute left-0 mt-2 w-[350px] bg-card border border-border rounded-2xl shadow-2xl p-4 z-50 text-xs space-y-3 max-h-[400px] overflow-y-auto">
               <div className="flex justify-between items-center border-b pb-2 mb-2">
-                <span className="font-bold text-slate-400 uppercase text-[9px] tracking-wider">Search Results</span>
+                <span className="font-bold text-muted-foreground uppercase text-[9px] tracking-wider">Search Results</span>
                 <button 
                   onClick={() => {
                     setSearchQuery("");
                     setSearchResults({ materials: [], customers: [], suppliers: [], invoices: [], orders: [] });
                   }} 
-                  className="text-slate-400 hover:text-slate-600 font-bold"
+                  className="text-muted-foreground hover:text-muted-foreground font-bold"
                 >
                   Clear
                 </button>
               </div>
 
               {!hasSearchResults && (
-                <p className="text-slate-400 italic py-2">No matching records found.</p>
+                <p className="text-muted-foreground italic py-2">No matching records found.</p>
               )}
 
               {searchResults.materials.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Materials</h4>
+                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Materials</h4>
                   <div className="space-y-1">
                     {searchResults.materials.map(m => (
                       <Link 
                         key={m.id} 
                         to={`/materials/${m.id}`} 
                         onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-slate-50 rounded-lg font-bold text-slate-800"
+                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
                       >
-                        {m.materialName} <span className="text-[10px] text-slate-400 font-semibold">({m.sku})</span>
+                        {m.materialName} <span className="text-[10px] text-muted-foreground font-semibold">({m.sku})</span>
                       </Link>
                     ))}
                   </div>
@@ -429,16 +429,16 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
               {searchResults.customers.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Customers</h4>
+                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Customers</h4>
                   <div className="space-y-1">
                     {searchResults.customers.map(c => (
                       <Link 
                         key={c.id} 
                         to={`/customers/${c.id}`} 
                         onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-slate-50 rounded-lg font-bold text-slate-800"
+                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
                       >
-                        {c.name} <span className="text-[10px] text-slate-400 font-semibold">({c.phone})</span>
+                        {c.name} <span className="text-[10px] text-muted-foreground font-semibold">({c.phone})</span>
                       </Link>
                     ))}
                   </div>
@@ -447,16 +447,16 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
               {searchResults.suppliers.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Suppliers</h4>
+                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Suppliers</h4>
                   <div className="space-y-1">
                     {searchResults.suppliers.map(s => (
                       <Link 
                         key={s.id} 
                         to={`/suppliers/${s.id}`} 
                         onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-slate-50 rounded-lg font-bold text-slate-800"
+                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
                       >
-                        {s.name} <span className="text-[10px] text-slate-400 font-semibold">({s.phone})</span>
+                        {s.name} <span className="text-[10px] text-muted-foreground font-semibold">({s.phone})</span>
                       </Link>
                     ))}
                   </div>
@@ -465,16 +465,16 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
               {searchResults.invoices.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Invoices</h4>
+                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Invoices</h4>
                   <div className="space-y-1">
                     {searchResults.invoices.map(i => (
                       <Link 
                         key={i.id} 
                         to={`/invoices/${i.id}`} 
                         onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-slate-50 rounded-lg font-bold text-slate-800"
+                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
                       >
-                        {i.invoiceNumber} <span className="text-[10px] text-slate-400 font-semibold">({i.customerName})</span>
+                        {i.invoiceNumber} <span className="text-[10px] text-muted-foreground font-semibold">({i.customerName})</span>
                       </Link>
                     ))}
                   </div>
@@ -483,16 +483,16 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
               {searchResults.orders.length > 0 && (
                 <div>
-                  <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-wide mb-1">Sales Orders</h4>
+                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Sales Orders</h4>
                   <div className="space-y-1">
                     {searchResults.orders.map(o => (
                       <Link 
                         key={o.id} 
                         to={`/sales-orders/${o.id}`} 
                         onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-slate-50 rounded-lg font-bold text-slate-800"
+                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
                       >
-                        {o.orderNumber} <span className="text-[10px] text-slate-400 font-semibold">({o.customerName})</span>
+                        {o.orderNumber} <span className="text-[10px] text-muted-foreground font-semibold">({o.customerName})</span>
                       </Link>
                     ))}
                   </div>

@@ -14,9 +14,9 @@ export const StatCard = ({
   helper?: string;
   icon?: any;
 }) => (
-  <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm flex flex-col justify-between h-[110px] transition-all duration-200 hover:shadow-md">
+  <div className="rounded-xl border border-border dark:border-slate-800 bg-card dark:bg-slate-900 p-4 shadow-sm flex flex-col justify-between h-[110px] transition-all duration-200 hover:shadow-md">
     <div className="flex items-start justify-between">
-      <p className="text-xs font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">{label}</p>
+      <p className="text-xs font-semibold tracking-wider text-muted-foreground dark:text-muted-foreground uppercase">{label}</p>
       {Icon && (
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 border border-orange-100/50 dark:border-orange-900/50">
           <Icon size={14} />
@@ -25,33 +25,33 @@ export const StatCard = ({
     </div>
     <div className="mt-1 flex items-baseline justify-between">
       <div className="space-y-0.5">
-        <div className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none">{value}</div>
-        {helper && <p className="text-[11px] text-slate-400 dark:text-slate-400 font-medium truncate">{helper}</p>}
+        <div className="text-2xl font-black text-foreground dark:text-white tracking-tight leading-none">{value}</div>
+        {helper && <p className="text-[11px] text-muted-foreground dark:text-muted-foreground font-medium truncate">{helper}</p>}
       </div>
     </div>
   </div>
 );
 
 export const MobileEntityCard = ({ children }: { children: ReactNode }) => (
-  <article className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm md:hidden text-slate-900 dark:text-slate-100">
+  <article className="rounded-xl border border-border dark:border-slate-800 bg-card dark:bg-slate-900 p-4 shadow-sm md:hidden text-foreground dark:text-slate-100">
     {children}
   </article>
 );
 
 export const DesktopDataTable = ({ children }: { children: ReactNode }) => (
-  <div className="hidden overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 md:block text-slate-900 dark:text-slate-100">
+  <div className="hidden overflow-x-auto rounded-xl border border-border dark:border-slate-800 bg-card dark:bg-slate-900 md:block text-foreground dark:text-slate-100">
     {children}
   </div>
 );
 
 export const SearchFilterBar = ({ children }: { children: ReactNode }) => (
-  <div className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:flex-row sm:items-center text-slate-900 dark:text-slate-100">
+  <div className="flex flex-col gap-3 rounded-xl border border-border dark:border-slate-800 bg-card dark:bg-slate-900 p-3 sm:flex-row sm:items-center text-foreground dark:text-slate-100">
     {children}
   </div>
 );
 
 export const StickyFormActions = ({ children }: { children: ReactNode }) => (
-  <div className="sticky bottom-[72px] z-20 -mx-4 mt-6 flex justify-end gap-2 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 p-4 backdrop-blur md:bottom-0 md:mx-0 md:rounded-xl md:border">
+  <div className="sticky bottom-[72px] z-20 -mx-4 mt-6 flex justify-end gap-2 border-t border-border dark:border-slate-800 bg-card/95 dark:bg-slate-900/95 p-4 backdrop-blur md:bottom-0 md:mx-0 md:rounded-xl md:border">
     {children}
   </div>
 );

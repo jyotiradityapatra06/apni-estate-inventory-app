@@ -1,6 +1,6 @@
 const styles: Record<string, string> = {
-  DRAFT: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
-  PENDING: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
+  DRAFT: "bg-muted dark:bg-slate-800 text-muted-foreground dark:text-slate-300",
+  PENDING: "bg-muted dark:bg-slate-800 text-muted-foreground dark:text-slate-300",
   READY: "bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300",
   CONFIRMED: "bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300",
   READY_FOR_DISPATCH: "bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300",
@@ -30,7 +30,7 @@ export function BusinessStatusBadge({ status }: { status?: string }) {
   return (
     <span
       className={`inline-flex min-h-7 items-center rounded-full px-3 text-xs font-bold ${
-        styles[value] || "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+        styles[value] || "bg-muted dark:bg-slate-800 text-muted-foreground dark:text-slate-300"
       }`}
     >
       {value.replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}

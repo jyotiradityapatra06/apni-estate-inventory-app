@@ -84,14 +84,14 @@ export default function ReportsPage() {
 
       {/* Key Business Insights Summary KPI Grid */}
       {financial && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4 dark:border-slate-800 dark:bg-slate-900">
+        <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-2xs space-y-4 dark:border-slate-800 dark:bg-slate-900">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-black text-slate-900 tracking-tight flex items-center gap-2 dark:text-slate-100">
+              <h2 className="text-base font-black text-foreground tracking-tight flex items-center gap-2 dark:text-slate-100">
                 <Sparkles size={18} className="text-orange-500" />
                 Key Business Insights Overview
               </h2>
-              <p className="text-xs font-semibold text-slate-500 mt-0.5 dark:text-slate-400">Real-time financial summary across all business operations.</p>
+              <p className="text-xs font-semibold text-muted-foreground mt-0.5 dark:text-muted-foreground">Real-time financial summary across all business operations.</p>
             </div>
             <Link to="/reports/overview" className="text-xs font-extrabold text-orange-600 hover:underline dark:text-orange-400">
               Full Analytics →
@@ -102,14 +102,14 @@ export default function ReportsPage() {
             <KpiCard
               label="Sales Revenue"
               value={fmt(overview?.sales || 0)}
-              color="text-slate-900 dark:text-slate-100"
-              bg="bg-slate-50 dark:bg-slate-800"
+              color="text-foreground dark:text-slate-100"
+              bg="bg-muted dark:bg-slate-800"
             />
             <KpiCard
               label="Purchases Cost"
               value={fmt(overview?.purchases || 0)}
-              color="text-slate-900 dark:text-slate-100"
-              bg="bg-slate-50 dark:bg-slate-800"
+              color="text-foreground dark:text-slate-100"
+              bg="bg-muted dark:bg-slate-800"
             />
             <KpiCard
               label="Stock Valuation"
@@ -145,18 +145,18 @@ export default function ReportsPage() {
         if (!items.length) return null;
         return (
           <section key={g.name} className="space-y-3">
-            <h3 className="text-slate-900 font-extrabold text-xs uppercase tracking-wider dark:text-slate-200">{g.name}</h3>
+            <h3 className="text-foreground font-extrabold text-xs uppercase tracking-wider dark:text-slate-200">{g.name}</h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {items.map(([title, path, Icon, text]) => (
                 <Link
                   key={path}
                   to={path}
-                  className="min-h-[110px] rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs transition-all hover:border-orange-500 hover:shadow-md block space-y-2 group cursor-pointer dark:border-slate-800 dark:bg-slate-900 dark:hover:border-orange-500"
+                  className="min-h-[110px] rounded-2xl border border-border bg-card p-5 shadow-2xs transition-all hover:border-orange-500 hover:shadow-md block space-y-2 group cursor-pointer dark:border-slate-800 dark:bg-slate-900 dark:hover:border-orange-500"
                 >
                   <Icon className="text-orange-600 shrink-0 transition-transform group-hover:scale-110 dark:text-orange-500" size={24} />
                   <div>
-                    <h4 className="font-extrabold text-slate-900 text-sm group-hover:text-orange-600 transition-colors dark:text-slate-100 dark:group-hover:text-orange-400">{title}</h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed dark:text-slate-400">{text}</p>
+                    <h4 className="font-extrabold text-foreground text-sm group-hover:text-orange-600 transition-colors dark:text-slate-100 dark:group-hover:text-orange-400">{title}</h4>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed dark:text-muted-foreground">{text}</p>
                   </div>
                 </Link>
               ))}
@@ -170,8 +170,8 @@ export default function ReportsPage() {
 
 function KpiCard({ label, value, color, bg, highlight = false }: { label: string; value: string; color: string; bg: string; highlight?: boolean }) {
   return (
-    <div className={`rounded-xl border border-slate-200/80 p-3.5 space-y-1 dark:border-slate-700/80 ${bg} ${highlight ? "ring-2 ring-emerald-500/20" : ""}`}>
-      <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block truncate">{label}</span>
+    <div className={`rounded-xl border border-border/80 p-3.5 space-y-1 dark:border-slate-700/80 ${bg} ${highlight ? "ring-2 ring-emerald-500/20" : ""}`}>
+      <span className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block truncate">{label}</span>
       <strong className={`text-base sm:text-lg font-black block truncate ${color}`}>{value}</strong>
     </div>
   );

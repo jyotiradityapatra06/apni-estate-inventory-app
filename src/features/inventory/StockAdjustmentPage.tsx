@@ -88,6 +88,7 @@ export function StockAdjustmentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     if (!selectedMaterialId) {
       toast.error("Please select a material.");
       return;
@@ -139,7 +140,7 @@ export function StockAdjustmentPage() {
       {/* Navigation & Header */}
       <button
         onClick={() => navigate("/inventory")}
-        className="flex min-h-9 items-center gap-2 text-xs font-bold text-slate-700 hover:text-orange-600 cursor-pointer dark:text-slate-300 dark:hover:text-orange-400"
+        className="flex min-h-9 items-center gap-2 text-xs font-bold text-muted-foreground hover:text-orange-600 cursor-pointer dark:text-slate-300 dark:hover:text-orange-400"
       >
         <ArrowLeft size={14} />
         Back to Stock Overview
@@ -153,8 +154,8 @@ export function StockAdjustmentPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column: Adjustment Form (1 Column) */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-            <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+            <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2 border-b pb-3 dark:border-slate-800">
               <SlidersHorizontal size={16} className="text-orange-500" />
               New Stock Correction
             </h3>
@@ -162,7 +163,7 @@ export function StockAdjustmentPage() {
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               {/* Step 1: Select Material */}
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
                   1. Material Item *
                 </label>
                 <select
@@ -172,7 +173,7 @@ export function StockAdjustmentPage() {
                     setSelectedMaterialId(e.target.value);
                     setNewQuantityInput("");
                   }}
-                  className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">Select Material Item...</option>
                   {items.map((item) => (
@@ -185,13 +186,13 @@ export function StockAdjustmentPage() {
 
               {/* Step 2: Select Godown */}
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
                   2. Warehouse / Godown
                 </label>
                 <select
                   value={selectedGodownId}
                   onChange={(e) => setSelectedGodownId(e.target.value)}
-                  className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">All Warehouses / Default</option>
                   {godowns.map((g) => (
@@ -204,16 +205,16 @@ export function StockAdjustmentPage() {
 
               {/* Step 3 & 4: Quantities & Difference Calculation */}
               {selectedMaterial && (
-                <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-3 dark:border-slate-700 dark:bg-slate-800/60">
+                <div className="rounded-xl border border-border bg-muted/70 p-3.5 space-y-3 dark:border-slate-700 dark:bg-slate-800/60">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-extrabold uppercase text-[10px]">Current Quantity:</span>
-                    <strong className="text-slate-900 font-black text-sm dark:text-slate-100">
+                    <span className="text-muted-foreground font-extrabold uppercase text-[10px]">Current Quantity:</span>
+                    <strong className="text-foreground font-black text-sm dark:text-slate-100">
                       {currentQuantity} {selectedMaterial.unit}
                     </strong>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                    <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
                       New Corrected Quantity *
                     </label>
                     <input
@@ -224,20 +225,20 @@ export function StockAdjustmentPage() {
                       placeholder={`e.g. ${currentQuantity}`}
                       value={newQuantityInput}
                       onChange={(e) => setNewQuantityInput(e.target.value)}
-                      className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                      className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                     />
                   </div>
 
                   {newQuantityInput !== "" && (
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-200/80 dark:border-slate-700">
-                      <span className="text-slate-500 font-extrabold uppercase text-[10px]">Quantity Change:</span>
+                    <div className="flex items-center justify-between pt-1 border-t border-border/80 dark:border-slate-700">
+                      <span className="text-muted-foreground font-extrabold uppercase text-[10px]">Quantity Change:</span>
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-black ${
                           delta > 0
                             ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
                             : delta < 0
                             ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
-                            : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                            : "bg-slate-200 text-muted-foreground dark:bg-slate-700 dark:text-slate-300"
                         }`}
                       >
                         {delta > 0 ? <PlusCircle size={12} /> : delta < 0 ? <MinusCircle size={12} /> : null}
@@ -250,13 +251,13 @@ export function StockAdjustmentPage() {
 
               {/* Step 5: Adjustment Reason */}
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
                   5. Adjustment Reason *
                 </label>
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   {ADJUSTMENT_REASONS.map((r) => (
                     <option key={r.value} value={r.value}>
@@ -268,7 +269,7 @@ export function StockAdjustmentPage() {
 
               {/* Step 6: Reference Note */}
               <div>
-                <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
                   6. Audit Note / Reference
                 </label>
                 <input
@@ -276,7 +277,7 @@ export function StockAdjustmentPage() {
                   placeholder="Reasoning or physical audit ref..."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 />
               </div>
 
@@ -294,9 +295,9 @@ export function StockAdjustmentPage() {
 
         {/* Right Column: Audit Trail & Transaction Log (2 Columns) */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
-              <h3 className="font-black text-slate-900 text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+            <div className="flex items-center justify-between border-b border-border pb-3 dark:border-slate-800">
+              <h3 className="font-black text-foreground text-xs uppercase tracking-wider dark:text-slate-100 flex items-center gap-2">
                 <History size={16} className="text-orange-500" />
                 Stock Adjustment Audit Trail History ({transactions.length})
               </h3>
@@ -317,9 +318,9 @@ export function StockAdjustmentPage() {
             ) : (
               <>
                 {/* Desktop Audit Table */}
-                <div className="hidden overflow-hidden rounded-xl border border-slate-200 md:block dark:border-slate-800">
+                <div className="hidden overflow-hidden rounded-xl border border-border md:block dark:border-slate-800">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
+                    <thead className="bg-muted text-muted-foreground border-b border-border dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700">
                       <tr>
                         <th className="px-3.5 py-3 font-black uppercase">Date & Time</th>
                         <th className="px-3.5 py-3 font-black uppercase">Material Name</th>
@@ -340,18 +341,18 @@ export function StockAdjustmentPage() {
                         return (
                           <tr
                             key={tx.id}
-                            className="border-b last:border-0 border-slate-100 hover:bg-slate-50/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50"
+                            className="border-b last:border-0 border-border hover:bg-muted/70 transition-colors dark:border-slate-800 dark:hover:bg-slate-800/50"
                           >
-                            <td className="px-3.5 py-3 font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                            <td className="px-3.5 py-3 font-semibold text-muted-foreground dark:text-muted-foreground whitespace-nowrap">
                               {new Date(tx.createdAt).toLocaleString("en-IN", {
                                 dateStyle: "short",
                                 timeStyle: "short",
                               })}
                             </td>
-                            <td className="px-3.5 py-3 font-extrabold text-slate-900 dark:text-slate-100">
+                            <td className="px-3.5 py-3 font-extrabold text-foreground dark:text-slate-100">
                               {tx.inventoryItem?.materialName || "Material Item"}
                             </td>
-                            <td className="px-3.5 py-3 text-slate-600 dark:text-slate-300 font-semibold">
+                            <td className="px-3.5 py-3 text-muted-foreground dark:text-slate-300 font-semibold">
                               {tx.godown?.name || "Main Warehouse"}
                             </td>
                             <td className="px-3.5 py-3 font-black">
@@ -365,11 +366,11 @@ export function StockAdjustmentPage() {
                                 {isIncrease ? `+${tx.quantity}` : `-${tx.quantity}`} {tx.inventoryItem?.unit || "units"}
                               </span>
                             </td>
-                            <td className="px-3.5 py-3 text-slate-700 dark:text-slate-300 font-medium">
+                            <td className="px-3.5 py-3 text-muted-foreground dark:text-slate-300 font-medium">
                               <span className="capitalize">{reasonLabel}</span>
-                              {tx.note && <span className="text-[10px] text-slate-400 block">{tx.note}</span>}
+                              {tx.note && <span className="text-[10px] text-muted-foreground block">{tx.note}</span>}
                             </td>
-                            <td className="px-3.5 py-3 text-slate-600 dark:text-slate-400 font-semibold">
+                            <td className="px-3.5 py-3 text-muted-foreground dark:text-muted-foreground font-semibold">
                               {tx.user?.name || "System Admin"}
                             </td>
                           </tr>
@@ -386,10 +387,10 @@ export function StockAdjustmentPage() {
                     return (
                       <div
                         key={tx.id}
-                        className="rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 space-y-2 dark:border-slate-800 dark:bg-slate-800/40 text-xs"
+                        className="rounded-xl border border-border bg-muted/50 p-3.5 space-y-2 dark:border-slate-800 dark:bg-slate-800/40 text-xs"
                       >
                         <div className="flex items-center justify-between">
-                          <strong className="font-extrabold text-slate-900 dark:text-slate-100">
+                          <strong className="font-extrabold text-foreground dark:text-slate-100">
                             {tx.inventoryItem?.materialName || "Material"}
                           </strong>
                           <span
@@ -400,11 +401,11 @@ export function StockAdjustmentPage() {
                             {isIncrease ? `+${tx.quantity}` : `-${tx.quantity}`}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-[11px] text-slate-500">
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                           <span>{tx.godown?.name || "Warehouse"}</span>
                           <span>{new Date(tx.createdAt).toLocaleDateString("en-IN")}</span>
                         </div>
-                        {tx.note && <p className="text-[11px] text-slate-600 dark:text-slate-400 italic">{tx.note}</p>}
+                        {tx.note && <p className="text-[11px] text-muted-foreground dark:text-muted-foreground italic">{tx.note}</p>}
                       </div>
                     );
                   })}

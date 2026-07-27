@@ -62,11 +62,11 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
 
   if (!movements || movements.length === 0 || chartData.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+      <div className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card dark:bg-slate-900 p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-border dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
             <TrendingUp size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Stock Movement Trend</h3>
+            <h3 className="font-extrabold text-sm text-foreground dark:text-white">Stock Movement Trend</h3>
           </div>
         </div>
 
@@ -75,8 +75,8 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
             <TrendingUp size={24} />
           </div>
           <div>
-            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">No stock movement yet</h4>
-            <p className="text-xs text-slate-400 dark:text-slate-400 mt-1 max-w-[280px] mx-auto">
+            <h4 className="font-extrabold text-sm text-foreground dark:text-white">No stock movement yet</h4>
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1 max-w-[280px] mx-auto">
               Stock in and stock out activity will appear here after your first inventory transaction.
             </p>
           </div>
@@ -95,11 +95,11 @@ export const StockMovementChart: React.FC<StockMovementChartProps> = ({ movement
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+    <div className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card dark:bg-slate-900 p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-border dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <TrendingUp size={18} className="text-[#F97316]" />
-          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Stock Movement Trend</h3>
+          <h3 className="font-extrabold text-sm text-foreground dark:text-white">Stock Movement Trend</h3>
         </div>
 
         <div className="flex items-center gap-3">

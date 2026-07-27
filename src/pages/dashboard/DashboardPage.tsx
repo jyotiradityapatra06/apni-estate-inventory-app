@@ -109,17 +109,17 @@ export default function DashboardPage() {
           <p className="text-xs font-bold uppercase tracking-wider text-orange-600">
             {business?.name || "APNI ESTATE"} command center
           </p>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-1 md:text-3xl">
+          <h1 className="text-2xl font-black text-foreground tracking-tight mt-1 md:text-3xl">
             {greeting}, {user?.name || "Owner"} 👋
           </h1>
-          <p className="text-xs sm:text-sm font-semibold text-slate-500 mt-1">
-            Role: <span className="font-bold text-slate-700">{user?.role}</span> · {todayDate}
+          <p className="text-xs sm:text-sm font-semibold text-muted-foreground mt-1">
+            Role: <span className="font-bold text-muted-foreground">{user?.role}</span> · {todayDate}
           </p>
         </div>
         <div>
           <button
             onClick={refresh}
-            className="flex min-h-[42px] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs sm:text-sm font-extrabold text-slate-700 shadow-sm hover:bg-slate-50 cursor-pointer active:scale-95 transition-transform"
+            className="flex min-h-[42px] items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-xs sm:text-sm font-extrabold text-muted-foreground shadow-sm hover:bg-muted cursor-pointer active:scale-95 transition-transform"
           >
             <RefreshCw size={16} className={dashboard.inventory.loading ? "animate-spin text-orange-500" : ""} />
             Sync Dashboard
@@ -132,23 +132,23 @@ export default function DashboardPage() {
         <div className="rounded-2xl border border-orange-200 bg-orange-50/20 p-5 shadow-sm space-y-4">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">Welcome to APNI ESTATE &mdash; Complete your business setup 🚀</h3>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-medium">Follow this step-by-step checklist to configure your construction material ERP.</p>
+              <h3 className="font-extrabold text-foreground text-sm sm:text-base">Welcome to APNI ESTATE &mdash; Complete your business setup 🚀</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 font-medium">Follow this step-by-step checklist to configure your construction material ERP.</p>
             </div>
             <button 
               onClick={dismissSetup} 
-              className="text-slate-400 hover:text-slate-600 text-xs font-bold uppercase tracking-wider cursor-pointer"
+              className="text-muted-foreground hover:text-muted-foreground text-xs font-bold uppercase tracking-wider cursor-pointer"
             >
               Skip guide
             </button>
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex justify-between text-xs sm:text-sm font-bold text-slate-700">
+            <div className="flex justify-between text-xs sm:text-sm font-bold text-muted-foreground">
               <span>Setup Progress ({doneCount} of {setupSteps.length} complete)</span>
               <span>{progressPercent}%</span>
             </div>
-            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
               <div 
                 className="h-full bg-orange-500 rounded-full transition-all duration-500" 
                 style={{ width: `${progressPercent}%` }}
@@ -164,7 +164,7 @@ export default function DashboardPage() {
                 className={`rounded-xl border p-3 block text-left text-xs sm:text-sm transition-colors ${
                   step.done 
                     ? "bg-green-50/50 border-green-200 text-green-800 animate-fade-in" 
-                    : "bg-white hover:bg-slate-50 border-slate-200 text-slate-700"
+                    : "bg-card hover:bg-muted border-border text-muted-foreground"
                 }`}
               >
                 <div className="flex items-center justify-between font-extrabold">
@@ -173,7 +173,7 @@ export default function DashboardPage() {
                     {step.done ? "✓" : "○"}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1 font-semibold">
+                <p className="text-[11px] text-muted-foreground mt-1 font-semibold">
                   {step.done ? "Completed successfully" : "Click to set up"}
                 </p>
               </Link>
@@ -187,7 +187,7 @@ export default function DashboardPage() {
 
       {/* 3. Business Overview Cards */}
       <section className="space-y-3.5">
-        <h2 className="text-xs font-black tracking-wider text-slate-500 uppercase">Financial Health</h2>
+        <h2 className="text-xs font-black tracking-wider text-muted-foreground uppercase">Financial Health</h2>
         <DashboardSummaryCards dashboard={dashboard} />
       </section>
 
@@ -210,19 +210,19 @@ export default function DashboardPage() {
           <InventoryValueTrendChart materials={dashboard.inventory.data} movements={dashboard.movements.data || []} />
 
           {/* 6. Financial Summary (Cash Flow) */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between border-b pb-3 mb-4">
-              <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Cash Flow Overview</h3>
-              <span className="text-xs text-slate-500 font-semibold">Real-time balances</span>
+              <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Cash Flow Overview</h3>
+              <span className="text-xs text-muted-foreground font-semibold">Real-time balances</span>
             </div>
             
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-xs mb-1 font-semibold">
-                  <span className="text-slate-500">Money Received</span>
+                  <span className="text-muted-foreground">Money Received</span>
                   <span className="text-green-700 font-bold">{fmt(moneyReceived)}</span>
                 </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-green-600 rounded-full" 
                     style={{ width: `${totalSales ? Math.min(100, (moneyReceived / totalSales) * 100) : 0}%` }}
@@ -232,10 +232,10 @@ export default function DashboardPage() {
 
               <div>
                 <div className="flex justify-between text-xs mb-1 font-semibold">
-                  <span className="text-slate-500">Money Pending (Receivables)</span>
+                  <span className="text-muted-foreground">Money Pending (Receivables)</span>
                   <span className="text-orange-600 font-bold">{fmt(totalReceivables)}</span>
                 </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-orange-500 rounded-full" 
                     style={{ width: `${totalSales ? Math.min(100, (totalReceivables / totalSales) * 100) : 0}%` }}
@@ -245,10 +245,10 @@ export default function DashboardPage() {
 
               <div>
                 <div className="flex justify-between text-xs mb-1 font-semibold">
-                  <span className="text-slate-500">Supplier Payments Due (Payables)</span>
-                  <span className="text-slate-900 font-bold">{fmt(payablesDue)}</span>
+                  <span className="text-muted-foreground">Supplier Payments Due (Payables)</span>
+                  <span className="text-foreground font-bold">{fmt(payablesDue)}</span>
                 </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-slate-900 rounded-full" 
                     style={{ width: `${totalPurchases ? Math.min(100, (payablesDue / totalPurchases) * 100) : 0}%` }}
@@ -262,27 +262,27 @@ export default function DashboardPage() {
           <div className="grid gap-6 md:grid-cols-2">
             
             {/* Recent Sales */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between border-b pb-3 mb-3">
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Recent Sales</h3>
+                <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Recent Sales</h3>
                 <Link to="/sales-orders" className="text-xs font-semibold text-orange-600 hover:underline">View All</Link>
               </div>
 
               <div className="divide-y">
                 {loadingActivity ? (
-                  Array.from({ length: 3 }).map((_, i) => <div key={i} className="py-3 animate-pulse h-12 bg-slate-100 rounded-lg mt-1" />)
+                  Array.from({ length: 3 }).map((_, i) => <div key={i} className="py-3 animate-pulse h-12 bg-muted rounded-lg mt-1" />)
                 ) : recentSales.length > 0 ? (
                   recentSales.map((sale) => (
                     <div key={sale.id} className="py-3 flex justify-between items-center text-xs">
                       <div>
-                        <Link to={`/sales-orders/${sale.id}`} className="font-bold text-slate-900 hover:text-orange-600">
+                        <Link to={`/sales-orders/${sale.id}`} className="font-bold text-foreground hover:text-orange-600">
                           {sale.orderNumber}
                         </Link>
-                        <p className="text-slate-500 mt-0.5">{sale.customerName}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{new Date(sale.orderDate).toLocaleDateString("en-IN")}</p>
+                        <p className="text-muted-foreground mt-0.5">{sale.customerName}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(sale.orderDate).toLocaleDateString("en-IN")}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-slate-900">{fmt(sale.totalAmount)}</p>
+                        <p className="font-bold text-foreground">{fmt(sale.totalAmount)}</p>
                         <span className="inline-block mt-1 scale-90 origin-right">
                           <BusinessStatusBadge status={sale.status} />
                         </span>
@@ -290,33 +290,33 @@ export default function DashboardPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="py-4 text-center text-slate-400 text-xs">No recent sales records.</p>
+                  <p className="py-4 text-center text-muted-foreground text-xs">No recent sales records.</p>
                 )}
               </div>
             </div>
 
             {/* Recent Purchases */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between border-b pb-3 mb-3">
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Recent Purchases</h3>
+                <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Recent Purchases</h3>
                 <Link to="/purchases" className="text-xs font-semibold text-orange-600 hover:underline">View All</Link>
               </div>
 
               <div className="divide-y">
                 {loadingActivity ? (
-                  Array.from({ length: 3 }).map((_, i) => <div key={i} className="py-3 animate-pulse h-12 bg-slate-100 rounded-lg mt-1" />)
+                  Array.from({ length: 3 }).map((_, i) => <div key={i} className="py-3 animate-pulse h-12 bg-muted rounded-lg mt-1" />)
                 ) : recentPurchases.length > 0 ? (
                   recentPurchases.map((pur) => (
                     <div key={pur.id} className="py-3 flex justify-between items-center text-xs">
                       <div>
-                        <Link to={`/purchases/${pur.id}`} className="font-bold text-slate-900 hover:text-orange-600">
+                        <Link to={`/purchases/${pur.id}`} className="font-bold text-foreground hover:text-orange-600">
                           {pur.purchaseOrderNumber}
                         </Link>
-                        <p className="text-slate-500 mt-0.5">{pur.supplierName}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{new Date(pur.orderDate).toLocaleDateString("en-IN")}</p>
+                        <p className="text-muted-foreground mt-0.5">{pur.supplierName}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(pur.orderDate).toLocaleDateString("en-IN")}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-slate-900">{fmt(pur.totalAmount)}</p>
+                        <p className="font-bold text-foreground">{fmt(pur.totalAmount)}</p>
                         <span className="inline-block mt-1 scale-90 origin-right">
                           <BusinessStatusBadge status={pur.status} />
                         </span>
@@ -324,7 +324,7 @@ export default function DashboardPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="py-4 text-center text-slate-400 text-xs">No recent purchases records.</p>
+                  <p className="py-4 text-center text-muted-foreground text-xs">No recent purchases records.</p>
                 )}
               </div>
             </div>
@@ -337,21 +337,28 @@ export default function DashboardPage() {
         <div className="space-y-6">
           
           {/* 7. Recent Activity Timeline */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between border-b pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <Bell size={16} className="text-orange-600" />
-                <h3 className="font-bold text-slate-900 text-sm uppercase tracking-wider">Recent Activity Log</h3>
+                <h3 className="font-bold text-foreground text-sm uppercase tracking-wider">Recent Activity Log</h3>
               </div>
             </div>
 
-            <div className="relative border-l border-slate-100 pl-4 space-y-5">
+            <div className="relative border-l border-border pl-4 space-y-5">
               {dashboard.activity.loading ? (
-                Array.from({ length: 3 }).map((_, i) => <div key={i} className="animate-pulse h-14 bg-slate-100 rounded-xl" />)
+                Array.from({ length: 3 }).map((_, i) => <div key={i} className="animate-pulse h-14 bg-muted rounded-xl" />)
+              ) : dashboard.activity.error ? (
+                <div className="py-6 text-center">
+                  <p className="text-xs font-bold text-red-700">Could not load recent activity.</p>
+                  <button onClick={dashboard.refresh} className="mt-2 min-h-10 rounded-lg border px-4 text-xs font-bold text-muted-foreground">
+                    Retry
+                  </button>
+                </div>
               ) : dashboard.activity.data.length === 0 ? (
                 <div className="py-6 text-center">
-                  <p className="text-xs font-bold text-slate-700">No activity yet.</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                  <p className="text-xs font-bold text-muted-foreground">No activity yet.</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
                     Create sales orders, purchases, payments and invoices to see business activity here.
                   </p>
                 </div>
@@ -359,11 +366,11 @@ export default function DashboardPage() {
                 dashboard.activity.data.slice(0, 7).map((act) => (
                   <div key={act.id} className="relative text-xs">
                     {/* Bullet marker */}
-                    <div className="absolute -left-[21.5px] top-1 h-2.5 w-2.5 rounded-full border bg-white border-orange-500" />
+                    <div className="absolute -left-[21.5px] top-1 h-2.5 w-2.5 rounded-full border bg-card border-orange-500" />
                     
-                    <p className="font-bold text-slate-900">{act.title}</p>
-                    <p className="text-slate-500 mt-0.5">{act.message}</p>
-                    <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                    <p className="font-bold text-foreground">{act.title}</p>
+                    <p className="text-muted-foreground mt-0.5">{act.message}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1 font-medium">
                       {new Date(act.createdAt).toLocaleString("en-IN", { hour: "numeric", minute: "2-digit", hour12: true })}
                     </p>
                   </div>
