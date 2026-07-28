@@ -62,32 +62,7 @@ export function InvoiceFooter({ invoice }: InvoiceFooterProps) {
         </strong>
       </div>
 
-      {/* Bank Details & Terms Grid */}
-      <div className="grid gap-6 md:grid-cols-2 text-xs">
-        {/* Bank & UPI Details Placeholder */}
-        <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block border-b border-border pb-1.5">
-            Bank & Payment Details
-          </span>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-muted-foreground font-medium pt-1">
-            <span>Bank Name:</span>
-            <strong className="text-foreground font-bold">HDFC Bank</strong>
-
-            <span>Account Name:</span>
-            <strong className="text-foreground font-bold">{invoice.businessName || "APNI ESTATE PVT LTD"}</strong>
-
-            <span>Account Number:</span>
-            <strong className="text-foreground font-mono font-bold">50200012345678</strong>
-
-            <span>IFSC Code:</span>
-            <strong className="text-foreground font-mono font-bold">HDFC0001234</strong>
-
-            <span>UPI ID:</span>
-            <strong className="text-foreground font-mono font-bold">apniestate@upi</strong>
-          </div>
-        </div>
-
-        {/* Terms & Conditions / Notes */}
+      <div className="text-xs">
         <div className="rounded-xl border border-border bg-card p-4 space-y-2">
           <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block border-b border-border pb-1.5">
             Terms & Notes

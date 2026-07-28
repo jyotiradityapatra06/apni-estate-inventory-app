@@ -178,29 +178,26 @@ export const cancel = async (businessId: string, id: string) => prisma.$transact
 });
 
 export const share = async (businessId: string, id: string, userId: string, phone?: string) => {
-  const invoice = await prisma.invoice.findFirst({ where: { id, businessId } });
-  if (!invoice) throw new ApiError(404, "Invoice not found.");
+  return prisma.$transaction(async (tx) => {
+    const invoice = await tx.invoice.findFirst({ where: { id, businessId } });
+    if (!invoice) throw new ApiError(404, "Invoice not found.");
 
-  let publicToken = invoice.publicToken;
-  if (!publicToken) {
-    publicToken = generatePublicToken();
-    await prisma.invoice.update({ where: { id }, data: { publicToken } });
-  }
+    const publicToken = invoice.publicToken || generatePublicToken();
+    if (!invoice.publicToken) {
+      await tx.invoice.update({ where: { id }, data: { publicToken } });
+    }
 
-  const recipientPhone = phone || invoice.customerPhone || null;
-  await prisma.invoiceShare.create({
-    data: {
-      invoiceId: invoice.id,
-      channel: "WHATSAPP",
-      phone: recipientPhone,
-      sharedById: userId,
-    },
+    await tx.invoiceShare.create({
+      data: {
+        invoiceId: invoice.id,
+        channel: "WHATSAPP",
+        phone: phone || invoice.customerPhone || null,
+        sharedById: userId,
+      },
+    });
+
+    return { publicToken, publicUrl: `/i/${publicToken}` };
   });
-
-  return {
-    publicToken,
-    publicUrl: `/i/${publicToken}`,
-  };
 };
 
 export const getSharesByCustomer = async (businessId: string, customerId: string) => {

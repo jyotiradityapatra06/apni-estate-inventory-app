@@ -63,6 +63,7 @@ export default function InvoiceDetailPage() {
       return;
     }
 
+    const whatsappWindow = window.open("", "_blank");
     try {
       const shareRes = await invoiceApi.share(x.id, phone || undefined);
       const publicInvoiceURL = `${window.location.origin}${shareRes.data.publicUrl}`;
@@ -78,19 +79,21 @@ export default function InvoiceDetailPage() {
 
       const link = createWhatsAppLink(phone, message);
       if (!link) {
+        whatsappWindow?.close();
         toast.error("Customer phone number is missing. Please update customer details.");
         return;
       }
 
-      const whatsappWindow = window.open("", "_blank");
       if (whatsappWindow) {
         whatsappWindow.location.href = link;
       } else {
         window.location.href = link;
       }
       toast.success("Invoice shared on WhatsApp");
-    } catch {
-      toast.error("Unable to generate WhatsApp share link. Please try again.");
+      window.dispatchEvent(new Event("notifications:refresh"));
+    } catch (e) {
+      whatsappWindow?.close();
+      toast.error(e instanceof Error ? e.message : "Unable to generate WhatsApp share link. Please try again.");
     }
   };
 

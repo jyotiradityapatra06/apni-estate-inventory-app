@@ -29,6 +29,12 @@ export function SalesOrderDetailPage() {
 
   const act = async () => {
     if (!action || busy) return;
+    if (action === "confirm" && data?.taxMode === "GST" && (!business?.gstNumber || !business.stateCode)) {
+      toast.error("Complete Business GST Profile before creating GST documents");
+      setAction(null);
+      navigate("/management");
+      return;
+    }
     setBusy(true);
     try {
       const r = action === "confirm" ? await salesOrderApi.confirm(id) : await salesOrderApi.cancel(id);

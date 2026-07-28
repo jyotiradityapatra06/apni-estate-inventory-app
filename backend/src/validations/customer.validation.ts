@@ -1,10 +1,14 @@
 import { z } from "zod";
 
 const optionalText = z.string().trim().optional().nullable();
+const optionalEmail = z.preprocess(
+  (value) => typeof value === "string" && value.trim() === "" ? undefined : value,
+  z.string().trim().email("Enter a valid email").optional().nullable(),
+);
 export const createCustomerSchema = z.object({
   name: z.string().trim().min(2, "Customer name is required"),
   phone: z.string().trim().min(10, "Enter a valid phone number"),
-  email: z.string().trim().email("Enter a valid email").optional().nullable(),
+  email: optionalEmail,
   gstin: optionalText,
   billingAddress: optionalText,
   shippingAddress: optionalText,

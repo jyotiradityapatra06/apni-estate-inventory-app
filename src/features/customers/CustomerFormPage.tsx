@@ -91,7 +91,11 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
     if (saving) return;
     setSaving(true);
     try {
-      const r = mode === "create" ? await customerApi.create(form) : await customerApi.update(id, form);
+      const payload = {
+        ...form,
+        email: form.email?.trim() || null,
+      };
+      const r = mode === "create" ? await customerApi.create(payload) : await customerApi.update(id, payload);
       toast.success(mode === "create" ? "Customer added successfully" : "Customer updated successfully");
       window.dispatchEvent(new Event("customers:refresh"));
       window.dispatchEvent(new Event("notifications:refresh"));

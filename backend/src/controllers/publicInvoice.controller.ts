@@ -31,7 +31,7 @@ export const getPublicInvoice = async (req: Request, res: Response, next: NextFu
       where: { publicToken: token },
       include: {
         items: true,
-        salesOrder: { select: { orderNumber: true } },
+        salesOrder: { select: { id: true, orderNumber: true } },
         payments: { where: { status: "POSTED" }, select: { paymentNumber: true, amount: true, paymentDate: true } },
       },
     });

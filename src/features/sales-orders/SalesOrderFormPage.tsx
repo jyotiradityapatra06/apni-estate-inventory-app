@@ -19,7 +19,7 @@ const cls = "mt-2 min-h-[44px] w-full rounded-xl border border-border bg-card px
 export function SalesOrderFormPage() {
   const nav = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { user, business } = useAuth();
   const isOwnerOrManager = user?.role === "OWNER" || user?.role === "MANAGER";
 
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -52,7 +52,8 @@ export function SalesOrderFormPage() {
       setDetails(prev => ({
         ...prev,
         billingAddress: customer.billingAddress || "",
-        deliveryAddress: customer.shippingAddress || ""
+        deliveryAddress: customer.shippingAddress || "",
+        placeOfSupplyCode: customer.stateCode || prev.placeOfSupplyCode
       }));
     }
   }, [customerId, customers]);
@@ -133,6 +134,13 @@ export function SalesOrderFormPage() {
 
   const save = async (confirm: boolean) => {
     if (saving) return;
+    if (confirm && taxMode === "GST" && (!business?.gstNumber || !business.stateCode)) {
+      const message = "Complete Business GST Profile before creating GST documents";
+      setError(message);
+      toast.error(message);
+      nav("/management");
+      return;
+    }
     const message = validate();
     if (message) {
       setError(message);
@@ -165,6 +173,19 @@ export function SalesOrderFormPage() {
       setSaving(false);
       setConfirming(false);
     }
+  };
+
+  const reviewForConfirmation = () => {
+    if (taxMode === "GST" && (!business?.gstNumber || !business.stateCode)) {
+      const message = "Complete Business GST Profile before creating GST documents";
+      setError(message);
+      toast.error(message);
+      nav("/management");
+      return;
+    }
+    const message = validate();
+    if (message) setError(message);
+    else setReview(true);
   };
 
   if (loading) return <div className="h-64 animate-pulse rounded-xl bg-slate-200" />;
@@ -452,11 +473,7 @@ export function SalesOrderFormPage() {
         </button>
         <button 
           disabled={saving} 
-          onClick={() => {
-            const m = validate();
-            if (m) setError(m);
-            else setReview(true);
-          }} 
+          onClick={reviewForConfirmation}
           className="flex-1 min-h-[44px] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs font-bold text-white cursor-pointer press-active"
         >
           Confirm Order
@@ -474,11 +491,7 @@ export function SalesOrderFormPage() {
         </button>
         <button 
           disabled={saving} 
-          onClick={() => {
-            const m = validate();
-            if (m) setError(m);
-            else setReview(true);
-          }} 
+          onClick={reviewForConfirmation}
           className="min-h-11 rounded-xl bg-orange-600 hover:bg-orange-700 px-6 text-sm font-bold text-white cursor-pointer"
         >
           Confirm Order
