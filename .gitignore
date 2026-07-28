@@ -6,3 +6,5 @@ backend/dist
 backend/prisma/*.db
 backend/prisma/*.db-journal
 .DS_Store
+
+APNI_ESTATE_ERP_Product_Intelligence_Audit.pdf
