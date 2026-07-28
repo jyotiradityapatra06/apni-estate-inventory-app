@@ -4,6 +4,9 @@ import { RefreshCw, ShieldAlert, Bell } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../../hooks/useAuth";
 import { useDashboardData } from "../../features/dashboard/useDashboardData";
+import { QuickBillingCTA } from "../../features/dashboard/QuickBillingCTA";
+import { TodaysBillingCards } from "../../features/dashboard/TodaysBillingCards";
+import { RecentInvoicesSection } from "../../features/dashboard/RecentInvoicesSection";
 import { DashboardQuickActions } from "../../features/dashboard/DashboardQuickActions";
 import { DashboardSummaryCards } from "../../features/dashboard/DashboardSummaryCards";
 import { MobileSupplierMetrics } from "../../features/dashboard/MobileSupplierMetrics";
@@ -122,6 +125,15 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+
+        {/* 1. Quick Billing Primary CTA */}
+        <QuickBillingCTA />
+
+        {/* 2. Today's Billing Summary Cards */}
+        <TodaysBillingCards dashboard={dashboard} />
+
+        {/* 3. Recent Invoices / Bills Section */}
+        <RecentInvoicesSection dashboard={dashboard} />
 
         {/* Setup Progress Widget */}
         {!setupDismissed && doneCount < 4 && (

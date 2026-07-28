@@ -33,6 +33,9 @@ import { lowStockItems } from "./dashboardCalculations";
 import { fmt } from "../../utils/currency";
 import { hasPermission } from "../../utils/permissions";
 import { BusinessStatusBadge } from "../../app/components/common/BusinessStatusBadge";
+import { QuickBillingCTA } from "./QuickBillingCTA";
+import { TodaysBillingCards } from "./TodaysBillingCards";
+import { RecentInvoicesSection } from "./RecentInvoicesSection";
 import { InventoryHealthChart } from "./InventoryHealthChart";
 import { StockMovementChart } from "./StockMovementChart";
 import { MaterialAvailabilityChart } from "./MaterialAvailabilityChart";
@@ -148,6 +151,15 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           <RefreshCw size={18} className={refreshing || dashboard.inventory.loading ? "animate-spin text-orange-400" : ""} />
         </button>
       </div>
+
+      {/* 1. Primary Quick Billing CTA */}
+      <QuickBillingCTA />
+
+      {/* 2. Today's Billing Metrics */}
+      <TodaysBillingCards dashboard={dashboard} />
+
+      {/* 3. Recent Invoices / Bills */}
+      <RecentInvoicesSection dashboard={dashboard} />
 
       {/* 2. Business Health Summary (Horizontal Carousel) */}
       <div className="space-y-2.5">

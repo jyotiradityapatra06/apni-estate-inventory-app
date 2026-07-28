@@ -17,7 +17,9 @@ export default function CreateInvoicePage() {
   const [orders, setOrders] = useState<SalesOrder[]>([]);
   const [orderId, setOrderId] = useState(params.get("salesOrderId") || "");
   const [order, setOrder] = useState<SalesOrder | null>(null);
-  const [type, setType] = useState<"GST" | "NON_GST">("GST");
+  const paramType = params.get("type")?.toUpperCase();
+  const initialType: "GST" | "NON_GST" = paramType === "NON_GST" ? "NON_GST" : "GST";
+  const [type, setType] = useState<"GST" | "NON_GST">(initialType);
   const [lines, setLines] = useState<Line[]>([]);
   const [due, setDue] = useState("");
   const [notes, setNotes] = useState("");
@@ -41,7 +43,9 @@ export default function CreateInvoicePage() {
       .getById(orderId)
       .then((r) => {
         setOrder(r.data);
-        setType(r.data.taxMode);
+        if (!params.get("type")) {
+          setType(r.data.taxMode);
+        }
         setLines(
           r.data.items
             .map((x) => ({
@@ -55,7 +59,7 @@ export default function CreateInvoicePage() {
         );
       })
       .catch((e) => setError(e.message));
-  }, [orderId]);
+  }, [orderId, params]);
 
   const summary = useMemo(
     () =>
