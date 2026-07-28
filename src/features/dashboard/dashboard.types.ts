@@ -12,6 +12,7 @@ export interface DashboardData {
   deliveries: ResourceState<DeliveryData[]>;
   activity: ResourceState<NotificationData[]>;
   invoices: ResourceState<InvoiceSummary[]>;
+  payments: ResourceState<any[]>;
   expenses: ResourceState<ExpenseSummary>;
   purchases: ResourceState<{ data: any[]; summary: any }>;
   salesReturns: ResourceState<any[]>;

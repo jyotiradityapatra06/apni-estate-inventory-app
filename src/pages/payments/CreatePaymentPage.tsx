@@ -26,18 +26,32 @@ export default function CreatePaymentPage() {
   useEffect(() => {
     Promise.all([customerApi.getAll(), invoiceApi.getAll()])
       .then(([c, i]) => {
-        setCustomers(c.data || []);
-        setInvoices((i.data || []).filter((x: any) => ["ISSUED", "PARTIALLY_PAID"].includes(x.status)));
-        const selected = (i.data || []).find((x: any) => x.id === form.invoiceId);
-        if (selected) {
-          setForm((f: any) => ({ ...f, customerId: selected.customerId, amount: selected.balanceDue }));
+        const custs = c.data || [];
+        const invs = (i.data || []).filter((x: any) => ["ISSUED", "PARTIALLY_PAID"].includes(x.status));
+        setCustomers(custs);
+        setInvoices(invs);
+
+        const targetInvoiceId = params.get("invoiceId") || form.invoiceId;
+        const targetCustId = params.get("customerId") || form.customerId;
+        const selectedInv = invs.find((x: any) => x.id === targetInvoiceId);
+
+        if (selectedInv) {
+          setForm((f: any) => ({
+            ...f,
+            customerId: selectedInv.customerId || targetCustId,
+            invoiceId: selectedInv.id,
+            amount: String(selectedInv.balanceDue),
+          }));
+        } else if (targetCustId) {
+          setForm((f: any) => ({ ...f, customerId: targetCustId }));
         }
       })
       .catch((e: any) => toast.error(e.message));
-  }, []);
+  }, [params]);
 
   const available = invoices.filter((x) => !form.customerId || x.customerId === form.customerId);
   const selected = invoices.find((x) => x.id === form.invoiceId);
+  const selectedCustomer = customers.find((x) => x.id === form.customerId);
 
   const [saving, setSaving] = useState(false);
 
@@ -57,7 +71,7 @@ export default function CreatePaymentPage() {
       const r = await paymentApi.create(body);
       toast.success("Payment recorded successfully");
       window.dispatchEvent(new Event("notifications:refresh"));
-      nav(`/payments/${r.data.id}`);
+      nav(`/payments/${r.data.id}/receipt`);
     } catch (e: any) {
       toast.error(e?.message || "Payment could not be recorded. Please try again.");
     } finally {
@@ -106,7 +120,7 @@ export default function CreatePaymentPage() {
                 ...form,
                 invoiceId: e.target.value,
                 customerId: x?.customerId || form.customerId,
-                amount: x?.balanceDue || "",
+                amount: x ? String(x.balanceDue) : "",
               });
             }}
             className={inputClass}
@@ -121,9 +135,33 @@ export default function CreatePaymentPage() {
         </label>
 
         {selected && (
-          <div className="rounded-xl bg-amber-50 border border-amber-200/80 p-4 md:col-span-2 space-y-1">
-            <span className="text-[10px] font-black uppercase text-amber-800 block">Remaining Invoice Balance</span>
-            <strong className="text-2xl font-black text-amber-950 block">{fmt(selected.balanceDue)}</strong>
+          <div className="rounded-xl bg-amber-50 border border-amber-200/80 p-4 md:col-span-2 space-y-2">
+            <div className="flex justify-between items-center border-b border-amber-200/60 pb-2">
+              <div>
+                <span className="text-[10px] font-black uppercase text-amber-800 block">Target Invoice</span>
+                <strong className="text-base font-black text-amber-950">{selected.invoiceNumber}</strong>
+              </div>
+              {selectedCustomer && (
+                <div className="text-right">
+                  <span className="text-[10px] font-black uppercase text-amber-800 block">Customer</span>
+                  <strong className="text-xs font-bold text-amber-900">{selectedCustomer.name} ({selectedCustomer.phone})</strong>
+                </div>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-xs pt-1">
+              <div>
+                <span className="text-[10px] font-bold text-amber-800 block uppercase">Invoice Total</span>
+                <strong className="text-amber-950 font-black">{fmt(selected.totalAmount)}</strong>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-amber-800 block uppercase">Already Paid</span>
+                <strong className="text-emerald-700 font-black">{fmt(Number(selected.totalAmount || 0) - Number(selected.balanceDue || 0))}</strong>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-amber-800 block uppercase">Remaining Balance</span>
+                <strong className="text-red-700 font-black text-sm">{fmt(selected.balanceDue)}</strong>
+              </div>
+            </div>
           </div>
         )}
 
@@ -161,11 +199,11 @@ export default function CreatePaymentPage() {
             onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}
             className={inputClass}
           >
-            {["CASH", "UPI", "BANK_TRANSFER", "CHEQUE", "CARD", "OTHER"].map((x) => (
-              <option key={x} value={x}>
-                {x.replaceAll("_", " ")}
-              </option>
-            ))}
+            <option value="CASH">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="BANK_TRANSFER">Bank Transfer</option>
+            <option value="CHEQUE">Cheque</option>
+            <option value="OTHER">Other</option>
           </select>
         </label>
 

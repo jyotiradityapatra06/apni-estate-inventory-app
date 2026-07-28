@@ -1,5 +1,5 @@
 import React from "react";
-import { IndianRupee, FileCheck, Landmark } from "lucide-react";
+import { IndianRupee, FileCheck, Landmark, DollarSign } from "lucide-react";
 import { fmt } from "../../utils/currency";
 import type { DashboardData } from "./dashboard.types";
 import type { Invoice } from "../invoices/invoice.types";
@@ -10,7 +10,8 @@ interface TodaysBillingCardsProps {
 
 export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboard }) => {
   const invoices: Invoice[] = dashboard.invoices.data || [];
-  const loading = dashboard.invoices.loading;
+  const payments: any[] = dashboard.payments?.data || [];
+  const loading = dashboard.invoices.loading || dashboard.payments?.loading;
 
   // Filter out DRAFT and CANCELLED invoices
   const validInvoices = invoices.filter(
@@ -31,16 +32,23 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
   const todaysInvoices = validInvoices.filter((inv) => isToday(inv.invoiceDate || inv.createdAt));
   const todaysSalesAmount = todaysInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount || 0), 0);
   const todaysInvoiceCount = todaysInvoices.length;
+
+  // Calculate Today's Collections
+  const postedPayments = payments.filter((p) => p.status === "POSTED");
+  const todaysPayments = postedPayments.filter((p) => isToday(p.paymentDate || p.createdAt));
+  const todaysCollectionsAmount = todaysPayments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+
+  // Pending Receivables
   const pendingCollections = validInvoices.reduce((sum, inv) => sum + Number(inv.balanceDue || 0), 0);
 
   if (loading) {
     return (
       <section className="space-y-3">
         <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-          Today's Billing
+          Today's Billing & Collections
         </h3>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-28 animate-pulse rounded-2xl border border-border bg-card" />
           ))}
         </div>
@@ -52,14 +60,14 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
     <section className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-          Today's Billing
+          Today's Billing & Collections
         </h3>
         <span className="text-[11px] font-semibold text-muted-foreground">
-          Live Daily Performance
+          Live Financial Performance
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Today's Sales Amount */}
         <div className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-orange-200 transition-colors">
           <div className="flex items-center justify-between">
@@ -74,11 +82,11 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
             {fmt(todaysSalesAmount)}
           </strong>
           <p className="mt-1 text-xs font-medium text-muted-foreground">
-            From {todaysInvoiceCount} valid invoice{todaysInvoiceCount === 1 ? "" : "s"} today
+            From {todaysInvoiceCount} valid bill{todaysInvoiceCount === 1 ? "" : "s"} today
           </p>
         </div>
 
-        {/* Today's Invoice Count */}
+        {/* Invoices Created Today */}
         <div className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-blue-200 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -96,11 +104,29 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
           </p>
         </div>
 
-        {/* Pending Customer Collections */}
+        {/* Today's Collections */}
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-emerald-200 transition-colors">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Today's Collections
+            </span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+              <DollarSign size={20} />
+            </span>
+          </div>
+          <strong className="mt-3 block text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400">
+            {fmt(todaysCollectionsAmount)}
+          </strong>
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
+            {todaysPayments.length} payment receipt{todaysPayments.length === 1 ? "" : "s"} today
+          </p>
+        </div>
+
+        {/* Pending Receivables */}
         <div className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-amber-200 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Pending Customer Collections
+              Pending Receivables
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400">
               <Landmark size={20} />
@@ -110,7 +136,7 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
             {fmt(pendingCollections)}
           </strong>
           <p className="mt-1 text-xs font-medium text-muted-foreground">
-            Total receivables outstanding
+            Total customer outstanding
           </p>
         </div>
       </div>

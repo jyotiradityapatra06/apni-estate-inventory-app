@@ -7,6 +7,7 @@ import { expenseApi } from "../../api/expense.api";
 import { salesReturnApi } from "../../api/salesReturn.api";
 import { purchaseReturnApi } from "../../api/purchaseReturn.api";
 import { purchaseApi } from "../../api/purchase.api";
+import paymentApi from "../../api/payment.api";
 import { useAuth } from "../../hooks/useAuth";
 import { hasPermission } from "../../utils/permissions";
 import type { DashboardData, ResourceState } from "./dashboard.types";
@@ -28,6 +29,7 @@ export function useDashboardData(): DashboardData {
   const [deliveries, setDeliveries] = useState(initial<any[]>([]));
   const [activity, setActivity] = useState(initial<any[]>([]));
   const [invoices, setInvoices] = useState(initial<any[]>([]));
+  const [payments, setPayments] = useState(initial<any[]>([]));
   const [expenses, setExpenses] = useState(initial({todayExpenses:0,monthExpenses:0,totalPaid:0,pendingExpenses:0}));
   const [purchases, setPurchases] = useState(initial<{ data: any[]; summary: any }>({ data: [], summary: { totalPurchases: 0, pendingPayments: 0, thisMonthPurchase: 0, totalSuppliers: 0 } }));
   const [salesReturns, setSalesReturns] = useState(initial<any[]>([]));
@@ -47,11 +49,14 @@ export function useDashboardData(): DashboardData {
     } else setDeliveries({ data: [], loading: false, error: null });
     if (canViewFinancials) {
       setInvoices((state) => ({ ...state, loading: true, error: null }));
+      setPayments((state) => ({ ...state, loading: true, error: null }));
       setPurchases((state) => ({ ...state, loading: true, error: null }));
       tasks.push(invoiceApi.getAll().then((response) => setInvoices({ data: response.data ?? [], loading: false, error: null })).catch((error) => setInvoices((state) => ({ ...state, loading: false, error: message(error) }))));
+      tasks.push(paymentApi.getAll().then((response) => setPayments({ data: response.data ?? [], loading: false, error: null })).catch((error) => setPayments((state) => ({ ...state, loading: false, error: message(error) }))));
       tasks.push(purchaseApi.list().then((response) => setPurchases({ data: { data: response.data ?? [], summary: response.summary }, loading: false, error: null })).catch((error) => setPurchases((state) => ({ ...state, loading: false, error: message(error) }))));
     } else {
       setInvoices({ data: [], loading: false, error: null });
+      setPayments({ data: [], loading: false, error: null });
       setPurchases({ data: { data: [], summary: { totalPurchases: 0, pendingPayments: 0, thisMonthPurchase: 0, totalSuppliers: 0 } }, loading: false, error: null });
     }
     if (canViewExpenses) {
@@ -73,5 +78,5 @@ export function useDashboardData(): DashboardData {
   }, [canViewDeliveries, canViewExpenses, canViewFinancials, canViewInventory, canViewSalesReturns, canViewPurchaseReturns, user?.id]);
 
   useEffect(() => { void load(); }, [load]);
-  return { inventory, movements, deliveries, activity, invoices, expenses, purchases, salesReturns, purchaseReturns, canViewFinancials, canViewDeliveries, canViewExpenses, canViewSalesReturns, canViewPurchaseReturns, refresh: load };
+  return { inventory, movements, deliveries, activity, invoices, payments, expenses, purchases, salesReturns, purchaseReturns, canViewFinancials, canViewDeliveries, canViewExpenses, canViewSalesReturns, canViewPurchaseReturns, refresh: load };
 }

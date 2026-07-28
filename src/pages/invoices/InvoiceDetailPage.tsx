@@ -162,7 +162,7 @@ export default function InvoiceDetailPage() {
           </button>
           {Number(x.balanceDue) > 0 && manage && (
             <Link 
-              to={`/payments/new?invoiceId=${x.id}`} 
+              to={`/payments/new?customerId=${x.customerId}&invoiceId=${x.id}`} 
               className="flex min-h-11 items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 px-4 text-xs font-black text-white shadow-xs transition-colors cursor-pointer"
             >
               <DollarSign size={15} className="mr-1.5" />
@@ -205,7 +205,7 @@ export default function InvoiceDetailPage() {
           </div>
           {Number(x.balanceDue) > 0 && manage && (
             <Link 
-              to={`/payments/new?invoiceId=${x.id}`} 
+              to={`/payments/new?customerId=${x.customerId}&invoiceId=${x.id}`} 
               className="flex min-h-11 items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 px-5 text-xs font-extrabold text-white shadow-xs transition-colors cursor-pointer"
             >
               <DollarSign size={16} className="mr-1.5" />

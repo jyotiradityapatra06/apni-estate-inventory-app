@@ -268,10 +268,10 @@ Thank you for your business.`;
         />
       </div>
 
-      {/* Payment History Section */}
+      {/* Recent Payment Activity Section */}
       <section className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between border-b pb-3">
-          <SectionHeader title="Payment History & Receipts" description="Recent customer payments, receipts, and settlement records." />
+          <SectionHeader title="Recent Payment Activity" description="Recent customer payments, receipts, and settlement records." />
           {hasPermission(user, "financials:manage") && (
             <Link
               to={`/payments/new?customerId=${data.id}`}
