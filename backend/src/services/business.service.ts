@@ -1,5 +1,6 @@
 import { prisma } from "../config/db";
 import { ApiError } from "../utils/apiError";
+import { BusinessUpdateInput } from "../validations/business.validation";
 
 export const getById = async (businessId: string) => {
   const business = await prisma.business.findUnique({
@@ -16,7 +17,7 @@ export const getById = async (businessId: string) => {
 export const update = async (
   businessId: string,
   userRole: string,
-  input: { name?: string; gstNumber?: string; phone?: string; address?: string; workerSeatLimit?: number }
+  input: BusinessUpdateInput
 ) => {
   if (userRole !== "OWNER") {
     throw new ApiError(403, "Only business owners can update company settings.");
@@ -34,9 +35,22 @@ export const update = async (
     where: { id: businessId },
     data: {
       name: input.name ?? undefined,
-      gstNumber: input.gstNumber !== undefined ? input.gstNumber : undefined,
-      phone: input.phone !== undefined ? input.phone : undefined,
-      address: input.address !== undefined ? input.address : undefined,
+      logoUrl: input.logoUrl,
+      gstNumber: input.gstNumber === null ? null : input.gstNumber?.toUpperCase(),
+      phone: input.phone,
+      email: input.email,
+      website: input.website,
+      address: input.address,
+      state: input.state,
+      stateCode: input.stateCode,
+      registrationType: input.registrationType,
+      bankName: input.bankName,
+      accountNumber: input.accountNumber,
+      ifscCode: input.ifscCode === null ? null : input.ifscCode?.toUpperCase(),
+      branch: input.branch,
+      upiId: input.upiId,
+      invoiceTerms: input.invoiceTerms,
+      invoiceFooter: input.invoiceFooter,
       workerSeatLimit: input.workerSeatLimit !== undefined ? Number(input.workerSeatLimit) : undefined,
     },
   });

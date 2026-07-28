@@ -110,7 +110,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
   if (loading) return <div className="h-64 animate-pulse rounded-2xl bg-slate-200" />;
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-28">
+    <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-44 md:pb-28">
       <PageHeader
         title={mode === "create" ? "Add New Customer" : "Edit Customer Details"}
         description={mode === "create" ? "Add contact, GSTIN, location, and credit threshold details." : "Update customer contact, location, address, and credit settings."}
@@ -278,7 +278,7 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
       </section>
 
       {/* Footer Actions */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-card p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-[74px] z-30 flex gap-3 border-t bg-card p-3 md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
         <button
           type="button"
           onClick={() => nav(-1)}

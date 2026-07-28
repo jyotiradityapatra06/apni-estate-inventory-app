@@ -196,7 +196,7 @@ export function StockOverviewPage() {
             {hasPermission(user, "inventory:update") && (
               <button
                 onClick={() => navigate("/inventory/stock-adjustments")}
-                className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer dark:bg-orange-600 dark:hover:bg-orange-500"
+                className="flex min-h-11 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer dark:bg-orange-600 dark:hover:bg-orange-500"
               >
                 <SlidersHorizontal size={15} />
                 Stock Adjustments
@@ -205,7 +205,7 @@ export function StockOverviewPage() {
             {hasPermission(user, "inventory:create") && (
               <button
                 onClick={() => navigate("/materials/new")}
-                className="flex min-h-10 items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700"
+                className="flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-4 text-xs font-bold text-white transition-colors shadow-2xs cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700"
               >
                 <PackagePlus size={15} />
                 Add Material
@@ -214,7 +214,7 @@ export function StockOverviewPage() {
             {hasPermission(user, "godowns:transfer") && (
               <button
                 onClick={() => navigate("/transfers/new")}
-                className="flex min-h-10 items-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground shadow-2xs hover:bg-muted transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-card px-4 text-xs font-bold text-muted-foreground shadow-2xs hover:bg-muted transition-colors cursor-pointer dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 <ArrowLeftRight size={15} />
                 Stock Transfer
@@ -487,6 +487,31 @@ export function StockOverviewPage() {
                     <span className="text-[10px] uppercase text-muted-foreground block font-bold">Stock Value</span>
                     <strong className="text-foreground dark:text-slate-100">{fmt(value)}</strong>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 border-t border-border pt-3 dark:border-slate-800">
+                  <Link
+                    to={`/materials/${item.id}`}
+                    className="flex min-h-11 items-center justify-center rounded-xl border border-border px-2 text-center text-[11px] font-black text-muted-foreground"
+                  >
+                    Details
+                  </Link>
+                  {hasPermission(user, "inventory:update") && (
+                    <Link
+                      to="/inventory/stock-adjustments"
+                      className="flex min-h-11 items-center justify-center rounded-xl bg-orange-600 px-2 text-center text-[11px] font-black text-white"
+                    >
+                      Adjust
+                    </Link>
+                  )}
+                  {hasPermission(user, "godowns:transfer") && (
+                    <Link
+                      to={`/transfers/new?materialId=${item.id}`}
+                      className="flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-2 text-center text-[11px] font-black text-white"
+                    >
+                      Transfer
+                    </Link>
+                  )}
                 </div>
               </div>
             );

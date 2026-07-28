@@ -173,21 +173,10 @@ export const ManagementPage = () => {
                 </div>
                 {canEditBusiness && (
                   <button
-                    onClick={() => {
-                      setBName(business?.name || "");
-                      setBGst(business?.gstNumber || "");
-                      setBState(business?.state || "");
-                      setBStateCode(business?.stateCode || "");
-                      setBPhone(business?.phone || "");
-                      setBAddress(business?.address || "");
-                      setBPrefix(localStorage.getItem("invoice_prefix") || "INV-");
-                      setBNext(localStorage.getItem("invoice_next") || "1001");
-                      setBFy(localStorage.getItem("fy_active") || "FY 2026 - 2027");
-                      setShowEditBusiness(true);
-                    }}
+                    onClick={() => navigate("/management/business-profile")}
                     className="px-4 py-2 rounded-xl text-xs font-bold bg-orange-500 text-white hover:bg-orange-600 shadow-sm transition-colors cursor-pointer"
                   >
-                    Edit Profile
+                    Manage Profile
                   </button>
                 )}
               </div>

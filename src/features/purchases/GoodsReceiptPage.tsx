@@ -43,13 +43,15 @@ export function GoodsReceiptPage() {
   // Form State
   const [selectedPoId, setSelectedPoId] = useState(initialPoId);
   const [challanNumber, setChallanNumber] = useState("");
-  const [remarks, setRemarks] = useState("");
+  const [vehicleNumber, setVehicleNumber] = useState("");
+  const [notes, setNotes] = useState("");
   const [itemInputs, setItemInputs] = useState<
     Record<
       string,
       {
         receivedQty: string;
         damagedQty: string;
+        shortageQty: string;
         godownId: string;
       }
     >
@@ -92,12 +94,13 @@ export function GoodsReceiptPage() {
   // Pre-fill item inputs when selected PO changes
   useEffect(() => {
     if (selectedOrder) {
-      const initial: Record<string, { receivedQty: string; damagedQty: string; godownId: string }> = {};
+      const initial: Record<string, { receivedQty: string; damagedQty: string; shortageQty: string; godownId: string }> = {};
       selectedOrder.items.forEach((item) => {
-        const pending = Math.max(0, item.quantity - item.receivedQuantity);
+        const pending = Math.max(0, item.quantity - item.receivedQuantity - Number(item.damagedQuantity || 0));
         initial[item.id] = {
           receivedQty: pending > 0 ? String(pending) : "0",
           damagedQty: "0",
+          shortageQty: "0",
           godownId: item.godownId || (godowns[0]?.id || ""),
         };
       });
@@ -154,7 +157,7 @@ export function GoodsReceiptPage() {
     });
   }, [receiptHistory, historySearch]);
 
-  const handleInputChange = (itemId: string, field: "receivedQty" | "damagedQty" | "godownId", value: string) => {
+  const handleInputChange = (itemId: string, field: "receivedQty" | "damagedQty" | "shortageQty" | "godownId", value: string) => {
     setItemInputs((prev) => ({
       ...prev,
       [itemId]: {
@@ -175,65 +178,60 @@ export function GoodsReceiptPage() {
     const itemsToReceive: Array<{
       purchaseOrderItemId: string;
       quantity: number;
+      damageQuantity: number;
+      shortageQuantity: number;
       godownId?: string;
     }> = [];
 
-    let totalDamaged = 0;
-    let totalShortage = 0;
-
     for (const item of selectedOrder.items) {
-      const input = itemInputs[item.id] || { receivedQty: "0", damagedQty: "0", godownId: item.godownId };
+      const input = itemInputs[item.id] || { receivedQty: "0", damagedQty: "0", shortageQty: "0", godownId: item.godownId };
       const recQty = Number(input.receivedQty || 0);
       const damQty = Number(input.damagedQty || 0);
+      const shortageQty = Number(input.shortageQty || 0);
       const pendingQty = Math.max(0, item.quantity - item.receivedQuantity);
 
       if (damQty > recQty) {
         toast.error(`Damaged quantity cannot exceed received quantity for ${item.materialName}.`);
         return;
       }
+      if (damQty + shortageQty > pendingQty) {
+        toast.error(`Damage and shortage cannot exceed ${pendingQty} ${item.unit} for ${item.materialName}.`);
+        return;
+      }
 
       const acceptedQty = Math.max(0, recQty - damQty);
-      const shortage = Math.max(0, pendingQty - recQty);
 
-      totalDamaged += damQty;
-      totalShortage += shortage;
-
-      if (acceptedQty > 0) {
+      if (recQty > 0 || damQty > 0 || shortageQty > 0) {
         itemsToReceive.push({
           purchaseOrderItemId: item.id,
-          quantity: acceptedQty,
+          quantity: recQty,
+          damageQuantity: damQty,
+          shortageQuantity: shortageQty,
           godownId: input.godownId || item.godownId,
         });
       }
     }
 
     if (itemsToReceive.length === 0) {
-      toast.error("Accepted stock quantity must be greater than 0 to record a Goods Receipt Note.");
+      toast.error("Enter a received, damaged, or shortage quantity to record a Goods Receipt Note.");
       return;
     }
 
     setSubmitting(true);
     try {
-      const idempotencyKey = `grn-${selectedOrder.id}-${Date.now()}`;
-      const noteDetails = [
-        challanNumber ? `Challan #: ${challanNumber}` : "",
-        totalShortage > 0 ? `Shortage: ${totalShortage} units` : "",
-        totalDamaged > 0 ? `Damaged: ${totalDamaged} units` : "",
-        remarks ? `Remarks: ${remarks}` : "",
-      ]
-        .filter(Boolean)
-        .join(" | ");
-
       await purchaseApi.receive(selectedOrder.id, {
-        idempotencyKey,
+        idempotencyKey: crypto.randomUUID(),
         items: itemsToReceive,
-        notes: noteDetails || undefined,
+        challanNumber: challanNumber.trim() || undefined,
+        vehicleNumber: vehicleNumber.trim() || undefined,
+        notes: notes.trim() || undefined,
       });
 
       toast.success("Goods Receipt Note (GRN) successfully recorded! Inventory stock updated.");
       setSelectedPoId("");
       setChallanNumber("");
-      setRemarks("");
+      setVehicleNumber("");
+      setNotes("");
       load();
       setActiveTab("history");
     } catch (err: any) {
@@ -346,13 +344,26 @@ export function GoodsReceiptPage() {
 
                 <div>
                   <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
-                    Internal Remarks / Vehicle #
+                    Vehicle Number
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Driver: Ramesh / MH-04-1234"
-                    value={remarks}
-                    onChange={(e) => setRemarks(e.target.value)}
+                    placeholder="e.g. MH-04-AB-1234"
+                    value={vehicleNumber}
+                    onChange={(e) => setVehicleNumber(e.target.value)}
+                    className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-black uppercase text-muted-foreground dark:text-muted-foreground block mb-1">
+                    Notes
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Optional receipt notes"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
                     className="w-full h-10 rounded-xl border border-border bg-card px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   />
                 </div>
@@ -393,13 +404,14 @@ export function GoodsReceiptPage() {
                         const input = itemInputs[item.id] || {
                           receivedQty: "0",
                           damagedQty: "0",
+                          shortageQty: "0",
                           godownId: item.godownId,
                         };
-                        const pendingQty = Math.max(0, item.quantity - item.receivedQuantity);
+                        const pendingQty = Math.max(0, item.quantity - item.receivedQuantity - Number(item.damagedQuantity || 0));
                         const recQty = Number(input.receivedQty || 0);
                         const damQty = Number(input.damagedQty || 0);
                         const acceptedQty = Math.max(0, recQty - damQty);
-                        const shortageQty = Math.max(0, pendingQty - recQty);
+                        const shortageQty = Number(input.shortageQty || 0);
 
                         return (
                           <tr
@@ -447,13 +459,15 @@ export function GoodsReceiptPage() {
                               </span>
                             </td>
                             <td className="px-3.5 py-3.5">
-                              {shortageQty > 0 ? (
-                                <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-black bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                                  {shortageQty} {item.unit} Short
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground font-normal">None</span>
-                              )}
+                              <input
+                                type="number"
+                                min="0"
+                                max={pendingQty}
+                                step="any"
+                                value={input.shortageQty}
+                                onChange={(e) => handleInputChange(item.id, "shortageQty", e.target.value)}
+                                className="w-20 h-9 rounded-lg border border-border bg-card px-2.5 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                              />
                             </td>
                             <td className="px-3.5 py-3.5">
                               <select

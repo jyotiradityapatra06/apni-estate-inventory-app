@@ -21,7 +21,8 @@ import {
   CornerUpLeft,
   ArrowLeftRight,
   SlidersHorizontal,
-  DollarSign
+  DollarSign,
+  Truck
 } from "lucide-react";
 import type { User } from "../context/AuthContext";
 import { hasPermission, hasRole } from "../utils/permissions";
@@ -77,7 +78,7 @@ export const navigationItems: NavigationItem[] = [
   { id: "report-profit-loss", label: "Profit & Loss", path: "/reports/profit-loss", icon: BarChart3, group: "Reports", requiredPermission: "reports:financial" },
 
   // 7. Management Group
-  { id: "team-members", label: "Team Members", path: "/management/team", icon: Users, group: "Management", allowedRoles: ["OWNER", "MANAGER"] },
+  { id: "team-members", label: "Team Members", path: "/management/team", icon: Users, group: "Management", allowedRoles: ["OWNER"] },
   { id: "business-profile", label: "Business Profile", path: "/management", icon: Settings, group: "Management", allowedRoles: ["OWNER", "MANAGER"] }
 ];
 
@@ -92,12 +93,13 @@ export const getDesktopNavigation = (user: User | null) => getVisibleNavigation(
 
 export const getMobileNavigation = (user: User | null): NavigationItem[] => {
   const navs: NavigationItem[] = [
-    { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: Home, group: "Dashboard" },
-    { id: "inventory", label: "Inventory", path: "/materials", icon: Package, group: "Inventory" },
-    { id: "sales", label: "Sales", path: "/sales-orders", icon: ShoppingCart, group: "Sales" },
-    { id: "finance", label: "Finance", path: "/financials/payments", icon: Landmark, group: "Finance" }
+    { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: Home, group: "Dashboard", requiredPermission: "dashboard:view" },
+    { id: "inventory", label: "Inventory", path: "/materials", icon: Package, group: "Inventory", requiredPermission: "inventory:view" },
+    { id: "sales", label: "Sales", path: "/sales-orders", icon: ShoppingCart, group: "Sales", requiredPermission: "sales:view" },
+    { id: "finance", label: "Finance", path: "/financials/payments", icon: Landmark, group: "Finance", requiredPermission: "financials:view" },
+    { id: "driver-trips", label: "My Trips", path: "/driver/trips", icon: Truck, group: "Inventory", allowedRoles: ["DRIVER"] },
   ];
-  return navs;
+  return navs.filter((item) => canViewNavigationItem(item, user));
 };
 
 export const isNavigationItemActive = (item: NavigationItem, pathname: string) =>

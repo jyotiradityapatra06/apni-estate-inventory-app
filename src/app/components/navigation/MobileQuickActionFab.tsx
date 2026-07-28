@@ -12,6 +12,7 @@ export function MobileQuickActionFab() {
 
   if (!user) return null;
   if (location.pathname.endsWith("/new") || location.pathname.endsWith("/edit")) return null;
+  if (/^\/invoices\/[^/]+$/.test(location.pathname)) return null;
 
   const actions = getVisibleQuickActions(user);
   if (!actions.length) return null;

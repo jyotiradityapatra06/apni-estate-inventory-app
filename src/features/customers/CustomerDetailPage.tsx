@@ -148,7 +148,7 @@ Thank you for your business.`;
           <span className="font-black text-muted-foreground uppercase tracking-wider text-[11px]">
             Sales Workflow
           </span>
-          <div className="flex items-center gap-2 font-bold text-foreground overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex flex-wrap items-center gap-2 font-bold text-foreground">
             <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">
               Sales Order
             </span>

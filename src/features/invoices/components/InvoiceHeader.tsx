@@ -1,5 +1,4 @@
 import React from "react";
-import { Building2 } from "lucide-react";
 import { BusinessStatusBadge } from "../../../app/components/common/BusinessStatusBadge";
 import type { Invoice } from "../invoice.types";
 
@@ -9,6 +8,7 @@ interface InvoiceHeaderProps {
 
 export function InvoiceHeader({ invoice }: InvoiceHeaderProps) {
   const isGst = invoice.invoiceType === "GST";
+  const initials = (invoice.businessName || "Business").split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
   return (
     <header className="space-y-6">
@@ -16,9 +16,11 @@ export function InvoiceHeader({ invoice }: InvoiceHeaderProps) {
       <div className="flex flex-col justify-between gap-6 border-b border-border pb-6 sm:flex-row sm:items-start">
         {/* Business Information */}
         <div className="flex items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 font-black text-white text-xl shadow-xs print:border print:border-slate-300 print:bg-none print:text-black">
-            AE
-          </div>
+          {invoice.businessLogoUrl ? (
+            <img src={invoice.businessLogoUrl} alt={`${invoice.businessName} logo`} className="h-14 w-14 shrink-0 rounded-2xl border border-border object-contain bg-white p-1" />
+          ) : (
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 font-black text-white text-xl shadow-xs print:border print:border-slate-300 print:bg-none print:text-black">{initials}</div>
+          )}
           <div className="space-y-1">
             <h1 className="text-xl font-black text-foreground tracking-tight sm:text-2xl">
               {invoice.businessName || "APNI ESTATE"}
@@ -30,9 +32,12 @@ export function InvoiceHeader({ invoice }: InvoiceHeaderProps) {
             )}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold text-muted-foreground pt-0.5">
               {invoice.businessPhone && <span>Phone: <strong className="text-foreground">{invoice.businessPhone}</strong></span>}
+              {invoice.businessEmail && <span>Email: <strong className="text-foreground">{invoice.businessEmail}</strong></span>}
+              {invoice.businessWebsite && <span>Web: <strong className="text-foreground">{invoice.businessWebsite}</strong></span>}
               {isGst && invoice.businessGstin && (
                 <span>GSTIN: <strong className="font-mono text-foreground uppercase">{invoice.businessGstin}</strong></span>
               )}
+              {isGst && invoice.businessRegistrationType && <span>Registration: <strong className="text-foreground">{invoice.businessRegistrationType}</strong></span>}
             </div>
           </div>
         </div>

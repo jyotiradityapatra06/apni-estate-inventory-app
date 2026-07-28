@@ -33,36 +33,74 @@ export const getById = async (businessId: string, id: string) => {
 
 export const create = async (businessId: string, userId: string, input: unknown) => {
   const data = createInvoiceSchema.parse(input);
-  const [business, order] = await Promise.all([
-    prisma.business.findUnique({ where: { id: businessId } }),
-    prisma.salesOrder.findFirst({ where: { id: data.salesOrderId, businessId }, include: { customer: true, items: true, invoices: { where: { status: "DRAFT" } } } }),
-  ]);
+  const business = await prisma.business.findUnique({ where: { id: businessId } });
   if (!business) throw new ApiError(404, "Business not found.");
-  if (!order) throw new ApiError(404, "Sales Order not found.");
-  if (!["CONFIRMED", "PARTIALLY_INVOICED"].includes(order.status)) throw new ApiError(400, "Only confirmed Sales Orders can be invoiced.");
-  if (order.invoices.length) throw new ApiError(409, "This Sales Order already has an active draft invoice.");
 
-  const requestedMap = new Map((data.items || []).map((line) => [line.salesOrderItemId, line]));
-  if (data.items && requestedMap.size !== data.items.length) throw new ApiError(400, "An order line can appear only once on an invoice.");
-  const selectedItems = data.items
-    ? order.items.filter((item) => requestedMap.has(item.id))
-    : order.items.filter((item) => item.quantity.gt(item.invoicedQuantity));
-  if (!selectedItems.length || (data.items && selectedItems.length !== data.items.length)) throw new ApiError(400, "Select valid uninvoiced Sales Order items.");
+  let order: any = null;
+  let customer: any;
+  let selectedItems: Array<{
+    key: string; salesOrderItemId: string | null; inventoryItemId: string; materialName: string;
+    sku: string; hsnCode: string | null; unit: string; quantity: Prisma.Decimal;
+    rate: Prisma.Decimal; discountRate: Prisma.Decimal; gstRate: Prisma.Decimal;
+  }> = [];
 
-  const invoiceType = data.invoiceType || (order.taxMode as "GST" | "NON_GST");
+  if (data.invoiceMode === "SALES_ORDER") {
+    order = await prisma.salesOrder.findFirst({
+      where: { id: data.salesOrderId!, businessId },
+      include: { customer: true, items: true, invoices: { where: { status: "DRAFT" } } },
+    });
+    if (!order) throw new ApiError(404, "Sales Order not found.");
+    if (!["CONFIRMED", "PARTIALLY_INVOICED"].includes(order.status)) throw new ApiError(400, "Only confirmed Sales Orders can be invoiced.");
+    if (order.invoices.length) throw new ApiError(409, "This Sales Order already has an active draft invoice.");
+    customer = order.customer;
+    const requestedMap = new Map((data.items || []).map((line) => [line.salesOrderItemId, line]));
+    if (data.items && requestedMap.size !== data.items.length) throw new ApiError(400, "An order line can appear only once on an invoice.");
+    const orderItems = data.items ? order.items.filter((item: any) => requestedMap.has(item.id)) : order.items.filter((item: any) => item.quantity.gt(item.invoicedQuantity));
+    if (!orderItems.length || (data.items && orderItems.length !== data.items.length)) throw new ApiError(400, "Select valid uninvoiced Sales Order items.");
+    selectedItems = orderItems.map((item: any) => {
+      const requested = requestedMap.get(item.id);
+      const remaining = item.quantity.minus(item.invoicedQuantity);
+      const quantity = new Prisma.Decimal(requested?.quantity ?? remaining);
+      if (quantity.gt(remaining)) throw new ApiError(400, `Invoice quantity exceeds remaining quantity for ${item.materialName}.`);
+      return {
+        key: item.id, salesOrderItemId: item.id, inventoryItemId: item.inventoryItemId,
+        materialName: item.materialName, sku: item.sku, hsnCode: item.hsnCode, unit: item.unit,
+        quantity, rate: new Prisma.Decimal(requested?.rate ?? item.rate),
+        discountRate: new Prisma.Decimal(requested?.discountRate ?? item.discountRate),
+        gstRate: new Prisma.Decimal(item.gstRate),
+      };
+    });
+  } else {
+    const directLines = data.directItems!;
+    const uniqueIds = [...new Set(directLines.map((line) => line.inventoryItemId))];
+    if (uniqueIds.length !== directLines.length) throw new ApiError(400, "An inventory item can appear only once on an invoice.");
+    const [foundCustomer, inventoryItems] = await Promise.all([
+      prisma.customer.findFirst({ where: { id: data.customerId!, businessId, isActive: true } }),
+      prisma.inventoryItem.findMany({ where: { id: { in: uniqueIds }, businessId, isActive: true } }),
+    ]);
+    if (!foundCustomer) throw new ApiError(404, "Customer not found.");
+    if (inventoryItems.length !== uniqueIds.length) throw new ApiError(400, "Select valid active inventory items.");
+    customer = foundCustomer;
+    const itemMap = new Map(inventoryItems.map((item) => [item.id, item]));
+    selectedItems = directLines.map((line) => {
+      const item = itemMap.get(line.inventoryItemId)!;
+      return {
+        key: item.id, salesOrderItemId: null, inventoryItemId: item.id,
+        materialName: item.materialName, sku: item.sku, hsnCode: item.hsnCode, unit: item.unit,
+        quantity: new Prisma.Decimal(line.quantity), rate: new Prisma.Decimal(line.rate),
+        discountRate: new Prisma.Decimal(line.discountRate ?? 0), gstRate: new Prisma.Decimal(item.taxRate ?? 0),
+      };
+    });
+  }
+
+  const invoiceType = data.invoiceType || (order!.taxMode as "GST" | "NON_GST");
   const sellerStateCode = data.sellerStateCode || stateCodeFromGstin(business.gstNumber);
-  const placeOfSupplyCode = data.placeOfSupplyCode || order.placeOfSupplyCode;
-  const calculation = calculateInvoice(selectedItems.map((item) => {
-    const requested = requestedMap.get(item.id);
-    const remaining = item.quantity.minus(item.invoicedQuantity);
-    const quantity = requested?.quantity ?? remaining;
-    if (new Prisma.Decimal(quantity).gt(remaining)) throw new ApiError(400, `Invoice quantity exceeds remaining quantity for ${item.materialName}.`);
-    return {
-      key: item.id, quantity, rate: requested?.rate ?? item.rate,
-      discountRate: requested?.discountRate ?? item.discountRate, gstRate: item.gstRate,
+  const placeOfSupplyCode = data.placeOfSupplyCode || order?.placeOfSupplyCode || customer.stateCode;
+  const calculation = calculateInvoice(selectedItems.map((item) => ({
+      key: item.key, quantity: item.quantity, rate: item.rate,
+      discountRate: item.discountRate, gstRate: item.gstRate,
       invoiceType, sellerStateCode, placeOfSupplyCode,
-    };
-  }), data.roundToRupee);
+  })), data.roundToRupee);
 
   if (invoiceType === "GST") {
     for (const item of selectedItems) {
@@ -82,17 +120,28 @@ export const create = async (businessId: string, userId: string, input: unknown)
         invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : new Date(),
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
         invoiceType,
-        salesOrderId: order.id,
-        customerId: order.customerId,
+        invoiceMode: data.invoiceMode,
+        salesOrderId: order?.id || null,
+        customerId: customer.id,
         businessName: business.name,
         businessGstin: business.gstNumber,
         businessAddress: business.address,
         businessPhone: business.phone,
-        customerName: order.customerName,
-        customerPhone: order.customerPhone,
-        customerGstin: order.customerGstin,
-        billingAddress: order.billingAddress,
-        deliveryAddress: order.deliveryAddress,
+        businessLogoUrl: business.logoUrl,
+        businessEmail: business.email,
+        businessWebsite: business.website,
+        businessRegistrationType: business.registrationType,
+        bankName: business.bankName,
+        bankAccountNumber: business.accountNumber,
+        bankIfscCode: business.ifscCode,
+        bankBranch: business.branch,
+        businessUpiId: business.upiId,
+        invoiceFooter: business.invoiceFooter,
+        customerName: customer.name,
+        customerPhone: customer.phone,
+        customerGstin: customer.gstin,
+        billingAddress: order?.billingAddress || customer.billingAddress,
+        deliveryAddress: order?.deliveryAddress || customer.shippingAddress || customer.billingAddress,
         sellerStateCode,
         placeOfSupplyCode,
         supplyType: calculation.calculatedLines[0]?.supplyType,
@@ -107,14 +156,14 @@ export const create = async (businessId: string, userId: string, input: unknown)
         totalAmount: calculation.totalAmount,
         balanceDue: calculation.totalAmount,
         notes: data.notes,
-        terms: data.terms,
+        terms: data.terms ?? business.invoiceTerms,
         businessId,
         createdById: userId,
         items: {
           create: selectedItems.map((item, index) => {
             const line = calculation.calculatedLines[index];
             return {
-              salesOrderItemId: item.id, inventoryItemId: item.inventoryItemId,
+              salesOrderItemId: item.salesOrderItemId, inventoryItemId: item.inventoryItemId,
               materialName: item.materialName, sku: item.sku, hsnCode: item.hsnCode, unit: item.unit,
               quantity: line.quantity, rate: line.rate, grossAmount: line.grossAmount,
               discountRate: line.discountRate, discountAmount: line.discountAmount, taxableAmount: line.taxableAmount,
@@ -133,22 +182,23 @@ export const issue = async (businessId: string, id: string) => prisma.$transacti
   const invoice = await tx.invoice.findFirst({ where: { id, businessId }, include: { items: true } });
   if (!invoice) throw new ApiError(404, "Invoice not found.");
   if (invoice.status !== "DRAFT") throw new ApiError(400, "Only draft invoices can be issued.");
-  if (!invoice.salesOrderId) throw new ApiError(400, "This invoice is not linked to a Sales Order.");
-  const order = await tx.salesOrder.findFirst({ where: { id: invoice.salesOrderId, businessId }, include: { items: true } });
-  if (!order || !["CONFIRMED", "PARTIALLY_INVOICED"].includes(order.status)) throw new ApiError(400, "The linked Sales Order cannot be invoiced.");
-
-  for (const line of invoice.items) {
-    const orderLine = order.items.find((item) => item.id === line.salesOrderItemId);
-    if (!orderLine || orderLine.invoicedQuantity.plus(line.quantity).gt(orderLine.quantity)) throw new ApiError(400, `Invoice quantity exceeds the Sales Order quantity for ${line.materialName}.`);
+  if (invoice.invoiceMode === "SALES_ORDER") {
+    if (!invoice.salesOrderId) throw new ApiError(400, "This invoice is not linked to a Sales Order.");
+    const order = await tx.salesOrder.findFirst({ where: { id: invoice.salesOrderId, businessId }, include: { items: true } });
+    if (!order || !["CONFIRMED", "PARTIALLY_INVOICED"].includes(order.status)) throw new ApiError(400, "The linked Sales Order cannot be invoiced.");
+    for (const line of invoice.items) {
+      const orderLine = order.items.find((item) => item.id === line.salesOrderItemId);
+      if (!orderLine || orderLine.invoicedQuantity.plus(line.quantity).gt(orderLine.quantity)) throw new ApiError(400, `Invoice quantity exceeds the Sales Order quantity for ${line.materialName}.`);
+    }
+    for (const line of invoice.items) {
+      await tx.salesOrderItem.update({ where: { id: line.salesOrderItemId! }, data: { invoicedQuantity: { increment: line.quantity } } });
+    }
+    const allInvoiced = order.items.every((orderLine) => {
+      const invoiceLine = invoice.items.find((line) => line.salesOrderItemId === orderLine.id);
+      return orderLine.invoicedQuantity.plus(invoiceLine?.quantity || 0).gte(orderLine.quantity);
+    });
+    await tx.salesOrder.update({ where: { id: order.id }, data: { status: allInvoiced ? "INVOICED" : "PARTIALLY_INVOICED" } });
   }
-  for (const line of invoice.items) {
-    await tx.salesOrderItem.update({ where: { id: line.salesOrderItemId! }, data: { invoicedQuantity: { increment: line.quantity } } });
-  }
-  const allInvoiced = order.items.every((orderLine) => {
-    const invoiceLine = invoice.items.find((line) => line.salesOrderItemId === orderLine.id);
-    return orderLine.invoicedQuantity.plus(invoiceLine?.quantity || 0).gte(orderLine.quantity);
-  });
-  await tx.salesOrder.update({ where: { id: order.id }, data: { status: allInvoiced ? "INVOICED" : "PARTIALLY_INVOICED" } });
   await tx.customer.update({ where: { id: invoice.customerId }, data: { outstandingBalance: { increment: Number(invoice.totalAmount.toString()) } } });
   const publicToken = invoice.publicToken || generatePublicToken();
   await tx.invoice.update({ where: { id }, data: { status: "ISSUED", issuedAt: new Date(), publicToken } });

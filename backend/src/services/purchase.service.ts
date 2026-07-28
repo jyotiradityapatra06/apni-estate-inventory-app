@@ -226,6 +226,15 @@ export const cancel = async (businessId: string, id: string) => {
 
 export const receive = async (businessId: string, userId: string, id: string, input: unknown) => {
   const d = receivePurchaseSchema.parse(input);
+  const reportedShortage = d.items.reduce((sum, item) => sum + item.shortageQuantity, 0);
+  const reportedDamage = d.items.reduce((sum, item) => sum + item.damageQuantity, 0);
+  const receiptNotes = [
+    d.challanNumber ? `Challan #: ${d.challanNumber}` : "",
+    d.vehicleNumber ? `Vehicle #: ${d.vehicleNumber}` : "",
+    reportedShortage > 0 ? `Shortage: ${reportedShortage}` : "",
+    reportedDamage > 0 ? `Damaged: ${reportedDamage}` : "",
+    d.notes || "",
+  ].filter(Boolean).join(" | ") || undefined;
   return prisma.$transaction(async (tx) => {
     const duplicate = await tx.purchaseReceipt.findFirst({
       where: { businessId, idempotencyKey: d.idempotencyKey },
@@ -245,7 +254,7 @@ export const receive = async (businessId: string, userId: string, id: string, in
       data: {
         receiptNumber,
         idempotencyKey: d.idempotencyKey,
-        notes: d.notes,
+        notes: receiptNotes,
         purchaseOrderId: id,
         supplierId: po.supplierId,
         businessId,
@@ -258,76 +267,86 @@ export const receive = async (businessId: string, userId: string, id: string, in
       const item = po.items.find((x) => x.id === r.purchaseOrderItemId);
       if (!item) throw new ApiError(400, "Purchase item is invalid.");
 
-      const remaining = Number(item.quantity) - Number(item.receivedQuantity);
+      const remaining = Number(item.quantity) - Number(item.receivedQuantity) - Number(item.damagedQuantity);
       if (r.quantity > remaining + 1e-9) {
         throw new ApiError(409, `Only ${remaining} ${item.unit} remain for ${item.materialName}.`);
       }
+      if (r.damageQuantity + r.shortageQuantity > remaining + 1e-9) {
+        throw new ApiError(409, `Damage and shortage cannot exceed the pending quantity for ${item.materialName}.`);
+      }
 
-      const fraction = r.quantity / Number(item.quantity),
+      const acceptedQuantity = round(r.quantity - r.damageQuantity);
+      const acceptedAfter = Number(item.receivedQuantity) + acceptedQuantity;
+      const pendingAfter = Math.max(0, round(remaining - r.quantity));
+      const fraction = acceptedAfter / Number(item.quantity),
         priorValue = round((Number(item.lineTotal) * Number(item.receivedQuantity)) / Number(item.quantity)),
-        value =
-          Math.abs(r.quantity - remaining) < 1e-9
-            ? round(Number(item.lineTotal) - priorValue)
-            : round(Number(item.lineTotal) * fraction);
+        value = round(round(Number(item.lineTotal) * fraction) - priorValue);
 
       receivedAmount += value;
       const targetGodownId = r.godownId || item.godownId;
 
-      await tx.godownStock.upsert({
-        where: {
-          businessId_godownId_inventoryItemId: {
+      if (acceptedQuantity > 0) {
+        await tx.godownStock.upsert({
+          where: {
+            businessId_godownId_inventoryItemId: {
+              businessId,
+              godownId: targetGodownId,
+              inventoryItemId: item.inventoryItemId,
+            },
+          },
+          create: {
             businessId,
             godownId: targetGodownId,
             inventoryItemId: item.inventoryItemId,
+            quantity: acceptedQuantity,
           },
-        },
-        create: {
-          businessId,
-          godownId: targetGodownId,
-          inventoryItemId: item.inventoryItemId,
-          quantity: r.quantity,
-        },
-        update: { quantity: { increment: r.quantity } },
-      });
-
-      await tx.inventoryItem.update({
-        where: { id: item.inventoryItemId },
-        data: { costPrice: Number(item.rate) },
-      });
-
-      await syncMaterialAggregate(tx, businessId, item.inventoryItemId);
+          update: { quantity: { increment: acceptedQuantity } },
+        });
+        await tx.inventoryItem.update({ where: { id: item.inventoryItemId }, data: { costPrice: Number(item.rate) } });
+        await syncMaterialAggregate(tx, businessId, item.inventoryItemId);
+      }
       await tx.purchaseOrderItem.update({
         where: { id: item.id },
-        data: { receivedQuantity: { increment: r.quantity } },
-      });
-
-      await tx.stockTransaction.create({
         data: {
-          type: "IN",
-          quantity: r.quantity,
-          note: d.notes || `Received against ${po.purchaseOrderNumber}`,
-          reason: "PURCHASE_RECEIPT",
-          referenceType: "PURCHASE_RECEIPT",
-          referenceId: receipt.id,
-          idempotencyKey: `PURCHASE_RECEIPT:${d.idempotencyKey}:${item.id}`,
-          inventoryItemId: item.inventoryItemId,
-          godownId: targetGodownId,
-          userId,
-          businessId,
+          receivedQuantity: { increment: acceptedQuantity },
+          damagedQuantity: { increment: r.damageQuantity },
         },
       });
+
+      if (acceptedQuantity > 0) {
+        await tx.stockTransaction.create({
+          data: {
+            type: "IN",
+            quantity: acceptedQuantity,
+            note: receiptNotes || `Received against ${po.purchaseOrderNumber}`,
+            reason: "PURCHASE_RECEIPT",
+            referenceType: "PURCHASE_RECEIPT",
+            referenceId: receipt.id,
+            idempotencyKey: `PURCHASE_RECEIPT:${d.idempotencyKey}:${item.id}`,
+            inventoryItemId: item.inventoryItemId,
+            godownId: targetGodownId,
+            userId,
+            businessId,
+          },
+        });
+      }
 
       await tx.purchaseReceiptItem.create({
         data: {
           purchaseReceiptId: receipt.id,
           purchaseOrderItemId: item.id,
           inventoryItemId: item.inventoryItemId,
-          quantity: r.quantity,
+          quantity: acceptedQuantity,
+          orderedQuantity: item.quantity,
+          receivedQuantity: r.quantity,
+          shortageQuantity: r.shortageQuantity,
+          damageQuantity: r.damageQuantity,
+          pendingQuantity: pendingAfter,
           amount: value,
         },
       });
 
-      await tx.supplierMaterial.upsert({
+      if (acceptedQuantity > 0) await tx.supplierMaterial.upsert({
         where: {
           supplierId_inventoryItemId: {
             supplierId: po.supplierId,
@@ -344,7 +363,7 @@ export const receive = async (businessId: string, userId: string, id: string, in
     }
 
     const fresh = await tx.purchaseOrderItem.findMany({ where: { purchaseOrderId: id } }),
-      complete = fresh.every((x) => Number(x.receivedQuantity) >= Number(x.quantity) - 1e-9),
+      complete = fresh.every((x) => Number(x.receivedQuantity) + Number(x.damagedQuantity) >= Number(x.quantity) - 1e-9),
       amount = round(receivedAmount);
 
     await tx.purchaseReceipt.update({ where: { id: receipt.id }, data: { totalAmount: amount } });
@@ -357,25 +376,26 @@ export const receive = async (businessId: string, userId: string, id: string, in
       },
     });
 
-    await tx.supplier.update({
-      where: { id: po.supplierId },
-      data: { totalPurchases: { increment: amount }, pendingPayments: { increment: amount } },
-    });
-
-    await postLedgerEntry(tx, {
-      businessId,
-      partyType: "SUPPLIER",
-      partyId: po.supplierId,
-      transactionType: "PURCHASE_RECEIPT",
-      referenceType: "PURCHASE_RECEIPT",
-      referenceId: receipt.id,
-      amount,
-      creditAmount: amount,
-      debitAmount: 0,
-      description: `Materials received against ${po.purchaseOrderNumber}`,
-      createdById: userId,
-      idempotencyKey: `PURCHASE_RECEIPT:${receipt.id}`,
-    });
+    if (amount > 0) {
+      await tx.supplier.update({
+        where: { id: po.supplierId },
+        data: { totalPurchases: { increment: amount }, pendingPayments: { increment: amount } },
+      });
+      await postLedgerEntry(tx, {
+        businessId,
+        partyType: "SUPPLIER",
+        partyId: po.supplierId,
+        transactionType: "PURCHASE_RECEIPT",
+        referenceType: "PURCHASE_RECEIPT",
+        referenceId: receipt.id,
+        amount,
+        creditAmount: amount,
+        debitAmount: 0,
+        description: `Materials received against ${po.purchaseOrderNumber}`,
+        createdById: userId,
+        idempotencyKey: `PURCHASE_RECEIPT:${receipt.id}`,
+      });
+    }
 
     return tx.purchaseOrder.findUniqueOrThrow({ where: { id }, include });
   });

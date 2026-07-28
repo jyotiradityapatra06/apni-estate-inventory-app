@@ -361,7 +361,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
           type="button"
           onClick={() => setMobileSearchOpen(true)}
           aria-label="Open search"
-          className="flex h-10 w-10 md:hidden cursor-pointer items-center justify-center rounded-full bg-muted text-muted-foreground active:scale-95 transition-transform"
+          className="flex h-11 w-11 md:hidden cursor-pointer items-center justify-center rounded-full bg-muted text-muted-foreground active:scale-95 transition-transform"
         >
           <Search size={16} />
         </button>

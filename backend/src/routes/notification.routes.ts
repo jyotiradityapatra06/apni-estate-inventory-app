@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as notificationController from "../controllers/notification.controller";
-import { authenticate } from "../middleware/auth.middleware";
+import { authenticate, requirePermission } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -13,11 +13,13 @@ router.get(
 
 router.post(
     "/",
+    requirePermission("notifications:manage"),
     notificationController.createNotification
 );
 
 router.delete(
     "/",
+    requirePermission("notifications:manage"),
     notificationController.clearAllNotifications
 );
 

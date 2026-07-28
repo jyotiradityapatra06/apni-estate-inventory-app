@@ -5,6 +5,20 @@ import * as bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt";
 import { ROLE_PERMISSIONS, UserRole } from "../config/permissions";
 
+const businessForRole = (business: any, role: string) => {
+  if (role === UserRole.OWNER || role === UserRole.MANAGER) return business;
+  return {
+    id: business.id,
+    name: business.name,
+    logoUrl: business.logoUrl,
+    phone: business.phone,
+    address: business.address,
+    gstNumber: role === UserRole.STAFF ? business.gstNumber : undefined,
+    state: role === UserRole.STAFF ? business.state : undefined,
+    stateCode: role === UserRole.STAFF ? business.stateCode : undefined,
+  };
+};
+
 export const register = async (input: any) => {
   const data = registerSchema.parse(input);
 
@@ -59,7 +73,7 @@ export const register = async (input: any) => {
       isActive: result.user.isActive,
     },
     permissions: ROLE_PERMISSIONS[result.user.role as UserRole] || [],
-    business: result.business,
+    business: businessForRole(result.business, result.user.role),
   };
 };
 
@@ -77,10 +91,6 @@ export const login = async (input: any) => {
 
   if (!user.isActive) {
     throw new ApiError(403, "Your account has been deactivated. Please contact your administrator.");
-  }
-
-  if (user.role === "DRIVER") {
-    throw new ApiError(403, "Driver login is not available.");
   }
 
   const isValidPassword = await bcrypt.compare(data.password, user.passwordHash);
@@ -112,7 +122,7 @@ export const login = async (input: any) => {
       isActive: user.isActive,
     },
     permissions: ROLE_PERMISSIONS[user.role as UserRole] || [],
-    business: user.business,
+    business: businessForRole(user.business, user.role),
   };
 };
 
@@ -143,6 +153,6 @@ export const getMe = async (userId: string) => {
       isActive: user.isActive,
     },
     permissions: ROLE_PERMISSIONS[user.role as UserRole] || [],
-    business: user.business,
+    business: businessForRole(user.business, user.role),
   };
 };

@@ -117,7 +117,7 @@ export default function InvoiceDetailPage() {
   const gst = x.invoiceType === "GST";
 
   return (
-    <div className="invoice-page mx-auto max-w-4xl space-y-6 pb-16">
+    <div className="invoice-page mx-auto max-w-4xl space-y-6 pb-36 md:pb-16">
       {/* Navigation actions */}
       <div className="invoice-actions flex flex-wrap items-center justify-between gap-4 border-b pb-5">
         <div>
@@ -217,6 +217,45 @@ export default function InvoiceDetailPage() {
           )}
         </div>
       )}
+
+      <div className="invoice-actions fixed inset-x-0 bottom-[74px] z-30 grid grid-cols-4 gap-1 border-t border-border bg-card/95 p-2 backdrop-blur md:hidden">
+        <button
+          disabled={generatingPdf}
+          onClick={handleDownloadPDF}
+          className="flex min-h-12 flex-col items-center justify-center rounded-xl text-[10px] font-black text-orange-700 disabled:opacity-50"
+        >
+          <Download size={18} />
+          PDF
+        </button>
+        <button
+          onClick={handleWhatsAppShare}
+          className="flex min-h-12 flex-col items-center justify-center rounded-xl bg-emerald-50 text-[10px] font-black text-emerald-800"
+        >
+          <MessageCircle size={18} />
+          WhatsApp
+        </button>
+        {Number(x.balanceDue) > 0 && manage ? (
+          <Link
+            to={`/payments/new?customerId=${x.customerId}&invoiceId=${x.id}`}
+            className="flex min-h-12 flex-col items-center justify-center rounded-xl bg-green-600 text-[10px] font-black text-white"
+          >
+            <DollarSign size={18} />
+            Payment
+          </Link>
+        ) : (
+          <span className="flex min-h-12 flex-col items-center justify-center rounded-xl bg-muted text-[10px] font-black text-muted-foreground">
+            <DollarSign size={18} />
+            Paid
+          </span>
+        )}
+        <button
+          onClick={() => window.print()}
+          className="flex min-h-12 flex-col items-center justify-center rounded-xl text-[10px] font-black text-muted-foreground"
+        >
+          <Printer size={18} />
+          Print
+        </button>
+      </div>
 
       {/* Professional Invoice Presentation Card */}
       <ProfessionalInvoice invoice={x} />

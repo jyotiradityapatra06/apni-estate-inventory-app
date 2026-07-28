@@ -78,7 +78,7 @@ export const sales = async (businessId: string, raw: unknown) => {
       ...(q.invoiceType ? { invoiceType: q.invoiceType } : {}),
     };
 
-  const [all, total, detail, returns] = await Promise.all([
+  const [all, total, detail, returns, payments] = await Promise.all([
     prisma.invoice.findMany({
       where,
       select: {
@@ -127,6 +127,17 @@ export const sales = async (businessId: string, raw: unknown) => {
       },
       include: { invoice: true },
     }),
+    prisma.customerPayment.findMany({
+      where: {
+        businessId,
+        status: "POSTED",
+        paymentDate: range,
+        ...(q.customerId ? { customerId: q.customerId } : {}),
+        ...(q.paymentMode ? { paymentMethod: q.paymentMode } : {}),
+        ...(q.invoiceType ? { invoice: { invoiceType: q.invoiceType } } : {}),
+      },
+      select: { amount: true },
+    }),
   ]);
 
   const returnTotalAmount = sum(returns.map((r) => n(r.totalAmount)));
@@ -145,7 +156,7 @@ export const sales = async (businessId: string, raw: unknown) => {
       nonGstSales: round(sum(all.filter((x) => x.invoiceType !== "GST").map((x) => n(x.totalAmount))) - returnNonGstTotal),
       taxableAmount: round(sum(all.map((x) => n(x.taxableTotal))) - returnTaxableTotal),
       gstCollected: round(sum(all.map((x) => n(x.taxTotal))) - returnTaxTotal),
-      amountReceived: sum(all.map((x) => n(x.amountPaid))),
+      amountReceived: sum(payments.map((x) => n(x.amount))),
       outstandingAmount: sum(all.map((x) => n(x.balanceDue))),
       invoiceCount: all.length,
       averageInvoiceValue: all.length ? round(totalSales / all.length) : 0,
@@ -173,7 +184,7 @@ export const purchases = async (businessId: string, raw: unknown) => {
       ...(q.supplierId ? { supplierId: q.supplierId } : {}),
     };
 
-  const [all, total, rows, returns] = await Promise.all([
+  const [all, total, rows, returns, receipts, payments] = await Promise.all([
     prisma.purchaseOrder.findMany({
       where,
       select: {
@@ -215,30 +226,63 @@ export const purchases = async (businessId: string, raw: unknown) => {
         ...(q.supplierId ? { supplierId: q.supplierId } : {}),
       },
     }),
+    prisma.purchaseReceipt.findMany({
+      where: {
+        businessId,
+        receiptDate: dates(q),
+        purchaseOrder: {
+          status: { not: "CANCELLED" },
+          ...(q.supplierId ? { supplierId: q.supplierId } : {}),
+        },
+      },
+      select: {
+        receiptDate: true,
+        totalAmount: true,
+        supplier: { select: { name: true } },
+        items: {
+          select: {
+            amount: true,
+            purchaseOrderItem: { select: { materialName: true } },
+          },
+        },
+      },
+    }),
+    prisma.purchasePayment.findMany({
+      where: {
+        businessId,
+        status: "POSTED",
+        paymentDate: dates(q),
+        ...(q.supplierId ? { supplierId: q.supplierId } : {}),
+        ...(q.paymentMode ? { paymentMode: q.paymentMode } : {}),
+        purchaseOrder: { status: { not: "CANCELLED" } },
+      },
+      select: { amount: true },
+    }),
   ]);
 
   const returnTotalAmount = sum(returns.map((r) => n(r.totalAmount)));
   const ordered = sum(all.map((x) => n(x.totalAmount)));
-  const received = round(sum(all.map((x) => n(x.receivedAmount))) - returnTotalAmount);
+  const received = round(sum(receipts.map((x) => n(x.totalAmount))) - returnTotalAmount);
+  const pending = sum(all.map((x) => Math.max(0, n(x.totalAmount) - n(x.receivedAmount))));
 
   return {
     summary: {
       orderedPurchaseValue: ordered,
       receivedPurchaseValue: received,
-      pendingPurchaseValue: round(ordered - received),
-      amountPaid: sum(all.map((x) => n(x.amountPaid))),
+      pendingPurchaseValue: pending,
+      amountPaid: sum(payments.map((x) => n(x.amount))),
       supplierPayable: sum(all.map((x) => n(x.balanceDue))),
       purchaseOrderCount: all.length,
     },
     breakdowns: {
-      supplierWise: group(all, (x) => x.supplierName, (x) => n(x.receivedAmount)),
+      supplierWise: group(receipts, (x) => x.supplier.name, (x) => n(x.totalAmount)),
       materialWise: group(
-        all.flatMap((x) => x.items),
-        (x) => x.materialName,
-        (x) => n(x.lineTotal) * Math.min(1, n(x.receivedQuantity) / Math.max(1, n(x.quantity)))
+        receipts.flatMap((x) => x.items),
+        (x) => x.purchaseOrderItem.materialName,
+        (x) => n(x.amount)
       ),
       status: group(all, (x) => x.status, () => 1),
-      trend: group(all, (x) => x.orderDate.toISOString().slice(0, 7), (x) => n(x.receivedAmount)),
+      trend: group(receipts, (x) => x.receiptDate.toISOString().slice(0, 7), (x) => n(x.totalAmount)),
     },
     rows,
     pagination: pagination(q, total),
@@ -567,7 +611,7 @@ export const gst = async (businessId: string, raw: unknown) => {
     range = dates(q),
     [invoices, receipts, expenseRows, salesReturns, purchaseReturns] = await Promise.all([
       prisma.invoice.findMany({
-        where: { businessId, invoiceDate: range, status: { notIn: ["DRAFT", "CANCELLED"] } },
+        where: { businessId, invoiceDate: range, invoiceType: "GST", status: { notIn: ["DRAFT", "CANCELLED"] } },
         include: { items: true },
       }),
       prisma.purchaseReceipt.findMany({
@@ -576,7 +620,7 @@ export const gst = async (businessId: string, raw: unknown) => {
       }),
       prisma.expense.findMany({ where: { businessId, expenseDate: range, paymentStatus: { not: "CANCELLED" } } }),
       prisma.salesReturn.findMany({
-        where: { businessId, returnDate: range, status: "COMPLETED" },
+        where: { businessId, returnDate: range, status: "COMPLETED", invoice: { invoiceType: "GST" } },
         include: { invoice: true },
       }),
       prisma.purchaseReturn.findMany({ where: { businessId, returnDate: range, status: "COMPLETED" } }),
@@ -585,11 +629,13 @@ export const gst = async (businessId: string, raw: unknown) => {
     returnOutputGst = sum(salesReturns.map((r) => n(r.taxTotal))),
     returnTaxablePurchases = sum(purchaseReturns.map((r) => n(r.taxableTotal))),
     returnInputGst = sum(purchaseReturns.map((r) => n(r.taxTotal))),
-    returnGstSalesTotal = sum(salesReturns.filter((x) => x.invoice.invoiceType === "GST").map((x) => n(x.totalAmount))),
-    returnNonGstSalesTotal = sum(salesReturns.filter((x) => x.invoice.invoiceType !== "GST").map((x) => n(x.totalAmount)));
+    returnGstSalesTotal = sum(salesReturns.map((x) => n(x.totalAmount)));
 
   const salesTaxable = round(sum(invoices.map((x) => n(x.taxableTotal))) - returnTaxableSales),
     output = round(sum(invoices.map((x) => n(x.taxTotal))) - returnOutputGst),
+    outputCgst = round(sum(invoices.flatMap((x) => x.items).map((x) => n(x.cgstAmount))) - sum(salesReturns.map((x) => n(x.cgstTotal)))),
+    outputSgst = round(sum(invoices.flatMap((x) => x.items).map((x) => n(x.sgstAmount))) - sum(salesReturns.map((x) => n(x.sgstTotal)))),
+    outputIgst = round(sum(invoices.flatMap((x) => x.items).map((x) => n(x.igstAmount))) - sum(salesReturns.map((x) => n(x.igstTotal)))),
     expenseTaxable = sum(expenseRows.filter((x) => x.gstApplicable).map((x) => n(x.amount))),
     expenseInput = sum(expenseRows.map((x) => n(x.gstAmount))),
     purchaseInputVal = sum(
@@ -607,7 +653,10 @@ export const gst = async (businessId: string, raw: unknown) => {
       salesGst: {
         taxableSales: salesTaxable,
         outputGst: output,
-        gstInvoiceCount: invoices.filter((x) => x.invoiceType === "GST").length,
+        outputCgst,
+        outputSgst,
+        outputIgst,
+        gstInvoiceCount: invoices.length,
       },
       purchaseGst: { taxablePurchases: purchaseTaxable, inputGst: purchaseInput },
       expenseGst: { taxableExpenses: expenseTaxable, inputGst: expenseInput },
@@ -617,7 +666,7 @@ export const gst = async (businessId: string, raw: unknown) => {
         estimatedNetGstPayable: round(output - input),
       },
       gstSalesTotal: round(sum(invoices.filter((x) => x.invoiceType === "GST").map((x) => n(x.totalAmount))) - returnGstSalesTotal),
-      nonGstSalesTotal: round(sum(invoices.filter((x) => x.invoiceType !== "GST").map((x) => n(x.totalAmount))) - returnNonGstSalesTotal),
+      nonGstSalesTotal: 0,
     },
     breakdowns: {
       salesByRate: group(
@@ -625,6 +674,11 @@ export const gst = async (businessId: string, raw: unknown) => {
         (x) => `${n(x.gstRate)}%`,
         (x) => n(x.cgstAmount) + n(x.sgstAmount) + n(x.igstAmount)
       ),
+      outputTaxComponents: [
+        { name: "CGST", total: outputCgst },
+        { name: "SGST", total: outputSgst },
+        { name: "IGST", total: outputIgst },
+      ],
       expenseByRate: group(
         expenseRows,
         (x) => `${n(x.gstRate)}%`,

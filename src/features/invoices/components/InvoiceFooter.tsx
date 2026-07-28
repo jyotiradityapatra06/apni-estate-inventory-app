@@ -49,6 +49,8 @@ export function numberToWordsINR(amount: number): string {
 
 export function InvoiceFooter({ invoice }: InvoiceFooterProps) {
   const amountInWords = numberToWordsINR(invoice.totalAmount);
+  const hasPaymentDetails = Boolean(invoice.bankName || invoice.bankAccountNumber || invoice.bankIfscCode || invoice.bankBranch || invoice.businessUpiId);
+  const hasTerms = Boolean(invoice.notes || invoice.terms);
 
   return (
     <footer className="space-y-6 pt-4 border-t border-border">
@@ -62,7 +64,20 @@ export function InvoiceFooter({ invoice }: InvoiceFooterProps) {
         </strong>
       </div>
 
-      <div className="text-xs">
+      {hasPaymentDetails && <div className="text-xs">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <span className="mb-2 block border-b border-border pb-1.5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Payment Information</span>
+          <div className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
+            {invoice.bankName && <p><strong>Bank:</strong> {invoice.bankName}</p>}
+            {invoice.bankAccountNumber && <p><strong>Account:</strong> {invoice.bankAccountNumber}</p>}
+            {invoice.bankIfscCode && <p><strong>IFSC:</strong> {invoice.bankIfscCode}</p>}
+            {invoice.bankBranch && <p><strong>Branch:</strong> {invoice.bankBranch}</p>}
+            {invoice.businessUpiId && <p><strong>UPI:</strong> {invoice.businessUpiId}</p>}
+          </div>
+        </div>
+      </div>}
+
+      {hasTerms && <div className="text-xs">
         <div className="rounded-xl border border-border bg-card p-4 space-y-2">
           <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block border-b border-border pb-1.5">
             Terms & Notes
@@ -72,12 +87,14 @@ export function InvoiceFooter({ invoice }: InvoiceFooterProps) {
               <strong className="text-foreground font-bold">Notes:</strong> {invoice.notes}
             </p>
           )}
-          <p className="text-muted-foreground font-medium whitespace-pre-line leading-relaxed">
+          {invoice.terms && <p className="text-muted-foreground font-medium whitespace-pre-line leading-relaxed">
             <strong className="text-foreground font-bold">Terms:</strong>{" "}
-            {invoice.terms || "1. Payment is due within standard credit terms. 2. Goods once sold will not be returned without approval."}
-          </p>
+            {invoice.terms}
+          </p>}
         </div>
-      </div>
+      </div>}
+
+      {invoice.invoiceFooter && <p className="whitespace-pre-line text-center text-xs font-medium text-muted-foreground">{invoice.invoiceFooter}</p>}
 
       {/* Bottom References & Authorized Signatory Row */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 pt-4 border-t border-border text-xs text-muted-foreground">

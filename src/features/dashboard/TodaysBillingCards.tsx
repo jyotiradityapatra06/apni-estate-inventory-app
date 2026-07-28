@@ -47,7 +47,7 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
         <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
           Today's Billing & Collections
         </h3>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-28 animate-pulse rounded-2xl border border-border bg-card" />
           ))}
@@ -67,18 +67,18 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Today's Sales Amount */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-orange-200 transition-colors">
+        <div className="rounded-2xl border border-border bg-card p-3.5 sm:p-5 shadow-xs hover:border-orange-200 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Today's Sales Amount
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-950/60 dark:text-orange-400">
-              <IndianRupee size={20} />
+              <IndianRupee size={18} />
             </span>
           </div>
-          <strong className="mt-3 block text-2xl sm:text-3xl font-black text-foreground">
+          <strong className="mt-2 block text-xl sm:mt-3 sm:text-3xl font-black text-foreground">
             {fmt(todaysSalesAmount)}
           </strong>
           <p className="mt-1 text-xs font-medium text-muted-foreground">
@@ -87,7 +87,7 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
         </div>
 
         {/* Invoices Created Today */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-blue-200 transition-colors">
+        <div className="rounded-2xl border border-border bg-card p-3.5 sm:p-5 shadow-xs hover:border-blue-200 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Invoices Created Today
@@ -96,7 +96,7 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
               <FileCheck size={20} />
             </span>
           </div>
-          <strong className="mt-3 block text-2xl sm:text-3xl font-black text-foreground">
+          <strong className="mt-2 block text-xl sm:mt-3 sm:text-3xl font-black text-foreground">
             {todaysInvoiceCount}
           </strong>
           <p className="mt-1 text-xs font-medium text-muted-foreground">
@@ -105,7 +105,7 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
         </div>
 
         {/* Today's Collections */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-emerald-200 transition-colors">
+        <div className="rounded-2xl border border-border bg-card p-3.5 sm:p-5 shadow-xs hover:border-emerald-200 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Today's Collections
@@ -114,7 +114,7 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
               <DollarSign size={20} />
             </span>
           </div>
-          <strong className="mt-3 block text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400">
+          <strong className="mt-2 block text-xl sm:mt-3 sm:text-3xl font-black text-emerald-700 dark:text-emerald-400">
             {fmt(todaysCollectionsAmount)}
           </strong>
           <p className="mt-1 text-xs font-medium text-muted-foreground">
@@ -123,7 +123,7 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
         </div>
 
         {/* Pending Receivables */}
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs hover:border-amber-200 transition-colors">
+        <div className="rounded-2xl border border-border bg-card p-3.5 sm:p-5 shadow-xs hover:border-amber-200 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Pending Receivables
@@ -132,7 +132,7 @@ export const TodaysBillingCards: React.FC<TodaysBillingCardsProps> = ({ dashboar
               <Landmark size={20} />
             </span>
           </div>
-          <strong className="mt-3 block text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400">
+          <strong className="mt-2 block text-xl sm:mt-3 sm:text-3xl font-black text-amber-600 dark:text-amber-400">
             {fmt(pendingCollections)}
           </strong>
           <p className="mt-1 text-xs font-medium text-muted-foreground">

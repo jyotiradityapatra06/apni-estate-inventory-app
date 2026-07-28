@@ -4,6 +4,7 @@ import { getDesktopNavigation, type NavigationGroup } from "../../../constants/n
 import { useAuth } from "../../../hooks/useAuth";
 import { toast } from "sonner";
 import { ThemeToggle } from "../common/ThemeToggle";
+import { hasPermission } from "../../../utils/permissions";
 
 const groups: NavigationGroup[] = ["Inventory", "Sales", "Purchase", "Finance", "Reports", "Management"];
 
@@ -64,13 +65,13 @@ export function MobileMoreSheet({ open, onClose, onNotifications }: { open: bool
                 </p>
               </div>
             </div>
-            <button 
+            {hasPermission(user, "business:view") && <button 
               onClick={onClose} 
               aria-label="Close menu" 
               className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-slate-300 hover:text-white cursor-pointer"
             >
               <X size={18}/>
-            </button>
+            </button>}
           </div>
 
           <div className="flex items-center justify-between pt-2.5 text-xs text-slate-300">

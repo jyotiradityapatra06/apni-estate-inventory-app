@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { MoreVertical, Phone, Plus, Search, Users, DollarSign, UserCheck, ShoppingBag } from "lucide-react";
+import { MoreVertical, Phone, Plus, Search, Users, DollarSign, UserCheck, ShoppingBag, FilePlus, MessageCircle, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { customerApi } from "../../api/customer.api";
 import salesOrderApi from "../../api/salesOrder.api";
@@ -12,6 +12,7 @@ import { useAuth } from "../../hooks/useAuth";
 import type { Customer } from "../../types/customer.types";
 import { hasPermission } from "../../utils/permissions";
 import { fmt } from "../../utils/currency";
+import { createWhatsAppLink } from "../../utils/whatsapp";
 
 export function CustomerListPage() {
   const { user } = useAuth();
@@ -84,7 +85,7 @@ export function CustomerListPage() {
         description="Manage customer details, contact information and outstanding amounts." 
         actions={
           canCreate && (
-            <Link to="/customers/new" className="flex min-h-10 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white transition-colors shadow-sm cursor-pointer">
+            <Link to="/customers/new" className="flex min-h-11 items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-700 px-4 text-xs font-bold text-white transition-colors shadow-sm cursor-pointer">
               <Plus size={15}/>
               Add Customer
             </Link>
@@ -287,26 +288,48 @@ export function CustomerListPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border">
+                    <Link
+                      to={`/invoices/new?customerId=${c.id}`}
+                      className="min-h-[44px] flex items-center justify-center gap-1.5 rounded-xl bg-orange-600 px-2 text-center text-xs font-black text-white hover:bg-orange-700 cursor-pointer press-active"
+                    >
+                      <FilePlus size={14} />
+                      Create Invoice
+                    </Link>
                     <Link 
                       to={`/sales-orders/new?customerId=${c.id}`} 
-                      className="flex-1 min-h-[44px] flex items-center justify-center rounded-xl bg-orange-600 text-xs font-black text-white hover:bg-orange-700 cursor-pointer press-active"
+                      className="min-h-[44px] flex items-center justify-center rounded-xl border border-orange-200 bg-orange-50 px-2 text-center text-xs font-black text-orange-800 cursor-pointer press-active"
                     >
-                      + Create Sale
+                      Create Sales Order
                     </Link>
-                    {hasDue && (
-                      <Link 
-                        to={`/payments/new?customerId=${c.id}`} 
-                        className="min-h-[44px] px-3.5 flex items-center justify-center rounded-xl bg-[#0F172A] text-xs font-black text-white hover:bg-slate-800 cursor-pointer press-active"
-                      >
-                        Receive
-                      </Link>
-                    )}
+                    <Link
+                      to={`/payments/new?customerId=${c.id}`}
+                      className="min-h-[44px] flex items-center justify-center rounded-xl bg-[#0F172A] px-2 text-center text-xs font-black text-white hover:bg-slate-800 cursor-pointer press-active"
+                    >
+                      Receive Payment
+                    </Link>
+                    <a
+                      href={createWhatsAppLink(c.phone, `Hello ${c.name},` ) || `tel:${c.phone}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="min-h-[44px] flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-2 text-xs font-black text-emerald-800 cursor-pointer press-active"
+                    >
+                      <MessageCircle size={14} />
+                      WhatsApp
+                    </a>
+                    <Link
+                      to={`/financials/ledger?customerId=${c.id}`}
+                      className="min-h-[44px] flex items-center justify-center gap-1.5 rounded-xl border border-purple-200 bg-purple-50 px-2 text-xs font-black text-purple-800 cursor-pointer press-active"
+                    >
+                      <BookOpen size={14} />
+                      Ledger
+                    </Link>
                     <a 
                       href={`tel:${c.phone}`} 
-                      className="px-3.5 min-h-[44px] flex items-center justify-center gap-1 rounded-xl border border-border text-xs font-black text-muted-foreground hover:bg-muted cursor-pointer press-active"
+                      className="min-h-[44px] flex items-center justify-center gap-1.5 rounded-xl border border-border px-2 text-xs font-black text-muted-foreground hover:bg-muted cursor-pointer press-active"
                     >
                       <Phone size={14} />
+                      Call
                     </a>
                   </div>
 

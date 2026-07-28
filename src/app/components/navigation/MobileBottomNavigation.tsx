@@ -21,7 +21,7 @@ export function MobileBottomNavigation({ onOpenMore }: { isDark?: boolean; onOpe
       aria-label="Primary mobile bottom navigation"
       className="border-t border-border/80 dark:border-slate-800 bg-card/95 dark:bg-slate-900/95 backdrop-blur-md pb-[max(10px,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-4px_20px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.4)] transition-colors duration-200"
     >
-      <div className="grid h-[54px] grid-cols-5 items-center px-1">
+      <div className="grid h-[54px] items-center px-1" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
         {tabs.map((item) => {
           const Icon = item.icon;
           const isMore = item.id === "more";

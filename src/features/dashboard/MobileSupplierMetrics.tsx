@@ -128,7 +128,7 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
   }
 
   return (
-    <div className="space-y-7 md:hidden pb-16">
+    <div className="space-y-4 md:hidden pb-20">
       {/* 1. Mobile Business Compact Header */}
       <div className="flex items-center justify-between rounded-2xl bg-[#0F172A] p-4 text-white shadow-md">
         <div className="min-w-0 flex-1">
@@ -161,21 +161,17 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
       {/* 3. Recent Invoices / Bills */}
       <RecentInvoicesSection dashboard={dashboard} />
 
-      {/* 2. Business Health Summary (Horizontal Carousel) */}
+      {/* 2. Business Health Summary */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
             Financial Health
           </h3>
-          <span className="text-xs font-bold text-muted-foreground">Swipe &rarr;</span>
         </div>
 
-        <div
-          className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 scroll-smooth-mobile"
-          style={{ scrollbarWidth: "none" }}
-        >
+        <div className="grid gap-3">
           {/* Sales Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
+          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Total Sales</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-[#F97316]">
@@ -191,7 +187,7 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           </div>
 
           {/* Purchases Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
+          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Total Purchases</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -207,7 +203,7 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           </div>
 
           {/* Receivables Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
+          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Receivables</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
@@ -221,7 +217,7 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           </div>
 
           {/* Payables Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
+          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Payables</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600">
@@ -235,7 +231,7 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
           </div>
 
           {/* Stock Value Card */}
-          <div className="min-w-[210px] flex-1 rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
+          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Stock Valuation</span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">

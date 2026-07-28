@@ -12,6 +12,7 @@ export default function CreatePaymentPage() {
   const nav = useNavigate();
   const [customers, setCustomers] = useState<any[]>([]);
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [customerSearch, setCustomerSearch] = useState("");
   const [form, setForm] = useState<any>({
     customerId: params.get("customerId") || "",
     invoiceId: params.get("invoiceId") || "",
@@ -50,6 +51,10 @@ export default function CreatePaymentPage() {
   }, [params]);
 
   const available = invoices.filter((x) => !form.customerId || x.customerId === form.customerId);
+  const visibleCustomers = customers.filter((customer) => {
+    const query = customerSearch.trim().toLowerCase();
+    return !query || [customer.name, customer.phone, customer.gstin].some((value) => value?.toLowerCase().includes(query));
+  });
   const selected = invoices.find((x) => x.id === form.invoiceId);
   const selectedCustomer = customers.find((x) => x.id === form.customerId);
 
@@ -83,7 +88,7 @@ export default function CreatePaymentPage() {
     "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-2xl space-y-6 pb-28">
+    <form onSubmit={submit} className="mx-auto max-w-2xl space-y-6 pb-44 md:pb-28">
       <PageHeader
         title="Record Payment Receipt"
         description="Enter payment received from customer against an issued invoice."
@@ -91,6 +96,17 @@ export default function CreatePaymentPage() {
 
       <section className="grid gap-5 rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm md:grid-cols-2">
         <SectionHeader title="Payment & Invoice Details" description="Select customer account and target invoice." />
+
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground md:col-span-2">
+          Search Customer
+          <input
+            type="search"
+            value={customerSearch}
+            onChange={(e) => setCustomerSearch(e.target.value)}
+            placeholder="Customer name, phone, or GSTIN"
+            className={inputClass}
+          />
+        </label>
 
         <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Customer Account *
@@ -101,7 +117,7 @@ export default function CreatePaymentPage() {
             className={inputClass}
           >
             <option value="">Choose customer…</option>
-            {customers.map((c) => (
+            {visibleCustomers.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name} ({c.phone})
               </option>
@@ -239,7 +255,7 @@ export default function CreatePaymentPage() {
       </section>
 
       {/* Action Footer */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-card p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-[74px] z-30 flex gap-3 border-t bg-card p-3 md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
         <button
           type="button"
           onClick={() => nav(-1)}

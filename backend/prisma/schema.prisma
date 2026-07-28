@@ -10,11 +10,22 @@ generator client {
 model Business {
   id                String             @id @default(uuid())
   name              String
+  logoUrl           String?
   gstNumber         String?
   phone             String?
+  email             String?
+  website           String?
   address           String?
   state             String?
   stateCode         String?
+  registrationType  String?
+  bankName          String?
+  accountNumber     String?
+  ifscCode          String?
+  branch            String?
+  upiId             String?
+  invoiceTerms      String?
+  invoiceFooter     String?
   workerSeatLimit   Int                @default(5)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
@@ -431,6 +442,7 @@ model PurchaseOrderItem {
   unit               String
   quantity           Decimal
   receivedQuantity   Decimal               @default(0)
+  damagedQuantity    Decimal               @default(0)
   rate               Decimal
   grossAmount        Decimal
   discountRate       Decimal               @default(0)
@@ -519,6 +531,11 @@ model PurchaseReceiptItem {
   inventoryItemId     String
   inventoryItem       InventoryItem     @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
   quantity            Decimal
+  orderedQuantity     Decimal
+  receivedQuantity    Decimal
+  shortageQuantity    Decimal             @default(0)
+  damageQuantity      Decimal             @default(0)
+  pendingQuantity     Decimal             @default(0)
   amount              Decimal
   createdAt           DateTime          @default(now())
 
@@ -681,6 +698,7 @@ model Invoice {
   invoiceDate       DateTime          @default(now())
   dueDate           DateTime?
   invoiceType       String            @default("GST")
+  invoiceMode       String            @default("SALES_ORDER")
   status            String            @default("DRAFT")
   salesOrderId      String?
   salesOrder        SalesOrder?       @relation(fields: [salesOrderId], references: [id], onDelete: SetNull)
@@ -691,6 +709,15 @@ model Invoice {
   businessAddress   String?
   businessPhone     String?
   businessLogoUrl   String?
+  businessEmail     String?
+  businessWebsite   String?
+  businessRegistrationType String?
+  bankName          String?
+  bankAccountNumber String?
+  bankIfscCode      String?
+  bankBranch        String?
+  businessUpiId     String?
+  invoiceFooter     String?
   customerName      String
   customerPhone     String?
   customerGstin     String?

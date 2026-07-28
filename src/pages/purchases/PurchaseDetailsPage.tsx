@@ -31,7 +31,7 @@ export default function PurchaseDetailsPage() {
 
   const load = () => purchaseApi.get(id).then(r => {
     setOrder(r.data);
-    setQty(Object.fromEntries(r.data.items.map(i => [i.id, String(Math.max(0, Number(i.quantity) - Number(i.receivedQuantity)))])));
+    setQty(Object.fromEntries(r.data.items.map(i => [i.id, String(Math.max(0, Number(i.quantity) - Number(i.receivedQuantity) - Number(i.damagedQuantity || 0)))])));
   }).catch(e => setError(e.message));
 
   useEffect(() => {
@@ -200,7 +200,7 @@ export default function PurchaseDetailsPage() {
         <div className="space-y-4">
           {order.items.map(i => {
             const percent = Math.min(100, Math.round((Number(i.receivedQuantity || 0) / Math.max(1, Number(i.quantity))) * 100));
-            const remaining = Math.max(0, Number(i.quantity) - Number(i.receivedQuantity));
+            const remaining = Math.max(0, Number(i.quantity) - Number(i.receivedQuantity) - Number(i.damagedQuantity || 0));
             return (
               <article key={i.id} className="rounded-xl border border-border bg-muted/50 p-4 space-y-3 text-xs dark:border-slate-800 dark:bg-slate-800/40">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -411,7 +411,7 @@ export default function PurchaseDetailsPage() {
             </div>
             
             <div className="space-y-4">
-              {order.items.filter(i => Number(i.receivedQuantity) < Number(i.quantity)).map(i => (
+              {order.items.filter(i => Number(i.receivedQuantity) + Number(i.damagedQuantity || 0) < Number(i.quantity)).map(i => (
                 <div key={i.id} className="rounded-xl border border-border bg-muted/70 p-4 space-y-3 text-xs">
                   <div className="flex justify-between items-start">
                     <div>
@@ -433,7 +433,7 @@ export default function PurchaseDetailsPage() {
                     </div>
                     <div>
                       <span className="text-[9px] uppercase font-black text-muted-foreground block">Remaining</span>
-                      <strong className="block text-red-600 font-black mt-0.5">{formatQuantity(Number(i.quantity) - Number(i.receivedQuantity), i.unit)}</strong>
+                      <strong className="block text-red-600 font-black mt-0.5">{formatQuantity(Number(i.quantity) - Number(i.receivedQuantity) - Number(i.damagedQuantity || 0), i.unit)}</strong>
                     </div>
                   </div>
 
@@ -443,7 +443,7 @@ export default function PurchaseDetailsPage() {
                       aria-label={`Receive ${i.materialName}`} 
                       type="number" 
                       min="0" 
-                      max={Number(i.quantity) - Number(i.receivedQuantity)} 
+                      max={Number(i.quantity) - Number(i.receivedQuantity) - Number(i.damagedQuantity || 0)} 
                       step="0.001" 
                       placeholder="0.00"
                       value={qty[i.id] || ""} 

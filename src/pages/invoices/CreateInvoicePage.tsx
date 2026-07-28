@@ -8,10 +8,16 @@ import { PageHeader, SectionHeader } from "../../app/components/common/PageHeade
 import { fmt, formatQuantity } from "../../utils/currency";
 import { calculateOrder } from "../../features/sales-orders/salesOrderCalculations";
 import type { SalesOrder } from "../../features/sales-orders/salesOrder.types";
+import DirectInvoiceForm from "../../features/invoices/components/DirectInvoiceForm";
 
 type Line = { id: string; quantity: string; rate: string; discountRate: string; gstRate: string };
 
 export default function CreateInvoicePage() {
+  const [params] = useSearchParams();
+  return params.get("mode")?.toUpperCase() === "DIRECT" ? <DirectInvoiceForm /> : <SalesOrderInvoiceForm />;
+}
+
+function SalesOrderInvoiceForm() {
   const [params] = useSearchParams();
   const nav = useNavigate();
   const [orders, setOrders] = useState<SalesOrder[]>([]);
@@ -24,6 +30,7 @@ export default function CreateInvoicePage() {
   const [due, setDue] = useState("");
   const [notes, setNotes] = useState("");
   const [terms, setTerms] = useState("");
+  const [orderSearch, setOrderSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -75,6 +82,10 @@ export default function CreateInvoicePage() {
       ),
     [lines, type]
   );
+  const visibleOrders = orders.filter((x) => {
+    const query = orderSearch.trim().toLowerCase();
+    return !query || [x.orderNumber, x.customerName, x.customerPhone].some((value) => value?.toLowerCase().includes(query));
+  });
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,7 +143,7 @@ export default function CreateInvoicePage() {
     "mt-1.5 min-h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-sm font-semibold text-foreground focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none";
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-28">
+    <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-44 md:pb-28">
       <PageHeader
         title="Create Customer Invoice"
         description="Generate a GST Tax Invoice or Non-GST Bill from a confirmed Sales Order."
@@ -150,10 +161,21 @@ export default function CreateInvoicePage() {
         <SectionHeader title="Sales Order & Bill Category" description="Choose confirmed sales order and select bill tax classification." />
 
         <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
+          Search Customer or Order
+          <input
+            type="search"
+            value={orderSearch}
+            onChange={(e) => setOrderSearch(e.target.value)}
+            placeholder="Customer name, phone, or order number"
+            className={inputClass}
+          />
+        </label>
+
+        <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
           Select Confirmed Sales Order *
           <select required value={orderId} onChange={(e) => setOrderId(e.target.value)} className={inputClass}>
             <option value="">Choose confirmed Sales Order…</option>
-            {orders.map((x) => (
+            {visibleOrders.map((x) => (
               <option key={x.id} value={x.id}>
                 {x.orderNumber} — {x.customerName} ({fmt(x.totalAmount)})
               </option>
@@ -162,7 +184,7 @@ export default function CreateInvoicePage() {
         </label>
 
         {/* GST vs Non-GST Selector Cards */}
-        <div className="grid grid-cols-2 gap-3.5 pt-1">
+        <div className="grid grid-cols-1 gap-3.5 pt-1 sm:grid-cols-2">
           <button
             type="button"
             onClick={() => setType("GST")}
@@ -307,7 +329,7 @@ export default function CreateInvoicePage() {
       </section>
 
       {/* Action Footer */}
-      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t bg-card p-4 pb-[max(16px,env(safe-area-inset-bottom))] md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
+      <div className="fixed inset-x-0 bottom-[74px] z-30 flex gap-3 border-t bg-card p-3 md:static md:justify-end md:border-0 md:bg-transparent md:p-0">
         <button
           type="button"
           onClick={() => nav(-1)}

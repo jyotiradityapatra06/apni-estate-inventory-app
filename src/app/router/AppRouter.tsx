@@ -18,6 +18,7 @@ const StockAdjustmentPage=lazy(()=>import("../../features/inventory/StockAdjustm
 const MaterialListPage=lazy(()=>import("../../features/materials/MaterialListPage"));
 const DeliveriesPage=lazy(()=>import("../../pages/deliveries/DeliveriesPage"));
 const ManagementPage=lazy(()=>import("../../pages/management/ManagementPage"));
+const BusinessProfilePage=lazy(()=>import("../../pages/management/BusinessProfilePage"));
 const CustomersPage=lazy(()=>import("../../pages/customers/CustomersPage"));
 const SuppliersPage=lazy(()=>import("../../pages/suppliers/SuppliersPage"));
 const GodownsPage=lazy(()=>import("../../pages/godowns/GodownsPage"));
@@ -184,6 +185,9 @@ export const AppRouter = () => {
               {/* Management Page & Redirects */}
               <Route element={<RoleGuard allowedRoles={["OWNER", "MANAGER"]} />}>
                 <Route path="/management" element={<ManagementPage />} />
+                <Route path="/management/business-profile" element={<BusinessProfilePage />} />
+              </Route>
+              <Route element={<RoleGuard allowedRoles={["OWNER"]} />}>
                 <Route path="/management/team" element={<ManagementPage />} />
               </Route>
               <Route path="/more" element={<HomeRedirect />} />
