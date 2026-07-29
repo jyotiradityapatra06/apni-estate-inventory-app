@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router";
-import { Bell, Search, Trash2, User, X, ChevronRight } from "lucide-react";
+import { Bell, Search, Trash2, User, X } from "lucide-react";
 import { C } from "../../../constants/colors";
 import { notificationApi, type NotificationData } from "../../../api/notification.api";
 import { useAuth } from "../../../hooks/useAuth";
@@ -9,6 +9,95 @@ import { OfflineIndicator } from "../common/OfflineIndicator";
 
 export interface AppHeaderProps {
   isDark: boolean;
+}
+
+function SearchResultsList({
+  results,
+  onSelect,
+}: {
+  results: {
+    materials: any[];
+    customers: any[];
+    suppliers: any[];
+    invoices: any[];
+    orders: any[];
+  };
+  onSelect: () => void;
+}) {
+  const categories = [
+    {
+      key: "materials",
+      label: "Materials",
+      items: results.materials,
+      getPath: (item: any) => `/materials/${item.id}`,
+      getTitle: (item: any) => item.materialName,
+      getInfo: (item: any) => item.sku,
+    },
+    {
+      key: "customers",
+      label: "Customers",
+      items: results.customers,
+      getPath: (item: any) => `/customers/${item.id}`,
+      getTitle: (item: any) => item.name,
+      getInfo: (item: any) => item.phone,
+    },
+    {
+      key: "suppliers",
+      label: "Suppliers",
+      items: results.suppliers,
+      getPath: (item: any) => `/suppliers/${item.id}`,
+      getTitle: (item: any) => item.name,
+      getInfo: (item: any) => item.phone,
+    },
+    {
+      key: "invoices",
+      label: "Invoices",
+      items: results.invoices,
+      getPath: (item: any) => `/invoices/${item.id}`,
+      getTitle: (item: any) => item.invoiceNumber,
+      getInfo: (item: any) => item.customerName,
+    },
+    {
+      key: "orders",
+      label: "Sales Orders",
+      items: results.orders,
+      getPath: (item: any) => `/sales-orders/${item.id}`,
+      getTitle: (item: any) => item.orderNumber,
+      getInfo: (item: any) => item.customerName,
+    },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {categories.map((cat) => {
+        if (!cat.items || cat.items.length === 0) return null;
+        return (
+          <div key={cat.key}>
+            <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">
+              {cat.label}
+            </h4>
+            <div className="space-y-1">
+              {cat.items.map((item: any) => (
+                <Link
+                  key={item.id}
+                  to={cat.getPath(item)}
+                  onClick={onSelect}
+                  className="flex justify-between items-center p-2 rounded-xl bg-muted/60 hover:bg-muted font-bold text-foreground transition-colors text-xs"
+                >
+                  <span>{cat.getTitle(item)}</span>
+                  {cat.getInfo(item) && (
+                    <span className="text-[10px] text-muted-foreground font-semibold ml-2 shrink-0">
+                      ({cat.getInfo(item)})
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export const AppHeader = ({ isDark }: AppHeaderProps) => {
@@ -42,31 +131,36 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
     const term = q.toLowerCase();
     try {
       const [inv, cust, supp, invs, ords] = await Promise.all([
-        import("../../../api/inventory.api").then(m => m.inventoryApi.getItems().catch(() => ({ data: [] }))),
-        import("../../../api/customer.api").then(m => m.customerApi.getAll().catch(() => ({ data: [] }))),
-        import("../../../api/supplier.api").then(m => m.supplierApi.getAll().catch(() => ({ data: [] }))),
-        import("../../../api/invoice.api").then(m => m.invoiceApi.getAll().catch(() => ({ data: [] }))),
-        import("../../../api/salesOrder.api").then(m => m.salesOrderApi.getAll().catch(() => ({ data: [] })))
+        import("../../../api/inventory.api").then((m) => m.inventoryApi.getItems().catch(() => ({ data: [] }))),
+        import("../../../api/customer.api").then((m) => m.customerApi.getAll().catch(() => ({ data: [] }))),
+        import("../../../api/supplier.api").then((m) => m.supplierApi.getAll().catch(() => ({ data: [] }))),
+        import("../../../api/invoice.api").then((m) => m.invoiceApi.getAll().catch(() => ({ data: [] }))),
+        import("../../../api/salesOrder.api").then((m) => m.salesOrderApi.getAll().catch(() => ({ data: [] }))),
       ]);
 
-      const filteredMaterials = (inv.data || []).filter((item: any) => 
-        item.materialName.toLowerCase().includes(term) || item.sku.toLowerCase().includes(term)
+      const filteredMaterials = (inv.data || []).filter(
+        (item: any) =>
+          item.materialName.toLowerCase().includes(term) || item.sku.toLowerCase().includes(term)
       ).slice(0, 3);
 
-      const filteredCustomers = (cust.data || []).filter((item: any) => 
-        item.name.toLowerCase().includes(term) || item.phone.toLowerCase().includes(term)
+      const filteredCustomers = (cust.data || []).filter(
+        (item: any) =>
+          item.name.toLowerCase().includes(term) || item.phone.toLowerCase().includes(term)
       ).slice(0, 3);
 
-      const filteredSuppliers = (supp.data || []).filter((item: any) => 
-        item.name.toLowerCase().includes(term) || item.phone.toLowerCase().includes(term)
+      const filteredSuppliers = (supp.data || []).filter(
+        (item: any) =>
+          item.name.toLowerCase().includes(term) || item.phone.toLowerCase().includes(term)
       ).slice(0, 3);
 
-      const filteredInvoices = (invs.data || []).filter((item: any) => 
-        item.invoiceNumber.toLowerCase().includes(term) || item.customerName.toLowerCase().includes(term)
+      const filteredInvoices = (invs.data || []).filter(
+        (item: any) =>
+          item.invoiceNumber.toLowerCase().includes(term) || item.customerName.toLowerCase().includes(term)
       ).slice(0, 3);
 
-      const filteredOrders = (ords.data || []).filter((item: any) => 
-        item.orderNumber.toLowerCase().includes(term) || item.customerName.toLowerCase().includes(term)
+      const filteredOrders = (ords.data || []).filter(
+        (item: any) =>
+          item.orderNumber.toLowerCase().includes(term) || item.customerName.toLowerCase().includes(term)
       ).slice(0, 3);
 
       setSearchResults({
@@ -74,7 +168,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
         customers: filteredCustomers,
         suppliers: filteredSuppliers,
         invoices: filteredInvoices,
-        orders: filteredOrders
+        orders: filteredOrders,
       });
     } catch (e) {
       console.error(e);
@@ -218,12 +312,10 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
   const borderColor = isDark ? C.darkBorder : C.border;
 
   const unreadCount = notifications.filter((notification) => !notification.isRead).length;
-  const hasSearchResults = Object.values(searchResults).some(arr => arr.length > 0);
+  const hasSearchResults = Object.values(searchResults).some((arr) => arr.length > 0);
 
   return (
-    <header
-      className="sticky top-0 z-45 flex h-14 md:h-16 flex-shrink-0 items-center justify-between px-3 md:px-6 select-none bg-card dark:bg-[#0F172A] border-b border-border dark:border-slate-800 transition-colors duration-200"
-    >
+    <header className="sticky top-0 z-45 flex h-14 md:h-16 flex-shrink-0 items-center justify-between px-3 md:px-6 select-none bg-card dark:bg-[#0F172A] border-b border-border dark:border-slate-800 transition-colors duration-200">
       {/* Mobile Compact Business Header (md:hidden) */}
       <div className="flex items-center gap-2 md:hidden min-w-0">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0F172A] text-white shrink-0 shadow-sm">
@@ -248,9 +340,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
       {/* Desktop Page Title (hidden md:block) */}
       <div className="hidden md:block">
-        <h1
-          className="max-w-[190px] truncate text-[18px] font-bold text-foreground dark:text-white md:max-w-none lg:text-xl"
-        >
+        <h1 className="max-w-[190px] truncate text-[18px] font-bold text-foreground dark:text-white md:max-w-none lg:text-xl">
           {title}
         </h1>
       </div>
@@ -264,7 +354,7 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
               <input
                 type="text"
                 autoFocus
-                placeholder="Search stock, supplier, invoice, customer..."
+                placeholder="Search stock, customer, supplier, order..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -287,65 +377,16 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
 
           {searchQuery.length >= 2 && (
             <div className="mt-3 max-h-[60dvh] overflow-y-auto space-y-3 pt-2 border-t border-border text-xs">
-              {!hasSearchResults && (
+              {!hasSearchResults ? (
                 <p className="text-muted-foreground italic py-2 text-center">No matching records found.</p>
-              )}
-
-              {searchResults.materials.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Materials</h4>
-                  <div className="space-y-1">
-                    {searchResults.materials.map(m => (
-                      <Link 
-                        key={m.id} 
-                        to={`/materials/${m.id}`} 
-                        onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
-                        className="flex justify-between items-center p-2 bg-muted rounded-xl font-bold text-foreground"
-                      >
-                        <span>{m.materialName}</span>
-                        <span className="text-[10px] text-muted-foreground">{m.sku}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {searchResults.suppliers.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Suppliers</h4>
-                  <div className="space-y-1">
-                    {searchResults.suppliers.map(s => (
-                      <Link 
-                        key={s.id} 
-                        to={`/suppliers/${s.id}`} 
-                        onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
-                        className="flex justify-between items-center p-2 bg-muted rounded-xl font-bold text-foreground"
-                      >
-                        <span>{s.name}</span>
-                        <span className="text-[10px] text-muted-foreground">{s.phone}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {searchResults.invoices.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Invoices</h4>
-                  <div className="space-y-1">
-                    {searchResults.invoices.map(i => (
-                      <Link 
-                        key={i.id} 
-                        to={`/invoices/${i.id}`} 
-                        onClick={() => { setSearchQuery(""); setMobileSearchOpen(false); }}
-                        className="flex justify-between items-center p-2 bg-muted rounded-xl font-bold text-foreground"
-                      >
-                        <span>{i.invoiceNumber}</span>
-                        <span className="text-[10px] text-muted-foreground">{i.customerName}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+              ) : (
+                <SearchResultsList
+                  results={searchResults}
+                  onSelect={() => {
+                    setSearchQuery("");
+                    setMobileSearchOpen(false);
+                  }}
+                />
               )}
             </div>
           )}
@@ -384,119 +425,30 @@ export const AppHeader = ({ isDark }: AppHeaderProps) => {
             className="w-64 rounded-lg py-1.5 pl-9 pr-3 text-xs outline-none focus:border-orange-500 transition-colors"
           />
 
-          <Search
-            size={14}
-            style={{ color: C.muted }}
-            className="absolute left-3 top-2.5"
-          />
+          <Search size={14} style={{ color: C.muted }} className="absolute left-3 top-2.5" />
 
           {searchQuery.length >= 2 && (
             <div className="absolute left-0 mt-2 w-[350px] bg-card border border-border rounded-2xl shadow-2xl p-4 z-50 text-xs space-y-3 max-h-[400px] overflow-y-auto">
-              <div className="flex justify-between items-center border-b pb-2 mb-2">
+              <div className="flex justify-between items-center border-b border-border pb-2 mb-2">
                 <span className="font-bold text-muted-foreground uppercase text-[9px] tracking-wider">Search Results</span>
-                <button 
+                <button
                   onClick={() => {
                     setSearchQuery("");
                     setSearchResults({ materials: [], customers: [], suppliers: [], invoices: [], orders: [] });
-                  }} 
-                  className="text-muted-foreground hover:text-muted-foreground font-bold"
+                  }}
+                  className="text-muted-foreground hover:text-foreground font-bold cursor-pointer"
                 >
                   Clear
                 </button>
               </div>
 
-              {!hasSearchResults && (
-                <p className="text-muted-foreground italic py-2">No matching records found.</p>
-              )}
-
-              {searchResults.materials.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Materials</h4>
-                  <div className="space-y-1">
-                    {searchResults.materials.map(m => (
-                      <Link 
-                        key={m.id} 
-                        to={`/materials/${m.id}`} 
-                        onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
-                      >
-                        {m.materialName} <span className="text-[10px] text-muted-foreground font-semibold">({m.sku})</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {searchResults.customers.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Customers</h4>
-                  <div className="space-y-1">
-                    {searchResults.customers.map(c => (
-                      <Link 
-                        key={c.id} 
-                        to={`/customers/${c.id}`} 
-                        onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
-                      >
-                        {c.name} <span className="text-[10px] text-muted-foreground font-semibold">({c.phone})</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {searchResults.suppliers.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Suppliers</h4>
-                  <div className="space-y-1">
-                    {searchResults.suppliers.map(s => (
-                      <Link 
-                        key={s.id} 
-                        to={`/suppliers/${s.id}`} 
-                        onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
-                      >
-                        {s.name} <span className="text-[10px] text-muted-foreground font-semibold">({s.phone})</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {searchResults.invoices.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Invoices</h4>
-                  <div className="space-y-1">
-                    {searchResults.invoices.map(i => (
-                      <Link 
-                        key={i.id} 
-                        to={`/invoices/${i.id}`} 
-                        onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
-                      >
-                        {i.invoiceNumber} <span className="text-[10px] text-muted-foreground font-semibold">({i.customerName})</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {searchResults.orders.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-[9px] text-muted-foreground uppercase tracking-wide mb-1">Sales Orders</h4>
-                  <div className="space-y-1">
-                    {searchResults.orders.map(o => (
-                      <Link 
-                        key={o.id} 
-                        to={`/sales-orders/${o.id}`} 
-                        onClick={() => setSearchQuery("")}
-                        className="block p-1.5 hover:bg-muted rounded-lg font-bold text-foreground"
-                      >
-                        {o.orderNumber} <span className="text-[10px] text-muted-foreground font-semibold">({o.customerName})</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+              {!hasSearchResults ? (
+                <p className="text-muted-foreground italic py-2 text-center">No matching records found.</p>
+              ) : (
+                <SearchResultsList
+                  results={searchResults}
+                  onSelect={() => setSearchQuery("")}
+                />
               )}
             </div>
           )}

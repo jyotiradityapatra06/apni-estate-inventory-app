@@ -16,9 +16,12 @@ import { MaterialAvailabilityChart } from "../../features/dashboard/MaterialAvai
 import { InventoryValueTrendChart } from "../../features/dashboard/InventoryValueTrendChart";
 import { salesOrderApi } from "../../api/salesOrder.api";
 import { purchaseApi } from "../../api/purchase.api";
+import { customerApi } from "../../api/customer.api";
+import { godownApi } from "../../api/godown.api";
 import { fmt } from "../../utils/currency";
 import { BusinessStatusBadge } from "../../app/components/common/BusinessStatusBadge";
 import { lowStockItems } from "../../features/dashboard/dashboardCalculations";
+import { SetupChecklist } from "../../features/onboarding/SetupChecklist";
 
 export default function DashboardPage() {
   const { user, business } = useAuth();
@@ -26,17 +29,23 @@ export default function DashboardPage() {
   
   const [recentSales, setRecentSales] = useState<any[]>([]);
   const [recentPurchases, setRecentPurchases] = useState<any[]>([]);
+  const [customerCount, setCustomerCount] = useState<number>(0);
+  const [godownCount, setGodownCount] = useState<number>(0);
   const [loadingActivity, setLoadingActivity] = useState(true);
 
   const loadExtraData = async () => {
     setLoadingActivity(true);
     try {
-      const [salesRes, purchaseRes] = await Promise.all([
+      const [salesRes, purchaseRes, customersRes, godownsRes] = await Promise.all([
         salesOrderApi.getAll("limit=5").catch(() => ({ data: [] })),
-        purchaseApi.list("limit=5").catch(() => ({ data: [] }))
+        purchaseApi.list("limit=5").catch(() => ({ data: [] })),
+        customerApi.getAll().catch(() => ({ data: [] })),
+        godownApi.getAll().catch(() => ({ data: [] }))
       ]);
       setRecentSales(salesRes.data || []);
       setRecentPurchases(purchaseRes.data || []);
+      setCustomerCount((customersRes.data || []).length);
+      setGodownCount((godownsRes.data || []).length);
     } catch (e) {
       console.error("Could not load activity data", e);
     } finally {
@@ -77,31 +86,24 @@ export default function DashboardPage() {
     ? dashboard.purchases.data.data.reduce((sum: number, item: any) => sum + Number(item.balanceDue), 0) 
     : 0;
 
-  // First-time setup tracking
-  const [setupDismissed, setSetupDismissed] = useState(!!localStorage.getItem("setup_dismissed"));
-
-  const setupSteps = [
-    { label: "Business Profile Setup", path: "/management", done: !!business?.gstNumber },
-    { label: "Add First Customer", path: "/customers/new", done: recentSales.length > 0 || dashboard.invoices.data.length > 0 },
-    { label: "Add First Material", path: "/materials/new", done: dashboard.inventory.data.length > 0 },
-    { label: "Create First Invoice", path: "/invoices/new", done: dashboard.invoices.data.length > 0 }
-  ];
-  const doneCount = setupSteps.filter(s => s.done).length;
-  const progressPercent = Math.round((doneCount / setupSteps.length) * 100);
-
-  const dismissSetup = () => {
-    localStorage.setItem("setup_dismissed", "true");
-    setSetupDismissed(true);
-    toast.success("First-time setup guide dismissed");
-  };
-
   return (
-    <>
+    <div className="space-y-6 pb-16">
+      {/* First-Time Setup Checklist (Visible on Mobile & Desktop) */}
+      <SetupChecklist
+        business={business}
+        inventoryCount={dashboard.inventory.data.length}
+        customerCount={customerCount}
+        godownCount={godownCount}
+        invoiceCount={dashboard.invoices.data.length}
+        paymentCount={dashboard.payments.data.length}
+        recentSales={recentSales}
+      />
+
       {/* 1. Mobile-First Supplier Command Center (< 768px) */}
       <MobileSupplierMetrics dashboard={dashboard} />
 
       {/* 2. Desktop Command Center (>= 768px) */}
-      <div className="hidden md:block space-y-8 pb-16">
+      <div className="hidden md:block space-y-8">
         {/* 1. Top Welcome Section */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-border pb-5">
           <div>
@@ -126,71 +128,16 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 1. Quick Billing Primary CTA */}
+        {/* 2. Quick Billing Primary CTA */}
         <QuickBillingCTA />
 
-        {/* 2. Today's Billing Summary Cards */}
+        {/* 3. Today's Billing Summary Cards */}
         <TodaysBillingCards dashboard={dashboard} />
 
-        {/* 3. Recent Invoices / Bills Section */}
+        {/* 4. Recent Invoices / Bills Section */}
         <RecentInvoicesSection dashboard={dashboard} />
 
-        {/* Setup Progress Widget */}
-        {!setupDismissed && doneCount < 4 && (
-          <div className="rounded-2xl border border-orange-200/80 bg-orange-50/20 dark:bg-orange-950/20 p-5 shadow-sm space-y-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-semibold text-foreground text-base sm:text-lg">Welcome to APNI ESTATE &mdash; Complete your business setup 🚀</h3>
-                <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">Follow this step-by-step checklist to configure your construction material ERP.</p>
-              </div>
-              <button 
-                onClick={dismissSetup} 
-                className="text-muted-foreground hover:text-foreground text-xs font-semibold uppercase tracking-wider cursor-pointer"
-              >
-                Skip guide
-              </button>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-sm font-medium text-muted-foreground">
-                <span>Setup Progress ({doneCount} of {setupSteps.length} complete)</span>
-                <span>{progressPercent}%</span>
-              </div>
-              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-orange-500 rounded-full transition-all duration-500" 
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4 pt-2">
-              {setupSteps.map((step, idx) => (
-                <Link 
-                  key={idx} 
-                  to={step.path}
-                  className={`rounded-xl border p-3 block text-left text-xs sm:text-sm transition-colors ${
-                    step.done 
-                      ? "bg-green-50/50 border-green-200 text-green-800 dark:bg-green-950/30 dark:border-green-800 dark:text-green-300 animate-fade-in" 
-                      : "bg-card hover:bg-muted border-border text-muted-foreground"
-                  }`}
-                >
-                  <div className="flex items-center justify-between font-semibold">
-                    <span>{idx + 1}. {step.label}</span>
-                    <span className={step.done ? "text-green-600 dark:text-green-400 font-bold" : "text-muted-foreground"}>
-                      {step.done ? "✓" : "○"}
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1 leading-normal">
-                    {step.done ? "Completed successfully" : "Click to set up"}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 2. Quick Action Section */}
+        {/* 5. Quick Action Section */}
         <DashboardQuickActions />
 
         {/* 3. Business Overview Cards */}
@@ -391,6 +338,6 @@ export default function DashboardPage() {
 
         </div>
       </div>
-    </>
+    </div>
   );
 }
