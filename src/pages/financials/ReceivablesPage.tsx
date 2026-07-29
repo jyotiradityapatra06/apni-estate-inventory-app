@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { AlertTriangle, CalendarClock, IndianRupee, Users, ArrowLeft, Search, Filter, ShieldAlert, DollarSign } from "lucide-react";
+import { AlertTriangle, CalendarClock, IndianRupee, Users, ArrowLeft, Search, Filter, ShieldAlert, DollarSign, MessageSquare } from "lucide-react";
 import { financialApi } from "../../api/financial.api";
 import { PageHeader } from "../../app/components/common/PageHeader";
 import { AgeingReport } from "../../features/financials/AgeingReport";
@@ -10,6 +10,7 @@ import { MobileFilterDrawer } from "../../app/components/mobile/MobileFilterDraw
 import { fmt } from "../../utils/currency";
 import { useAuth } from "../../hooks/useAuth";
 import { hasPermission } from "../../utils/permissions";
+import { createWhatsAppLink } from "../../utils/whatsapp";
 
 export default function ReceivablesPage() {
   const navigate = useNavigate();
@@ -271,6 +272,18 @@ export default function ReceivablesPage() {
                     ]}
                     actions={
                       <>
+                        <a
+                          href={createWhatsAppLink(
+                            c.phone,
+                            `Hello ${c.name}, this is a payment reminder from APNI ESTATE regarding your pending dues of ${fmt(c.amountDue)}.`
+                          )}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 min-h-[44px] inline-flex items-center justify-center gap-1.5 rounded-xl border border-green-600 bg-green-50 dark:bg-green-950/40 text-xs font-bold text-green-700 dark:text-green-300 hover:bg-green-100 cursor-pointer press-active"
+                        >
+                          <MessageSquare size={15} />
+                          WhatsApp
+                        </a>
                         {hasPermission(user, "financials:manage") && c.invoices[0] && (
                           <button
                             onClick={() => setPay({ customerId: c.id, invoiceId: c.invoices[0].id, balance: c.invoices[0].amountDue })}
@@ -283,7 +296,7 @@ export default function ReceivablesPage() {
                           onClick={() => navigate(`/financials/customers/${c.id}`)}
                           className="flex-1 min-h-[44px] rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer press-active"
                         >
-                          View Ledger
+                          Ledger
                         </button>
                       </>
                     }

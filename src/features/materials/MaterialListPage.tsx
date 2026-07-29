@@ -321,6 +321,28 @@ export function MaterialListPage() {
                       <strong className="text-foreground dark:text-slate-200">{item.reorderLevel} {item.unit}</strong>
                     </div>
                   </div>
+
+                  {/* Mobile Material Card Quick Actions */}
+                  <div className="flex gap-2 pt-2 border-t border-border/60">
+                    <button
+                      onClick={() => navigate(`/materials/${item.id}`)}
+                      className="flex-1 min-h-[40px] rounded-xl border border-border bg-background hover:bg-muted text-[11px] font-bold text-foreground cursor-pointer press-active"
+                    >
+                      View History
+                    </button>
+                    <button
+                      onClick={() => navigate("/inventory/stock-adjustments")}
+                      className="flex-1 min-h-[40px] rounded-xl bg-orange-600 hover:bg-orange-700 text-[11px] font-bold text-white cursor-pointer press-active"
+                    >
+                      Adjust Stock
+                    </button>
+                    <button
+                      onClick={() => navigate("/transfers")}
+                      className="flex-1 min-h-[40px] rounded-xl border border-border bg-card hover:bg-muted text-[11px] font-bold text-muted-foreground cursor-pointer press-active"
+                    >
+                      Transfer
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

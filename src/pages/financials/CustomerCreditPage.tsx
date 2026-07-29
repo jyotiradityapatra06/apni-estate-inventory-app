@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
-import { ArrowLeft, DollarSign, Plus } from "lucide-react";
+import { ArrowLeft, DollarSign, MessageSquare } from "lucide-react";
 import { financialApi } from "../../api/financial.api";
 import { PageHeader } from "../../app/components/common/PageHeader";
 import { fmt } from "../../utils/currency";
+import { createWhatsAppLink } from "../../utils/whatsapp";
 
 export default function CustomerCreditPage() {
   const { id } = useParams();
@@ -47,6 +48,18 @@ export default function CustomerCreditPage() {
         description={`Customer phone: ${c.phone || "N/A"} · Credit limit & invoice history.`}
         actions={
           <div className="flex flex-wrap items-center gap-2.5">
+            <a
+              href={createWhatsAppLink(
+                c.phone,
+                `Hello ${c.name}, this is a friendly payment reminder from APNI ESTATE regarding your pending dues of ${fmt(c.amountDue)}.`
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-green-600 bg-green-50 dark:bg-green-950/40 text-xs font-bold text-green-700 dark:text-green-300 hover:bg-green-100 px-4 transition-colors cursor-pointer"
+            >
+              <MessageSquare size={15} />
+              WhatsApp Reminder
+            </a>
             <Link
               to={`/payments/new?customerId=${c.id}`}
               className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#F97316] hover:bg-orange-600 px-5 text-xs font-black text-white shadow-xs transition-colors cursor-pointer"

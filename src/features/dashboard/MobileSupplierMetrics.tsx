@@ -55,6 +55,7 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
   const canReceivePayment = hasPermission(user, "financials:view");
 
   const [refreshing, setRefreshing] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -129,7 +130,7 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
 
   return (
     <div className="space-y-4 md:hidden pb-20">
-      {/* 1. Mobile Business Compact Header */}
+      {/* 1. Mobile Business Identity Header */}
       <div className="flex items-center justify-between rounded-2xl bg-[#0F172A] p-4 text-white shadow-md">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-bold uppercase tracking-wider text-orange-400">
@@ -152,101 +153,12 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
         </button>
       </div>
 
-      {/* 1. Primary Quick Billing CTA */}
-      <QuickBillingCTA />
-
-      {/* 2. Today's Billing Metrics */}
+      {/* 2. Today's Business Summary */}
       <TodaysBillingCards dashboard={dashboard} />
 
-      {/* 3. Recent Invoices / Bills */}
-      <RecentInvoicesSection dashboard={dashboard} />
+      {/* 3. Primary Quick Billing & Supplier Actions */}
+      <QuickBillingCTA />
 
-      {/* 2. Business Health Summary */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-            Financial Health
-          </h3>
-        </div>
-
-        <div className="grid gap-3">
-          {/* Sales Card */}
-          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Total Sales</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-[#F97316]">
-                <IndianRupee size={16} />
-              </span>
-            </div>
-            <strong className="text-2xl font-black text-foreground block leading-none">
-              {totalSales > 0 ? fmt(totalSales) : "₹0"}
-            </strong>
-            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">
-              {totalSales > 0 ? `${invoices.length} Sales Invoices` : "No sales logged yet"}
-            </p>
-          </div>
-
-          {/* Purchases Card */}
-          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Total Purchases</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                <ShoppingBag size={16} />
-              </span>
-            </div>
-            <strong className="text-2xl font-black text-foreground block leading-none">
-              {totalPurchases > 0 ? fmt(totalPurchases) : "₹0"}
-            </strong>
-            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">
-              {totalPurchases > 0 ? `${purchasesList.length} Orders` : "No purchases logged yet"}
-            </p>
-          </div>
-
-          {/* Receivables Card */}
-          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Receivables</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                <Landmark size={16} />
-              </span>
-            </div>
-            <strong className={`text-2xl font-black block leading-none ${totalReceivables > 0 ? "text-orange-600" : "text-foreground"}`}>
-              {fmt(totalReceivables)}
-            </strong>
-            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">Pending customer dues</p>
-          </div>
-
-          {/* Payables Card */}
-          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Payables</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600">
-                <Landmark size={16} />
-              </span>
-            </div>
-            <strong className={`text-2xl font-black block leading-none ${totalPayables > 0 ? "text-red-600" : "text-foreground"}`}>
-              {fmt(totalPayables)}
-            </strong>
-            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">Due to suppliers</p>
-          </div>
-
-          {/* Stock Value Card */}
-          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Stock Valuation</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                <Package size={16} />
-              </span>
-            </div>
-            <strong className="text-2xl font-black text-foreground block leading-none">
-              {fmt(totalStockValue)}
-            </strong>
-            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">Physical store inventory</p>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Supplier Quick Actions Grid */}
       <div className="space-y-2.5">
         <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground px-1">
           Supplier Quick Actions
@@ -314,119 +226,122 @@ export const MobileSupplierMetrics: React.FC<MobileSupplierMetricsProps> = ({ da
         </div>
       </div>
 
-      {/* 4. Inventory Health Breakdown Chart */}
-      <InventoryHealthChart materials={materials} />
-
-      {/* 4b. Stock Movement Trend Chart */}
-      <StockMovementChart movements={dashboard.movements.data || []} />
-
-      {/* 4c. Top Material Availability Chart */}
-      <MaterialAvailabilityChart materials={materials} />
-
-      {/* 4d. Inventory Value Trend Chart */}
-      <InventoryValueTrendChart materials={materials} movements={dashboard.movements.data || []} />
-
-      {/* 5. Sales & Purchase Trends Chart */}
-      <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-border pb-2">
-          <div className="flex items-center gap-2">
-            <TrendingUp size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-foreground">Sales & Purchase Trends</h3>
-          </div>
+      {/* 4. Financial Health & Pending Dues */}
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+            Financial Health & Outstanding
+          </h3>
         </div>
 
-        {hasChartData ? (
-          <div className="w-full min-h-[200px] h-52 pt-2">
-            <ResponsiveContainer width="100%" height={200} minHeight={200}>
-              <AreaChart data={trendSeries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F97316" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#F97316" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorPurchases" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0F172A" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#0F172A" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                <XAxis dataKey="month" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: "#0F172A", color: "#FFF", borderRadius: "12px", fontSize: "11px", border: "none" }}
-                  formatter={(val: any) => [fmt(Number(val)), ""]}
-                />
-                <Area type="monotone" dataKey="sales" name="Sales" stroke="#F97316" strokeWidth={2.5} fillOpacity={1} fill="url(#colorSales)" />
-                <Area type="monotone" dataKey="purchases" name="Purchases" stroke="var(--chart-1)" strokeWidth={2} fillOpacity={1} fill="url(#colorPurchases)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <div className="py-8 text-center space-y-2">
-            <p className="font-extrabold text-sm text-foreground">No trend data yet</p>
-            <p className="text-xs text-muted-foreground max-w-[240px] mx-auto">
-              Create your first sale or purchase order to generate live business analytics graphs.
+        <div className="grid gap-3">
+          {/* Sales Card */}
+          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Total Sales</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-[#F97316]">
+                <IndianRupee size={16} />
+              </span>
+            </div>
+            <strong className="text-2xl font-black text-foreground block leading-none">
+              {totalSales > 0 ? fmt(totalSales) : "₹0"}
+            </strong>
+            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">
+              {totalSales > 0 ? `${invoices.length} Sales Invoices` : "No sales logged yet"}
             </p>
           </div>
-        )}
+
+          {/* Receivables Card */}
+          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Customer Dues (Receivables)</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                <Landmark size={16} />
+              </span>
+            </div>
+            <strong className={`text-2xl font-black block leading-none ${totalReceivables > 0 ? "text-orange-600" : "text-foreground"}`}>
+              {fmt(totalReceivables)}
+            </strong>
+            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">Pending customer dues</p>
+          </div>
+
+          {/* Payables Card */}
+          <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Supplier Dues (Payables)</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                <Landmark size={16} />
+              </span>
+            </div>
+            <strong className={`text-2xl font-black block leading-none ${totalPayables > 0 ? "text-red-600" : "text-foreground"}`}>
+              {fmt(totalPayables)}
+            </strong>
+            <p className="text-xs text-muted-foreground font-semibold truncate mt-1">Due to suppliers</p>
+          </div>
+        </div>
       </div>
 
-      {/* 6. Outstanding Payments & Finance Widget */}
+      {/* 5. Recent Invoices / Bills */}
+      <RecentInvoicesSection dashboard={dashboard} />
+
+      {/* 6. Collapsible Analytics & Trends Accordion */}
       <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+        <button
+          type="button"
+          onClick={() => setShowAnalytics((prev) => !prev)}
+          className="flex w-full items-center justify-between text-xs font-black uppercase tracking-wider text-muted-foreground cursor-pointer"
+        >
           <div className="flex items-center gap-2">
-            <Landmark size={18} className="text-[#F97316]" />
-            <h3 className="font-extrabold text-sm text-foreground">Cash Flow & Payments</h3>
+            <TrendingUp size={16} className="text-[#F97316]" />
+            <span>Analytics & Business Trends</span>
           </div>
-          <Link to="/financials/receivables" className="text-xs font-bold text-[#F97316] hover:underline">
-            Ledger
-          </Link>
-        </div>
+          <ChevronRight
+            size={16}
+            className={`transition-transform duration-200 ${showAnalytics ? "rotate-90 text-[#F97316]" : ""}`}
+          />
+        </button>
 
-        {totalSales === 0 && totalPurchases === 0 ? (
-          <div className="py-6 text-center space-y-2">
-            <p className="font-extrabold text-sm text-foreground">No outstanding payments</p>
-            <p className="text-xs text-muted-foreground">All customer & supplier balances are clean and up to date.</p>
-          </div>
-        ) : (
-          <div className="space-y-3 text-xs font-semibold">
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-muted-foreground">Received Cash</span>
-                <span className="text-green-700 font-bold">{fmt(moneyReceived)}</span>
-              </div>
-              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-green-600 rounded-full"
-                  style={{ width: `${totalSales ? Math.min(100, (moneyReceived / totalSales) * 100) : 0}%` }}
-                />
-              </div>
-            </div>
+        {showAnalytics && (
+          <div className="space-y-4 pt-3 border-t border-border animate-fade-in">
+            <InventoryHealthChart materials={materials} />
+            <StockMovementChart movements={dashboard.movements.data || []} />
+            <MaterialAvailabilityChart materials={materials} />
+            <InventoryValueTrendChart materials={materials} movements={dashboard.movements.data || []} />
 
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-muted-foreground">Customer Dues (Receivables)</span>
-                <span className="text-orange-600 font-bold">{fmt(totalReceivables)}</span>
+            {/* Sales & Purchase Trends Chart */}
+            <div className="rounded-xl border border-border/80 bg-card p-3 shadow-xs space-y-2">
+              <div className="flex items-center justify-between border-b border-border pb-2">
+                <span className="font-extrabold text-xs text-foreground">Sales & Purchase History</span>
               </div>
-              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#F97316] rounded-full"
-                  style={{ width: `${totalSales ? Math.min(100, (totalReceivables / totalSales) * 100) : 0}%` }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-muted-foreground">Supplier Dues (Payables)</span>
-                <span className="text-red-600 font-bold">{fmt(totalPayables)}</span>
-              </div>
-              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-red-600 rounded-full"
-                  style={{ width: `${totalPurchases ? Math.min(100, (totalPayables / totalPurchases) * 100) : 0}%` }}
-                />
-              </div>
+              {hasChartData ? (
+                <div className="w-full min-h-[180px] h-48 pt-2">
+                  <ResponsiveContainer width="100%" height={180} minHeight={180}>
+                    <AreaChart data={trendSeries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#F97316" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#F97316" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorPurchases" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#0F172A" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#0F172A" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                      <XAxis dataKey="month" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "#0F172A", color: "#FFF", borderRadius: "12px", fontSize: "11px", border: "none" }}
+                        formatter={(val: any) => [fmt(Number(val)), ""]}
+                      />
+                      <Area type="monotone" dataKey="sales" name="Sales" stroke="#F97316" strokeWidth={2.5} fillOpacity={1} fill="url(#colorSales)" />
+                      <Area type="monotone" dataKey="purchases" name="Purchases" stroke="var(--chart-1)" strokeWidth={2} fillOpacity={1} fill="url(#colorPurchases)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground italic py-3 text-center">No trend data logged yet.</p>
+              )}
             </div>
           </div>
         )}
