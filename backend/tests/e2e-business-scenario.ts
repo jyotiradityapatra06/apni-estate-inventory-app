@@ -264,6 +264,7 @@ async function main() {
       invoiceId: invoice.id,
       amount: 10000,
       paymentMethod: "UPI",
+      referenceNumber: `UPI-${suffix}`,
       idempotencyKey: cpKey,
       notes: "Partial customer payment"
     });
@@ -301,6 +302,42 @@ async function main() {
     const ledgerCpRev = ledgerCpEntries.find(x => x.transactionType === "CUSTOMER_PAYMENT_REVERSAL");
     assert(ledgerCpRev && fmt(ledgerCpRev.debitAmount) === 10000, "Opposite customer payment ledger entry debit amount incorrect");
     console.log(`Ledger Reversal Entry Added: Customer Payment Reversal Debit = ₹${fmt(ledgerCpRev?.debitAmount)}`);
+
+    // Advance payments remain unallocated, affect customer credit, and are idempotent.
+    const advanceKey = crypto.randomUUID();
+    const advanceRes = await call("POST", "/customer-payments", ownerA, {
+      customerId: customer.id,
+      invoiceId: null,
+      amount: 15000,
+      paymentMethod: "CASH",
+      idempotencyKey: advanceKey,
+      notes: "Advance / unallocated customer payment",
+    });
+    assert(advanceRes.status === 201, `Failed to record advance payment: ${advanceRes.text}`);
+    const advancePayment = advanceRes.json.data;
+    assert(advancePayment.invoiceId === null, "Advance payment must remain unallocated.");
+    const customerAfterAdvance = await prisma.customer.findUniqueOrThrow({ where: { id: customer.id } });
+    const invoiceAfterAdvance = await prisma.invoice.findUniqueOrThrow({ where: { id: invoice.id } });
+    assert(fmt(customerAfterAdvance.outstandingBalance) === -840, `Customer credit should be 840, got ${fmt(customerAfterAdvance.outstandingBalance)}`);
+    assert(fmt(invoiceAfterAdvance.balanceDue) === 14160, "Advance payment must not change an invoice balance.");
+    const advanceLedger = await prisma.ledgerEntry.findFirstOrThrow({ where: { businessId: businessA.id, referenceId: advancePayment.id } });
+    assert(fmt(advanceLedger.creditAmount) === 15000, "Advance payment ledger credit mismatch.");
+
+    const advanceDuplicateRes = await call("POST", "/customer-payments", ownerA, {
+      customerId: customer.id,
+      invoiceId: null,
+      amount: 15000,
+      paymentMethod: "CASH",
+      idempotencyKey: advanceKey,
+    });
+    assert(advanceDuplicateRes.status === 201 && advanceDuplicateRes.json.data.id === advancePayment.id, "Advance idempotency must return the original payment.");
+    const advanceCount = await prisma.customerPayment.count({ where: { businessId: businessA.id, idempotencyKey: advanceKey } });
+    assert(advanceCount === 1, "Duplicate advance submission created more than one payment.");
+
+    const advanceRevRes = await call("POST", `/customer-payments/${advancePayment.id}/reverse`, ownerA);
+    assert(advanceRevRes.status === 200, `Failed to reverse advance payment: ${advanceRevRes.text}`);
+    const customerAfterAdvanceRev = await prisma.customer.findUniqueOrThrow({ where: { id: customer.id } });
+    assert(fmt(customerAfterAdvanceRev.outstandingBalance) === 14160, "Advance reversal did not restore the customer balance.");
 
     // 17. Create paid GST expense (₹5,000, gstRate: 18, total: ₹5,900)
     const categoryName = `E2E Expense Category ${suffix}`;

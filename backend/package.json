@@ -22,6 +22,7 @@
     "test:phase310": "npx ts-node --files tests/phase310.expense-management.ts",
     "test:phase311": "npx ts-node --files tests/phase311.reports-analytics.ts",
     "test:e2e": "npx ts-node --files tests/e2e-business-scenario.ts",
+    "test:payments": "npx ts-node --files tests/payment-workflow.ts",
     "test:perf": "npx ts-node --files tests/performance-scale.ts"
   },
   "dependencies": {

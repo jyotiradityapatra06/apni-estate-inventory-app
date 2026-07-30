@@ -257,7 +257,7 @@ export default function PaymentsPage() {
                       <p className="font-extrabold text-foreground">{p.customer?.name || "—"}</p>
                       {p.customer?.customerCode && <p className="text-[10px] text-muted-foreground font-bold">{p.customer.customerCode}</p>}
                     </td>
-                    <td className="p-3.5 font-semibold text-muted-foreground">{p.invoice?.invoiceNumber || "—"}</td>
+                    <td className="p-3.5 font-semibold text-muted-foreground">{p.invoice?.invoiceNumber || "Advance / Unallocated"}</td>
                     <td className="p-3.5 text-right font-black text-emerald-700 text-sm">{fmt(p.amount)}</td>
                     <td className="p-3.5">
                       <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-[10px] font-bold uppercase text-muted-foreground">
@@ -320,7 +320,7 @@ export default function PaymentsPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-[11px] font-medium text-muted-foreground">
-                  <p>Invoice: <strong className="text-foreground">{p.invoice?.invoiceNumber || "—"}</strong></p>
+                  <p>Invoice: <strong className="text-foreground">{p.invoice?.invoiceNumber || "Advance / Unallocated"}</strong></p>
                   <p className="text-right">Date: <strong>{new Date(p.paymentDate).toLocaleDateString("en-IN")}</strong></p>
                 </div>
 

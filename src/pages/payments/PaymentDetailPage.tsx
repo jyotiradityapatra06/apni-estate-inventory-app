@@ -23,7 +23,7 @@ export default function PaymentDetailPage() {
   if (!p) return <div className="h-40 animate-pulse rounded-xl bg-slate-200" />;
 
   const reverse = async () => {
-    if (!confirm("Reverse this payment and restore the invoice balance?")) return;
+    if (!confirm(p.invoice ? "Reverse this payment and restore the invoice balance?" : "Reverse this advance payment and restore the customer account balance?")) return;
     try {
       await paymentApi.reverse(id);
       toast.success("Payment reversed");
@@ -65,7 +65,7 @@ export default function PaymentDetailPage() {
         <div className="mt-6 grid gap-4 border-t pt-5 md:grid-cols-2 text-xs">
           {[
             ["Customer", p.customer?.name],
-            ["Invoice", p.invoice?.invoiceNumber],
+            ["Invoice", p.invoice?.invoiceNumber || "Advance / Unallocated Payment"],
             ["Method", p.paymentMethod?.replaceAll("_", " ")],
             ["Reference", p.referenceNumber || "—"],
             ["Received by", p.receivedBy?.name],
@@ -123,7 +123,7 @@ export default function PaymentDetailPage() {
           </div>
           <div>
             <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Invoice Reference</span>
-            <p className="text-foreground mt-1">{p.invoice?.invoiceNumber}</p>
+            <p className="text-foreground mt-1">{p.invoice?.invoiceNumber || "Advance / Unallocated Payment"}</p>
           </div>
           <div>
             <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Authorized Signatory</span>

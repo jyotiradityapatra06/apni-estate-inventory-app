@@ -121,28 +121,38 @@ export const create = async (businessId: string, userId: string, input: unknown)
     }
     const [customer, invoice] = await Promise.all([
       tx.customer.findFirst({ where: { id: data.customerId, businessId, isActive: true } }),
-      tx.invoice.findFirst({ where: { id: data.invoiceId, businessId } }),
+      data.invoiceId
+        ? tx.invoice.findFirst({ where: { id: data.invoiceId, businessId } })
+        : Promise.resolve(null),
     ]);
     if (!customer) throw new ApiError(404, "Customer not found or inactive.");
-    if (!invoice || invoice.customerId !== customer.id) throw new ApiError(404, "Invoice not found for this customer.");
-    if (!["ISSUED", "PARTIALLY_PAID"].includes(invoice.status)) throw new ApiError(400, "Payments can only be recorded against an issued invoice.");
-    if (amount.gt(invoice.balanceDue)) throw new ApiError(400, "Payment amount cannot exceed the invoice balance.");
+    if (data.invoiceId) {
+      if (!invoice || invoice.customerId !== customer.id) throw new ApiError(404, "Invoice not found for this customer.");
+      if (!["ISSUED", "PARTIALLY_PAID"].includes(invoice.status)) throw new ApiError(400, "Payments can only be recorded against an issued invoice.");
+      if (amount.gt(invoice.balanceDue)) throw new ApiError(400, "Payment amount cannot exceed the invoice balance.");
+    }
 
     const paymentNumber = await nextDocumentNumber(tx, businessId, "CUSTOMER_PAYMENT", "PAY");
-    const newAmountPaid = money(invoice.amountPaid.plus(amount));
-    const newBalanceDue = money(invoice.balanceDue.minus(amount));
-    const invoiceStatus = newBalanceDue.eq(0) ? "PAID" : "PARTIALLY_PAID";
-    await tx.invoice.update({ where: { id: invoice.id }, data: { amountPaid: newAmountPaid, balanceDue: newBalanceDue, status: invoiceStatus } });
+    if (invoice) {
+      const newAmountPaid = money(invoice.amountPaid.plus(amount));
+      const newBalanceDue = money(invoice.balanceDue.minus(amount));
+      const invoiceStatus = newBalanceDue.eq(0) ? "PAID" : "PARTIALLY_PAID";
+      await tx.invoice.update({ where: { id: invoice.id }, data: { amountPaid: newAmountPaid, balanceDue: newBalanceDue, status: invoiceStatus } });
+    }
     await tx.customer.update({
       where: { id: customer.id },
-      data: { outstandingBalance: Math.max(0, customer.outstandingBalance - Number(amount.toString())) },
+      data: {
+        outstandingBalance: invoice
+          ? Math.max(0, customer.outstandingBalance - Number(amount.toString()))
+          : customer.outstandingBalance - Number(amount.toString()),
+      },
     });
     const payment = await tx.customerPayment.create({
       data: {
         paymentNumber,
         paymentDate: data.paymentDate ? new Date(data.paymentDate) : new Date(),
         customerId: customer.id,
-        invoiceId: invoice.id,
+        invoiceId: invoice?.id ?? null,
         amount,
         paymentMethod: data.paymentMethod,
         referenceNumber: data.referenceNumber,
@@ -164,7 +174,9 @@ export const create = async (businessId: string, userId: string, input: unknown)
       amount,
       debitAmount: 0,
       creditAmount: amount,
-      description: `Payment received against ${invoice.invoiceNumber}`,
+      description: invoice
+        ? `Payment received against ${invoice.invoiceNumber}`
+        : "Advance / unallocated customer payment received",
       transactionDate: payment.paymentDate,
       createdById: userId,
       idempotencyKey: `CUSTOMER_PAYMENT:${payment.id}`,
@@ -181,15 +193,15 @@ export const reverse = async (businessId: string, id: string) => prisma.$transac
   const payment = await tx.customerPayment.findFirst({ where: { id, businessId }, include: { invoice: true, customer: true } });
   if (!payment) throw new ApiError(404, "Customer payment not found.");
   if (payment.status !== "POSTED") throw new ApiError(400, "Payment is already reversed.");
-  if (!payment.invoice) throw new ApiError(400, "Payment is not linked to an invoice.");
-  if (payment.invoice.status === "CANCELLED") throw new ApiError(400, "Cannot reverse a payment on a cancelled invoice.");
-
-  const newAmountPaid = money(payment.invoice.amountPaid.minus(payment.amount));
-  const newBalanceDue = money(payment.invoice.balanceDue.plus(payment.amount));
-  await tx.invoice.update({
-    where: { id: payment.invoice.id },
-    data: { amountPaid: newAmountPaid, balanceDue: newBalanceDue, status: newAmountPaid.eq(0) ? "ISSUED" : "PARTIALLY_PAID" },
-  });
+  if (payment.invoice) {
+    if (payment.invoice.status === "CANCELLED") throw new ApiError(400, "Cannot reverse a payment on a cancelled invoice.");
+    const newAmountPaid = money(payment.invoice.amountPaid.minus(payment.amount));
+    const newBalanceDue = money(payment.invoice.balanceDue.plus(payment.amount));
+    await tx.invoice.update({
+      where: { id: payment.invoice.id },
+      data: { amountPaid: newAmountPaid, balanceDue: newBalanceDue, status: newAmountPaid.eq(0) ? "ISSUED" : "PARTIALLY_PAID" },
+    });
+  }
   await tx.customer.update({
     where: { id: payment.customerId },
     data: { outstandingBalance: { increment: Number(payment.amount.toString()) } },
