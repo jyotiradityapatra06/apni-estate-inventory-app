@@ -5,6 +5,9 @@ import { customerApi } from "../../api/customer.api";
 import { PageHeader, SectionHeader } from "../../app/components/common/PageHeader";
 import type { CustomerInput } from "../../types/customer.types";
 
+type CustomerField = "name" | "phone" | "email" | "gstin" | "stateCode";
+type FieldErrors = Partial<Record<CustomerField, string>>;
+
 const empty: CustomerInput = {
   name: "",
   phone: "",
@@ -27,15 +30,21 @@ const cls =
 const phonePattern = /^(?:\+91[ -]?)?[6-9]\d{9}$/;
 const gstPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
 const stateCodePattern = /^[0-9]{2}$/;
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const optionalText = (value: string | null | undefined) => value?.trim() || null;
+const safeNumber = (value: number | null | undefined) =>
+  typeof value === "number" && Number.isFinite(value) ? value : 0;
 
 export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
   const { id = "" } = useParams();
   const nav = useNavigate();
-  const first = useRef<HTMLInputElement>(null);
+  const fieldRefs = useRef<Partial<Record<CustomerField, HTMLInputElement | null>>>({});
+  const requestActive = useRef(false);
   const [form, setForm] = useState<CustomerInput>(empty);
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   useEffect(() => {
     if (mode === "edit") {
@@ -65,35 +74,63 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
     }
   }, [id, mode]);
 
-  const set = <K extends keyof CustomerInput>(k: K, v: CustomerInput[K]) =>
+  const set = <K extends keyof CustomerInput>(k: K, v: CustomerInput[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
+    if (k in fieldErrors) setFieldErrors((current) => ({ ...current, [k]: undefined }));
+  };
+
+  const focusFirstInvalid = (errors: FieldErrors) => {
+    const firstInvalid = (["name", "phone", "email", "gstin", "stateCode"] as CustomerField[])
+      .find((field) => errors[field]);
+    if (!firstInvalid) return;
+    requestAnimationFrame(() => {
+      const input = fieldRefs.current[firstInvalid];
+      input?.scrollIntoView({ behavior: "smooth", block: "center" });
+      input?.focus({ preventScroll: true });
+    });
+  };
+
+  const validate = (): FieldErrors => {
+    const errors: FieldErrors = {};
+    if (form.name.trim().length < 2) errors.name = "Enter a customer name with at least 2 characters.";
+    if (!phonePattern.test(form.phone.replace(/\s/g, ""))) errors.phone = "Enter a valid 10-digit Indian mobile number.";
+    if (form.email?.trim() && !emailPattern.test(form.email.trim())) errors.email = "Enter a valid email address.";
+    if (form.gstin?.trim() && !gstPattern.test(form.gstin.trim().toUpperCase())) {
+      errors.gstin = "Enter a valid 15-character GSTIN (e.g., 27AAAAA0000A1Z5).";
+    }
+    if (form.stateCode?.trim() && !stateCodePattern.test(form.stateCode.trim())) {
+      errors.stateCode = "State Code must be exactly 2 numeric digits (e.g., 27).";
+    }
+    return errors;
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (!phonePattern.test(form.phone.replace(/\s/g, ""))) {
-      setError("Please enter a valid 10-digit Indian phone number.");
-      first.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const errors = validate();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      focusFirstInvalid(errors);
       return;
     }
-
-    if (form.gstin && !gstPattern.test(form.gstin)) {
-      setError("Please enter a valid 15-character GSTIN (e.g., 27AAAAA0000A1Z5).");
-      return;
-    }
-
-    if (form.stateCode && !stateCodePattern.test(form.stateCode)) {
-      setError("State Code must be exactly 2 numeric digits (e.g., 27).");
-      return;
-    }
-
-    if (saving) return;
+    if (requestActive.current) return;
+    requestActive.current = true;
     setSaving(true);
     try {
-      const payload = {
+      const payload: CustomerInput = {
         ...form,
-        email: form.email?.trim() || null,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: optionalText(form.email),
+        gstin: optionalText(form.gstin)?.toUpperCase() || null,
+        state: optionalText(form.state),
+        stateCode: optionalText(form.stateCode),
+        billingAddress: optionalText(form.billingAddress),
+        shippingAddress: optionalText(form.shippingAddress),
+        notes: optionalText(form.notes),
+        creditLimit: safeNumber(form.creditLimit),
+        creditDays: safeNumber(form.creditDays),
+        openingBalance: safeNumber(form.openingBalance),
       };
       const r = mode === "create" ? await customerApi.create(payload) : await customerApi.update(id, payload);
       toast.success(mode === "create" ? "Customer added successfully" : "Customer updated successfully");
@@ -101,8 +138,11 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
       window.dispatchEvent(new Event("notifications:refresh"));
       nav(`/customers/${r.data.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Customer could not be saved.");
+      const message = err instanceof Error ? err.message : "Customer could not be saved.";
+      setError(message);
+      toast.error(message);
     } finally {
+      requestActive.current = false;
       setSaving(false);
     }
   };
@@ -110,14 +150,14 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
   if (loading) return <div className="h-64 animate-pulse rounded-2xl bg-slate-200" />;
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-44 md:pb-28">
+    <form id="customer-create-form" noValidate onSubmit={submit} className="mx-auto max-w-4xl space-y-6 pb-44 md:pb-28">
       <PageHeader
         title={mode === "create" ? "Add New Customer" : "Edit Customer Details"}
         description={mode === "create" ? "Add contact, GSTIN, location, and credit threshold details." : "Update customer contact, location, address, and credit settings."}
       />
 
       {error && (
-        <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-bold text-red-800">
+        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-bold text-red-800">
           {error}
         </p>
       )}
@@ -128,44 +168,57 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
           <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Customer Name *
             <input
-              ref={first}
-              required
+              ref={(element) => { fieldRefs.current.name = element; }}
+              aria-invalid={Boolean(fieldErrors.name)}
+              aria-describedby={fieldErrors.name ? "customer-name-error" : undefined}
               placeholder="e.g. Rajesh Kumar or Shivam Builders"
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
-              className={cls}
+              className={`${cls} ${fieldErrors.name ? "border-red-500" : ""}`}
             />
+            {fieldErrors.name && <span id="customer-name-error" className="mt-1 block text-[11px] font-bold normal-case text-red-600">{fieldErrors.name}</span>}
           </label>
           <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Phone Number *
             <input
-              required
+              ref={(element) => { fieldRefs.current.phone = element; }}
+              aria-invalid={Boolean(fieldErrors.phone)}
+              aria-describedby={fieldErrors.phone ? "customer-phone-error" : undefined}
               inputMode="tel"
               placeholder="10-digit mobile number"
               value={form.phone}
               onChange={(e) => set("phone", e.target.value)}
-              className={cls}
+              className={`${cls} ${fieldErrors.phone ? "border-red-500" : ""}`}
             />
+            {fieldErrors.phone && <span id="customer-phone-error" className="mt-1 block text-[11px] font-bold normal-case text-red-600">{fieldErrors.phone}</span>}
           </label>
           <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             Email Address
             <input
+              ref={(element) => { fieldRefs.current.email = element; }}
+              aria-invalid={Boolean(fieldErrors.email)}
+              aria-describedby={fieldErrors.email ? "customer-email-error" : undefined}
               type="email"
               placeholder="e.g. contact@business.com"
               value={form.email || ""}
               onChange={(e) => set("email", e.target.value)}
-              className={cls}
+              className={`${cls} ${fieldErrors.email ? "border-red-500" : ""}`}
             />
+            {fieldErrors.email && <span id="customer-email-error" className="mt-1 block text-[11px] font-bold normal-case text-red-600">{fieldErrors.email}</span>}
           </label>
           <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             GSTIN / Tax ID
             <input
+              ref={(element) => { fieldRefs.current.gstin = element; }}
+              aria-invalid={Boolean(fieldErrors.gstin)}
+              aria-describedby={fieldErrors.gstin ? "customer-gstin-error" : undefined}
               maxLength={15}
               placeholder="15-digit GSTIN (Optional)"
               value={form.gstin || ""}
               onChange={(e) => set("gstin", e.target.value.toUpperCase())}
-              className={cls}
+              className={`${cls} ${fieldErrors.gstin ? "border-red-500" : ""}`}
             />
+            {fieldErrors.gstin && <span id="customer-gstin-error" className="mt-1 block text-[11px] font-bold normal-case text-red-600">{fieldErrors.gstin}</span>}
           </label>
           <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             State Name
@@ -179,13 +232,17 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
           <label className="text-xs font-black text-muted-foreground uppercase tracking-wider block">
             GST State Code
             <input
+              ref={(element) => { fieldRefs.current.stateCode = element; }}
+              aria-invalid={Boolean(fieldErrors.stateCode)}
+              aria-describedby={fieldErrors.stateCode ? "customer-state-code-error" : undefined}
               maxLength={2}
               inputMode="numeric"
               placeholder="2-digit numeric code (e.g. 27)"
               value={form.stateCode || ""}
               onChange={(e) => set("stateCode", e.target.value)}
-              className={cls}
+              className={`${cls} ${fieldErrors.stateCode ? "border-red-500" : ""}`}
             />
+            {fieldErrors.stateCode && <span id="customer-state-code-error" className="mt-1 block text-[11px] font-bold normal-case text-red-600">{fieldErrors.stateCode}</span>}
           </label>
         </div>
       </section>
@@ -289,6 +346,8 @@ export function CustomerFormPage({ mode }: { mode: "create" | "edit" }) {
         <button
           disabled={saving}
           type="submit"
+          form="customer-create-form"
+          aria-busy={saving}
           className="min-h-[48px] flex-[2] rounded-xl bg-[#F97316] hover:bg-orange-600 text-xs sm:text-sm font-extrabold text-white cursor-pointer shadow-xs disabled:opacity-60 md:flex-none md:px-8"
         >
           {saving ? "Saving Customer…" : mode === "create" ? "Add Customer" : "Save Changes"}
