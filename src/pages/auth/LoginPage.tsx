@@ -18,11 +18,11 @@ import {
 import { toast } from "sonner";
 import { getHomePathForRole } from "../../utils/permissions";
 
-export const LoginPage = () => {
+export const LoginPage = ({ initialMode = "login" }: { initialMode?: "login" | "signup" }) => {
   const navigate = useNavigate();
   const { login, register } = useAuth();
 
-  const [isRegister, setIsRegister] = useState(false);
+  const [isRegister, setIsRegister] = useState(initialMode === "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");

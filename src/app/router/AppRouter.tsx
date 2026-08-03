@@ -79,6 +79,7 @@ const TransferFormPage=lazy(()=>import("../../features/transfers/TransferFormPag
 const TransferDetailPage=lazy(()=>import("../../features/transfers/TransferDetailPage").then(m=>({default:m.TransferDetailPage})));
 const DriverTripsPage=lazy(()=>import("../../pages/driver/DriverTripsPage"));
 const PublicInvoicePage = lazy(() => import("../../pages/invoices/PublicInvoicePage"));
+const LandingPage = lazy(() => import("../../pages/marketing/LandingPage"));
 const RouteLoading=()=> <div className="space-y-3" role="status" aria-label="Loading page"><div className="h-8 w-48 animate-pulse rounded bg-slate-200"/><div className="h-32 animate-pulse rounded-xl bg-slate-200"/><div className="h-32 animate-pulse rounded-xl bg-slate-200"/></div>;
 
 const HomeRedirect = () => {
@@ -92,16 +93,16 @@ export const AppRouter = () => {
       <BrowserRouter>
         <Suspense fallback={<RouteLoading/>}><Routes>
           {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/login" element={<LoginPage initialMode="login" />} />
+          <Route path="/auth/signup" element={<LoginPage initialMode="signup" />} />
           <Route path="/i/:token" element={<PublicInvoicePage />} />
           <Route path="/unauthorized" element={<AccessDeniedPage />} />
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              {/* Redirect / to role-based home */}
-              <Route path="/" element={<HomeRedirect />} />
-              
               {/* Permission Guarded Routes */}
               <Route element={<PermissionGuard permission="dashboard:view" />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
